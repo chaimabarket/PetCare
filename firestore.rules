@@ -1,0 +1,53 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return signedIn() && request.auth.uid == userId;
+    }
+
+    // Module Utilisateurs : chacun lit et modifie uniquement son propre profil.
+    match /users/{userId} {
+      allow read: if isOwner(userId);
+
+      // Le rôle choisi à l'inscription ne peut pas être « admin ».
+      allow create: if isOwner(userId)
+        && request.resource.data.role in ['proprietaire', 'prestataire', 'refuge'];
+
+      // L'utilisateur ne peut modifier ni son rôle ni son e-mail.
+      allow update: if isOwner(userId)
+        && request.resource.data.role == resource.data.role
+        && request.resource.data.email == resource.data.email;
+
+      allow delete: if false;
+
+      // Notifications dans l'application.
+      match /notifications/{notificationId} {
+        allow read, delete: if isOwner(userId);
+
+        // N'importe quel utilisateur connecté peut notifier un autre utilisateur
+        // (ex. un refuge qui accepte une candidature). La notification arrive non lue.
+        allow create: if signedIn()
+          && request.resource.data.keys().hasOnly(['title', 'body', 'category', 'read', 'createdAt'])
+          && request.resource.data.title is string
+          && request.resource.data.body is string
+          && request.resource.data.read == false
+          && request.resource.data.createdAt == request.time;
+
+        // Le destinataire peut seulement la marquer comme lue.
+        allow update: if isOwner(userId)
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+      }
+    }
+
+    // Tout le reste reste fermé tant que les autres modules n'ont pas ajouté leurs règles.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "background": "#f8f9ff", "outline-variant": "#bdc9c6", "on-tertiary-fixed": "#370e00", "surface-container-highest": "#d9e3f6", "on-secondary-fixed-variant": "#6f3723", "tertiary-fixed": "#ffdbce", "primary-container": "#0f766e", "tertiary": "#7f4025", "on-primary-fixed": "#00201d", "on-surface-variant": "#3e4947", "on-secondary-fixed": "#380d01", "inverse-surface": "#27313f", "surface-bright": "#f8f9ff", "on-tertiary-container": "#ffe5db", "surface-container-high": "#dee9fc", "on-surface": "#121c2a", "surface": "#f8f9ff", "inverse-primary": "#80d5cb", "surface-dim": "#d0dbed", "secondary": "#8c4e38", "on-error": "#ffffff", "surface-tint": "#006a63", "on-tertiary-fixed-variant": "#72361b", "on-error-container": "#93000a", "on-secondary-container": "#793f2a", "on-background": "#121c2a", "on-tertiary": "#ffffff", "error": "#ba1a1a", "primary-fixed-dim": "#80d5cb", "on-primary": "#ffffff", "secondary-container": "#feae92", "inverse-on-surface": "#eaf1ff", "tertiary-container": "#9c573a", "surface-variant": "#d9e3f6", "on-primary-container": "#a3faef", "primary": "#005c55", "surface-container-low": "#eff4ff", "primary-fixed": "#9cf2e8", "on-primary-fixed-variant": "#00504a", "error-container": "#ffdad6", "surface-container": "#e6eeff", "tertiary-fixed-dim": "#ffb598", "surface-container-lowest": "#ffffff", "outline": "#6e7977", "secondary-fixed-dim": "#ffb59c", "secondary-fixed": "#ffdbcf", "on-secondary": "#ffffff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "margin": "1.5rem", "space-xs": "0.25rem", "gutter-mobile": "0.75rem", "space-lg": "1.5rem", "space-sm": "0.5rem", "margin-mobile": "1rem", "space-xl": "2rem", "gutter": "1rem", "space-md": "1rem" }, fontFamily: { "headline-md": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "headline-lg-mobile": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "body-sm": ["Inter"], "body-md": ["Inter"], "label-lg": ["Inter"], "headline-sm": ["Inter"] }, fontSize: { "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "fontWeight": "700" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }] } } } }</script><style>@layer base{html,body{width:100%;margin:0;padding:0;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-10 h-10 rounded-full bg-surface-container-low flex items-center justify-center"><span class="material-symbols-outlined text-primary text-[24px]">pets</span></div><h1 class="font-headline-sm text-headline-sm text-on-surface font-semibold tracking-tight">Accueil</h1></div><div class="flex items-center gap-space-xs"><button aria-label="Notifications" class="w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors"><span class="material-symbols-outlined text-[22px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 w-full pt-16 pb-24 bg-surface px-margin-mobile"><div class="flex flex-col w-full gap-y-space-lg pb-10">
+<!-- Section Salutation & Profil -->
+<section class="flex items-center justify-between pt-space-xs">
+<div class="flex flex-col">
+<div class="flex items-center gap-space-xs">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Bonjour Lina</h2>
+<span class="text-[22px] select-none transform hover:rotate-12 transition-transform duration-200">👋</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">Prenez soin de vos compagnons aujourd'hui</p>
+</div>
+<div class="relative flex items-center">
+<div class="w-12 h-12 rounded-full overflow-hidden shadow-sm bg-surface-container-high flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Close up warm lifestyle portrait of Lina, a young smiling woman with brown wavy hair and a kind expression in gentle natural sunlight, soft cream and teal cozy background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCnuLbbP4JMJIV54-WPcIpu_xGKdPND3iSL3sEtPcDBtaN_gS7m_wEEP9oTNWJJeJ9RPHQ3aWcolEppsdzwUG8icpQnyJteElXeXaKdoU13ds7TadklsCPoPDijDCIveVbYS32s9zskByq-l-8XIUTtQ0To-n5NvywUes8kt9zZu8jxoyA9WG1LeuSCjKF1Kl0JJiqO7gP_uKob7A2BOKzSbgwN6dcAAojBYPHe782AzPToQn-vcdyZ"/>
+</div>
+<span class="absolute top-0 right-0 w-3.5 h-3.5 rounded-full bg-secondary-container flex items-center justify-center">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+</span>
+</div>
+</section>
+<!-- Section 1: Mes animaux (Horizontal avatar scroll) -->
+<section class="flex flex-col gap-space-sm">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Mes animaux</h3>
+<span class="font-label-md text-label-md px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-semibold">3</span>
+</div>
+<button class="font-label-md text-label-md text-primary hover:text-primary-container transition-colors">Gérer</button>
+</div>
+<!-- Carrousel horizontal compact et engageant -->
+<div class="flex items-start gap-space-md overflow-x-auto no-scrollbar py-space-xs -mx-margin-mobile px-margin-mobile">
+<!-- Milo -->
+<div class="flex flex-col items-center gap-1.5 flex-shrink-0 cursor-pointer group">
+<div class="relative w-16 h-16 rounded-full p-0.5 bg-surface-container-lowest shadow-sm group-hover:scale-105 transition-transform duration-200">
+<div class="w-full h-full rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Happy Golden Retriever dog Milo head portrait, joyful smiling expression, golden fluffy coat, bright outdoor garden lighting, warm teal-filtered ambiance." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAcMfjokXR8mCPzDPxH2KAAP_Nrcuslzu2OCNKKN5s_wf9FiqaDG-zC7RiL2YOAG23QUjri3Hx10BeX0qg1T9cByKibQb_LUBNxSWPuBWpWCx2vpkL-nBTNHy_QiBdUwTNj-IT8XTo1KM-L5AkPbssXKc4RIY3SJJLZRxkzlgwGV6mS4vva4KBhb1-d_gVT6Bml_k-KMAcgQ-VvUCXxQw-2ETYwZpzbFWS4T6ByaPHLm2m5KU1w3hMY"/>
+</div>
+<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[13px]">pets</span>
+</span>
+</div>
+<div class="text-center">
+<p class="font-label-lg text-label-lg text-on-surface leading-tight">Milo</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Chien • 3 ans</p>
+</div>
+</div>
+<!-- Luna -->
+<div class="flex flex-col items-center gap-1.5 flex-shrink-0 cursor-pointer group">
+<div class="relative w-16 h-16 rounded-full p-0.5 bg-surface-container-lowest shadow-sm group-hover:scale-105 transition-transform duration-200">
+<div class="w-full h-full rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Cute calico cat Luna with green eyes and expressive whiskers, soft fur texture, warm indoor domestic setting, gentle studio lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYu-ZUGXClprEhh7gfIjzkRyaNvDsYxLM692roSFi8uvSdxmXOGLF_N-AvWCNcb16iaCVJjwXLWJcOEAddp8enEkWnu5F0oMgQS4SnP4QZEqPPQxeSGCrADQH-9Y7DdIHISrpVpYqqnxEMzP8XK3wS1nBILiF3YqfULPOPFejW_H3SVDMWRsJlxdFS1-I6c0MO3ANV-uTOfDh8rmyeyNXcgAvf1U-Trr101n2aRXAO2RRXC5RcNYrP"/>
+</div>
+<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-secondary text-on-secondary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[13px]">cruelty_free</span>
+</span>
+</div>
+<div class="text-center">
+<p class="font-label-lg text-label-lg text-on-surface leading-tight">Luna</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Chatte • 2 ans</p>
+</div>
+</div>
+<!-- Kiwi -->
+<div class="flex flex-col items-center gap-1.5 flex-shrink-0 cursor-pointer group">
+<div class="relative w-16 h-16 rounded-full p-0.5 bg-surface-container-lowest shadow-sm group-hover:scale-105 transition-transform duration-200">
+<div class="w-full h-full rounded-full overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Adorable dwarf fluffy rabbit Kiwi with tiny ears sitting playfully, soft clean minimalist studio environment, warm organic tone." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_DDdLZ1D16J9PHl5xbEzVfIsRZkk91td9KekEXXXDuS8jjXs_gALM2JCwZKr-mclbq_4eYTjUyXEreYUWSfYIEi1xWdFW3FnaVCs3nb9Q4JNY20PCG6WiXW58FI1aN6QE3Ytrzcg-8BiRXS2jeTIPD61xTtbXFiDQ2A2yi3-_IbQyUmXtUiSW953S6mSLq0MzGiVEBDPRvv701q2aAdbghzJ0QNW87Q3b3y7AqOYanWzawfMiIl0Q"/>
+</div>
+<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[13px]">favorite</span>
+</span>
+</div>
+<div class="text-center">
+<p class="font-label-lg text-label-lg text-on-surface leading-tight">Kiwi</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Lapin • 1 an</p>
+</div>
+</div>
+<!-- Ajouter un animal -->
+<div class="flex flex-col items-center gap-1.5 flex-shrink-0 cursor-pointer group">
+<div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center shadow-sm text-primary group-hover:bg-primary group-hover:text-on-primary transition-all duration-200">
+<span class="material-symbols-outlined text-[28px]">add</span>
+</div>
+<div class="text-center">
+<p class="font-label-lg text-label-lg text-primary leading-tight font-semibold">Ajouter</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Nouveau</p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 2: Card Prochains rendez-vous -->
+<section class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">calendar_month</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Prochains rendez-vous</h3>
+</div>
+<button class="font-label-md text-label-md text-primary font-semibold flex items-center gap-0.5 hover:underline">
+<span>Voir l'agenda</span>
+<span class="material-symbols-outlined text-[16px]">chevron_right</span>
+</button>
+</div>
+<!-- Liste des rendez-vous -->
+<div class="flex flex-col gap-space-sm">
+<!-- Rendez-vous 1 : Milo -->
+<div class="p-space-sm rounded-xl bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[15px] text-primary">schedule</span>
+            Jeudi 24 Oct. • 14:30
+          </span>
+<!-- Pill Confirmé (Vert) -->
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-bright text-[#059669] font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#10b981]"></span>
+            Confirmé
+          </span>
+</div>
+<div class="flex items-start justify-between gap-space-sm mt-0.5">
+<div class="flex flex-col">
+<p class="font-label-lg text-label-lg text-on-surface font-semibold">Visite annuelle & Vaccin CHPPi</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+              Clinique Vétérinaire des Pins
+            </p>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-highest px-2 py-1 rounded-lg flex-shrink-0">
+<span class="material-symbols-outlined text-[14px] text-primary">pets</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Milo</span>
+</div>
+</div>
+</div>
+<!-- Rendez-vous 2 : Luna -->
+<div class="p-space-sm rounded-xl bg-surface-container-low flex flex-col gap-space-xs">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant flex items-center gap-1 font-medium">
+<span class="material-symbols-outlined text-[15px] text-secondary">schedule</span>
+            Lundi 4 Nov. • 10:00
+          </span>
+<!-- Pill En attente (Ambre) -->
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-bright text-[#d97706] font-semibold flex items-center gap-1">
+<span class="w-1.5 h-1.5 rounded-full bg-[#f59e0b]"></span>
+            En attente
+          </span>
+</div>
+<div class="flex items-start justify-between gap-space-sm mt-0.5">
+<div class="flex flex-col">
+<p class="font-label-lg text-label-lg text-on-surface font-semibold">Détartrage & Bilan dentaire</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+              Dr. Martin (Cabinet Félin)
+            </p>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-highest px-2 py-1 rounded-lg flex-shrink-0">
+<span class="material-symbols-outlined text-[14px] text-secondary">cruelty_free</span>
+<span class="font-label-sm text-label-sm text-on-surface font-semibold">Luna</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 3: Card Rappels de soins -->
+<section class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-xs">
+<div class="w-8 h-8 rounded-lg bg-surface-container-low flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">notifications_active</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Rappels de soins</h3>
+</div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">2 actifs</span>
+</div>
+<div class="flex flex-col gap-space-sm">
+<!-- Rappel 1 : Milo Vaccin Rage -->
+<div class="p-space-sm rounded-xl bg-surface-container-low flex items-start gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-secondary-container/40 flex items-center justify-center text-secondary flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">vaccines</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between gap-space-xs">
+<p class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Vaccin Rage & Rappel annuel</p>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-semibold whitespace-nowrap">Milo</span>
+</div>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-[14px] text-[#f59e0b]">alarm</span>
+<p class="font-body-sm text-body-sm text-secondary font-medium">Échéance : dans 5 jours (29 Oct.)</p>
+</div>
+</div>
+</div>
+<!-- Rappel 2 : Traitement antiparasitaire -->
+<div class="p-space-sm rounded-xl bg-surface-container-low flex items-start gap-space-sm">
+<div class="w-9 h-9 rounded-full bg-primary-fixed flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[20px]">medication</span>
+</div>
+<div class="flex flex-col flex-1 min-w-0">
+<div class="flex items-center justify-between gap-space-xs">
+<p class="font-label-lg text-label-lg text-on-surface font-semibold truncate">Traitement antiparasitaire (Pipette)</p>
+<div class="flex items-center gap-1 flex-shrink-0">
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded-full bg-surface-container-high text-on-surface-variant font-semibold">Luna & Milo</span>
+</div>
+</div>
+<div class="flex items-center justify-between mt-1">
+<p class="font-body-sm text-body-sm text-on-surface-variant">Prévu le 1er Novembre</p>
+<button class="font-label-sm text-label-sm text-primary font-semibold flex items-center gap-1 bg-surface-container-lowest px-2 py-0.5 rounded-full shadow-sm hover:bg-primary hover:text-on-primary transition-all">
+<span class="material-symbols-outlined text-[14px]">check</span>
+              Fait
+            </button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Raccourcis rapides -->
+<section class="flex flex-col gap-space-sm">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Raccourcis rapides</h3>
+<div class="grid grid-cols-2 gap-space-sm">
+<!-- Shortcut 1: Adoption -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm flex flex-col justify-between h-36 cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-xl bg-secondary-container/60 flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-[#FFF0EB] text-[#E07A5F] font-semibold">
+            12 nouveaux
+          </span>
+</div>
+<div class="flex flex-col">
+<h4 class="font-label-lg text-label-lg text-on-surface font-bold group-hover:text-secondary transition-colors">Adoption</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Trouver un compagnon</p>
+</div>
+</div>
+<!-- Shortcut 2: Perdus & Trouvés -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm flex flex-col justify-between h-36 cursor-pointer hover:shadow-md transition-shadow relative overflow-hidden group">
+<div class="flex items-start justify-between">
+<div class="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[22px]">radar</span>
+</div>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container-high text-primary font-semibold">
+            Actif
+          </span>
+</div>
+<div class="flex flex-col">
+<h4 class="font-label-lg text-label-lg text-on-surface font-bold group-hover:text-primary transition-colors">Perdus & Trouvés</h4>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Signaler ou aider</p>
+</div>
+</div>
+</div>
+</section>
+</div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]" data-active-classes="text-primary font-semibold"><div class="h-16 flex items-center justify-around px-space-xs"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs transition-all text-primary font-semibold" data-path="accueil" href="#"><span class="material-symbols-outlined text-[24px]">home</span><span class="font-label-sm text-label-sm">Accueil</span></a><a class="flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-on-surface-variant hover:text-primary transition-all" data-path="mes-animaux" href="#"><span class="material-symbols-outlined text-[24px]">pets</span><span class="font-label-sm text-label-sm">Mes animaux</span></a><a class="flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-on-surface-variant hover:text-primary transition-all" data-path="communaute" href="#"><span class="material-symbols-outlined text-[24px]">volunteer_activism</span><span class="font-label-sm text-label-sm">Communauté</span></a><a class="flex flex-col items-center justify-center min-w-[64px] min-h-[44px] gap-space-xs text-on-surface-variant hover:text-primary transition-all" data-path="services" href="#"><span class="material-symbols-outlined text-[24px]">medical_services</span><span class="font-label-sm text-label-sm">Services</span></a></div></nav></body></html>
