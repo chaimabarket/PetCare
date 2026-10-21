@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "786501057730",
+    "project_id": "petcare-communit",
+    "storage_bucket": "petcare-communit.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:786501057730:android:eb685838b81068efa0cf5b",
+        "android_client_info": {
+          "package_name": "tn.pyxis.projet_flutter"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAWNTrD1_irNJd0wHrOJzBK3YnwiAu8hq4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
