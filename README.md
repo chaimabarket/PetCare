@@ -67,3 +67,26 @@ await NotificationService().send(
 ```
 
 L'Accueil (`lib/features/home/presentation/home_screen.dart`) contient des emplacements commentés pour les modules 1 (animaux), 2 (rappels de soins) et 3 (rendez-vous).
+
+## Module Adoption (branche `Adoption`)
+
+Code dans `lib/features/adoption/`, onglet Communauté dans `lib/features/community/`.
+
+- Fil d'adoption avec recherche et filtres (espèce, âge, sexe, taille, ville, badges, « Adopte-moi »), favoris.
+- Annonce : photos (5 max), badges de personnalité, compatibilités, besoins et conditions ; brouillon, publication, archivage.
+- Candidature en 4 étapes (logement, foyer, mode de vie, récapitulatif) avec score de compatibilité visible par l'annonceur.
+- Suivi : frise Envoyée → En étude → Acceptée → Adoptée. Une seule candidature acceptée (transaction) ; l'annonce passe Réservée puis Adoptée ; à l'adoption, les autres candidats sont refusés et notifiés.
+- Happy Tails : l'adoptant publie une histoire Avant / Après, les membres peuvent aimer.
+
+Collections Firestore :
+
+| Collection | Contenu |
+|---|---|
+| `adoptions/{id}` | annonce ; `status` : `brouillon`, `disponible`, `reservee`, `adoptee`, `archivee` |
+| `adoptions/{id}/photos/{0-4}` | photos compressées (base64, pas de Firebase Storage) |
+| `adoptionApplications/{listingId}_{uid}` | candidature, réponses et score ; une seule par personne et par annonce |
+| `happyTails/{listingId}` | histoire de l'adoptant |
+| `users/{uid}/adoptionFavorites`, `users/{uid}/likedHappyTails` | favoris et « j'aime » |
+| `reports/{id}` | signalements pour l'administrateur |
+
+Pour le module 1 : `AdoptionRepository.confirmAdoption` est l'endroit où copier la fiche de l'animal vers l'adoptant (`adopterId`) ; le carnet de santé n'est pas transmis.

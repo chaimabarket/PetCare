@@ -43,6 +43,125 @@ service cloud.firestore {
         allow update: if isOwner(userId)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
       }
+
+      // Module Adoption : favoris et « j'aime » des Happy Tails, privés.
+      match /adoptionFavorites/{listingId} {
+        allow read, write: if isOwner(userId);
+      }
+      match /likedHappyTails/{tailId} {
+        allow read, write: if isOwner(userId);
+      }
+    }
+
+    // ------------------------------------------------------------ Module Adoption
+
+    function userRole() {
+      return get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role;
+    }
+
+    function changed() {
+      return request.resource.data.diff(resource.data).affectedKeys();
+    }
+
+    function listingDoc(listingId) {
+      return get(/databases/$(database)/documents/adoptions/$(listingId));
+    }
+
+    // Annonces : visibles par tous une fois publiées ; le brouillon et l'archive restent privés.
+    match /adoptions/{listingId} {
+      allow read: if resource.data.status in ['disponible', 'reservee', 'adoptee']
+        || (signedIn() && resource.data.publisherId == request.auth.uid);
+
+      allow create: if signedIn()
+        && userRole() in ['proprietaire', 'refuge', 'admin']
+        && request.resource.data.publisherId == request.auth.uid
+        && request.resource.data.status in ['brouillon', 'disponible']
+        && request.resource.data.acceptedApplicationId == null;
+
+      allow update: if signedIn() && (
+        // L'annonceur : réservation uniquement depuis « disponible », adoption uniquement depuis « réservée ».
+        (resource.data.publisherId == request.auth.uid
+          && request.resource.data.publisherId == resource.data.publisherId
+          && (request.resource.data.status != 'reservee' || resource.data.status in ['disponible', 'reservee'])
+          && (request.resource.data.status != 'adoptee' || resource.data.status in ['reservee', 'adoptee']))
+        // Le candidat accepté qui retire sa candidature libère l'animal.
+        || (resource.data.status == 'reservee'
+          && resource.data.acceptedApplicationId == listingId + '_' + request.auth.uid
+          && changed().hasOnly(['status', 'acceptedApplicationId', 'updatedAt'])
+          && request.resource.data.status == 'disponible'
+          && request.resource.data.acceptedApplicationId == null)
+      );
+
+      // Une annonce n'est jamais supprimée : elle est archivée.
+      allow delete: if false;
+
+      match /photos/{photoId} {
+        allow read: if true;
+        allow write: if signedIn()
+          && getAfter(/databases/$(database)/documents/adoptions/$(listingId)).data.publisherId == request.auth.uid;
+      }
+    }
+
+    // Candidatures : id = {listingId}_{applicantId}, donc une seule par personne et par annonce.
+    match /adoptionApplications/{applicationId} {
+      // `resource == null` : permet de vérifier qu'on n'a pas déjà candidaté.
+      allow get: if signedIn() && (resource == null
+        || resource.data.applicantId == request.auth.uid
+        || resource.data.publisherId == request.auth.uid);
+      allow list: if signedIn()
+        && (resource.data.applicantId == request.auth.uid || resource.data.publisherId == request.auth.uid);
+
+      allow create: if signedIn()
+        && request.resource.data.applicantId == request.auth.uid
+        && applicationId == request.resource.data.listingId + '_' + request.auth.uid
+        && request.resource.data.status == 'envoyee'
+        && listingDoc(request.resource.data.listingId).data.status in ['disponible', 'reservee']
+        && listingDoc(request.resource.data.listingId).data.publisherId == request.resource.data.publisherId
+        && request.resource.data.publisherId != request.auth.uid;
+
+      allow update: if signedIn() && (
+        (resource.data.publisherId == request.auth.uid
+          && changed().hasOnly(['status', 'refusalReason', 'updatedAt'])
+          && request.resource.data.status in ['en_etude', 'acceptee', 'refusee', 'adoptee'])
+        || (resource.data.applicantId == request.auth.uid
+          && changed().hasOnly(['status', 'updatedAt'])
+          && request.resource.data.status == 'retiree'
+          && resource.data.status in ['envoyee', 'en_etude', 'acceptee'])
+      );
+
+      allow delete: if false;
+    }
+
+    // Happy Tails : publiées par l'adoptant de l'annonce, aimées par les membres connectés.
+    match /happyTails/{tailId} {
+      allow read: if true;
+
+      allow create: if signedIn()
+        && tailId == request.resource.data.listingId
+        && request.resource.data.authorId == request.auth.uid
+        && listingDoc(tailId).data.adopterId == request.auth.uid
+        && request.resource.data.likeCount == 0;
+
+      allow update: if signedIn() && (
+        (resource.data.authorId == request.auth.uid
+          && !changed().hasAny(['authorId', 'listingId', 'likeCount', 'createdAt']))
+        // Un « j'aime » : +1 si le like est créé dans le même lot, -1 s'il est supprimé.
+        || (changed().hasOnly(['likeCount'])
+          && ((request.resource.data.likeCount == resource.data.likeCount + 1
+              && existsAfter(/databases/$(database)/documents/users/$(request.auth.uid)/likedHappyTails/$(tailId))
+              && !exists(/databases/$(database)/documents/users/$(request.auth.uid)/likedHappyTails/$(tailId)))
+            || (request.resource.data.likeCount == resource.data.likeCount - 1
+              && !existsAfter(/databases/$(database)/documents/users/$(request.auth.uid)/likedHappyTails/$(tailId))
+              && exists(/databases/$(database)/documents/users/$(request.auth.uid)/likedHappyTails/$(tailId)))))
+      );
+
+      allow delete: if signedIn() && resource.data.authorId == request.auth.uid;
+    }
+
+    // Signalements (annonces d'adoption, Happy Tails) : lus par l'administrateur uniquement.
+    match /reports/{reportId} {
+      allow create: if signedIn() && request.resource.data.reporterId == request.auth.uid;
+      allow read: if signedIn() && userRole() == 'admin';
     }
 
     // Tout le reste reste fermé tant que les autres modules n'ont pas ajouté leurs règles.
