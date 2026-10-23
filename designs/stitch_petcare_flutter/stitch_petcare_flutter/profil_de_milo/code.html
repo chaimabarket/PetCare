@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-container-lowest": "#ffffff", "inverse-surface": "#27313f", "on-tertiary": "#ffffff", "background": "#f8f9ff", "surface-variant": "#d9e3f6", "surface-container-low": "#eff4ff", "tertiary-fixed-dim": "#ffb598", "surface": "#f8f9ff", "error-container": "#ffdad6", "surface-bright": "#f8f9ff", "outline-variant": "#bdc9c6", "on-tertiary-fixed": "#370e00", "primary-fixed-dim": "#80d5cb", "primary-fixed": "#9cf2e8", "on-surface": "#121c2a", "tertiary": "#7f4025", "primary-container": "#0f766e", "tertiary-fixed": "#ffdbce", "inverse-primary": "#80d5cb", "on-surface-variant": "#3e4947", "tertiary-container": "#9c573a", "surface-container-high": "#dee9fc", "surface-dim": "#d0dbed", "inverse-on-surface": "#eaf1ff", "on-primary-container": "#a3faef", "on-secondary-fixed": "#380d01", "on-primary": "#ffffff", "on-background": "#121c2a", "outline": "#6e7977", "on-primary-fixed-variant": "#00504a", "surface-container-highest": "#d9e3f6", "secondary-fixed": "#ffdbcf", "on-secondary-container": "#793f2a", "primary": "#005c55", "error": "#ba1a1a", "secondary-container": "#feae92", "on-error-container": "#93000a", "secondary": "#8c4e38", "on-error": "#ffffff", "on-secondary-fixed-variant": "#6f3723", "surface-tint": "#006a63", "secondary-fixed-dim": "#ffb59c", "on-tertiary-fixed-variant": "#72361b", "on-secondary": "#ffffff", "on-tertiary-container": "#ffe5db", "on-primary-fixed": "#00201d", "surface-container": "#e6eeff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter-mobile": "0.75rem", "space-xs": "0.25rem", "margin": "1.5rem", "margin-mobile": "1rem", "space-lg": "1.5rem", "gutter": "1rem", "space-md": "1rem", "space-xl": "2rem", "space-sm": "0.5rem" }, fontFamily: { "body-sm": ["Inter"], "headline-lg-mobile": ["Inter"], "label-lg": ["Inter"], "label-sm": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], "headline-md": ["Inter"], "body-md": ["Inter"], "headline-lg": ["Inter"], "body-lg": ["Inter"] }, fontSize: { "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "fontWeight": "700" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }] } } } };</script><style>@layer base { html, body { width: 100vw; margin: 0; padding: 0; } body { overscroll-behavior: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface text-on-surface font-body-md text-body-md min-h-screen flex flex-col antialiased"><header class="fixed top-0 inset-x-0 z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin-mobile flex items-center justify-between gap-space-xs"><div class="flex items-center min-w-0 gap-space-xs"><button aria-label="Retour à Mes animaux" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:text-primary transition-colors" onclick="window.location.hash='#mes-animaux'" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><h1 class="font-headline-sm text-headline-sm text-on-surface truncate">Profil De Milo</h1></div><div class="flex items-center gap-space-xs shrink-0"><button aria-label="Ajouter aux favoris" class="w-11 h-11 flex items-center justify-center rounded-full text-secondary hover:text-tertiary transition-colors" type="button"><span class="material-symbols-outlined text-[24px]">favorite</span></button><div class="relative flex items-center"><button aria-expanded="false" aria-haspopup="true" aria-label="Plus d'options" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface transition-colors" id="overflow-menu-button" onclick="const menu = document.getElementById('overflow-dropdown'); const isHidden = menu.classList.contains('hidden'); menu.classList.toggle('hidden'); this.setAttribute('aria-expanded', isHidden);" type="button"><span class="material-symbols-outlined text-[24px]">more_vert</span></button><div class="hidden absolute right-0 top-12 w-48 bg-surface-container-lowest rounded-xl shadow-[0_10px_15px_-3px_rgba(15,23,42,0.08)] py-space-xs z-50 flex flex-col" id="overflow-dropdown"><button class="w-full flex items-center gap-space-sm px-space-md py-space-sm text-left font-label-md text-label-md text-on-surface hover:bg-surface-container-low transition-colors" type="button"><span class="material-symbols-outlined text-[20px] text-primary">edit</span><span>Modifier le profil</span></button><button class="w-full flex items-center gap-space-sm px-space-md py-space-sm text-left font-label-md text-label-md text-secondary hover:bg-surface-container-low transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">archive</span><span>Archiver</span></button></div></div><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0 ml-space-xs"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col w-full pt-16 pb-safe bg-surface"><div class="flex flex-col w-full pb-8">
+<!-- 1. PHOTO SHOWCASE & CAROUSEL -->
+<section class="relative w-full">
+<!-- Main Hero Image Frame -->
+<div class="relative w-full h-80 bg-surface-container-high overflow-hidden">
+<img class="w-full h-full object-cover transition-opacity duration-300" data-alt="A radiant golden retriever named Milo sitting peacefully in a sun-drenched lush clover meadow, soft golden hour rim lighting, warm fur texture, candid, joyful expression, crisp natural background with subtle bokeh, organic teal and earthy tones, professional pet photography 8k" id="hero-dog-image" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA-S7PF07UkE-kRTniGtuRJM-UrPhhK8OPAsbrcyf8BuXQmh0qEYt0a_d-8e0r20Yk5DDNQY7fAKArj6F7QMelvhhfUeFvqA8RWqZ3hbUZSFcHfckeqX974ByWBUozzk149L_V9be4hkszFLI59r4abQn3-EGIqfyABlrSrQszb-7fUPEhw8FhEZ7iyQhliLcyAZY4WECKHvpnXImwnRk5Ak0qZY6VaklvQ06B-KngYHjLaGvpeidQN"/>
+<!-- Gentle ambient gradient overlays -->
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
+<!-- Top Overlay Badges -->
+<div class="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-auto">
+<span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-surface-container-lowest/90 backdrop-blur-md shadow-sm text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+          En pleine forme
+        </span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-inverse-surface/80 backdrop-blur-md shadow-sm text-inverse-on-surface font-label-sm text-label-sm tracking-wide">
+<span class="material-symbols-outlined text-[14px]">qr_code_2</span>
+          ICAD : 250269608...
+        </span>
+</div>
+<!-- Bottom floating micro action -->
+<div class="absolute bottom-4 right-4 pointer-events-auto">
+<button aria-label="Agrandir les photos" class="w-9 h-9 rounded-full bg-surface-container-lowest/90 backdrop-blur-md text-on-surface flex items-center justify-center shadow-md active:scale-95 transition-transform" onclick="toggleGalleryViewer()" type="button">
+<span class="material-symbols-outlined text-[18px]">fullscreen</span>
+</button>
+</div>
+</div>
+<!-- Thumbnails Strip -->
+<div class="px-margin-mobile -mt-6 relative z-10">
+<div class="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+<!-- Thumbnail 1 (Active) -->
+<button class="photo-thumb relative shrink-0 w-16 h-16 rounded-xl overflow-hidden shadow-sm shadow-primary/20 scale-105 transition-all" onclick="selectThumbnail(0)" type="button">
+<img class="w-full h-full object-cover" data-alt="Close up portrait of golden retriever Milo smiling softly outdoors in green grass with gentle morning lighting" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBME_hVdK_htzVA8WbvsBEbIYpQXq6NE6fQSt2S1rcLKs_RXEXm1SkWMH2uCBezmwIcNRVlUWbFi7JLiWE-7plxbOreXDxgWSH8bGDvbpkSseH_e5o5FBTGeakYf5qnGpPt8qB9uMhq1lfDTT_Q1pi10fLwXQ0Llj-i1nO5AMHFbzYJUDoDwiGOrs-ftxjGyrWFa2QJA4bUHYng4uGGXnJNg-PCUdmbuXRgeF1C8w660QgYXNB0btg-"/>
+<div class="thumb-indicator absolute inset-0 bg-primary/20"></div>
+</button>
+<!-- Thumbnail 2 -->
+<button class="photo-thumb relative shrink-0 w-16 h-16 rounded-xl overflow-hidden shadow-sm opacity-80 hover:opacity-100 transition-all" onclick="selectThumbnail(1)" type="button">
+<img class="w-full h-full object-cover" data-alt="Milo the golden retriever playfully catching a red tennis ball on green meadow grass, high energy daylight" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC7PYfFgn-R0Ly1XMis6u55_vCY-13P7ZlBEqO46QXG37GX2MNYwswqNFcBwG6Nc2ifZrOoCE6_7ME_N8c5powZ98Cwf9GRipm8DZVWoKeYFol5u4GbgoX3uNXpArpP5yeH6wmfHtLQrIeRXjtRqTZ8sNqKJ2QkgpkEtMCrGZQ7kYArT78ohn-GxuitYQPzFRpoTTXUVN-QS7cDipR27bDgQu2m3l6VU8cuC4735AY4P3-W-QB8cs0y"/>
+<div class="thumb-indicator hidden absolute inset-0 bg-primary/20"></div>
+</button>
+<!-- Thumbnail 3 -->
+<button class="photo-thumb relative shrink-0 w-16 h-16 rounded-xl overflow-hidden shadow-sm opacity-80 hover:opacity-100 transition-all" onclick="selectThumbnail(2)" type="button">
+<img class="w-full h-full object-cover" data-alt="Happy golden retriever dog sleeping cozy curled up in a modern warm living room on an earth-toned velvet cushion" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA0PtkoNUMEnbYs-JxeCByeDdmr4KKlZs3JMEeq56xl23nOGypYSsQNraKRbglDZP3f5wR9JF7bB_27_fx0dWlPJqPxMSvjba_JDrQ6mIW8FqKKVm2IPone49jYdqMajR2Ombmzaz728UkdKMwLtsN0og8pug4Bzsd81QFcO5QsZEu2CAkuFil90eLhlUrq-jbFrK3MsIzzKhBEXQWS7jMy2JG8Q6kpBGOnzgF04izzk5Z9psRC_igU"/>
+<div class="thumb-indicator hidden absolute inset-0 bg-primary/20"></div>
+</button>
+<!-- Thumbnail 4 -->
+<button class="photo-thumb relative shrink-0 w-16 h-16 rounded-xl overflow-hidden shadow-sm opacity-80 hover:opacity-100 transition-all" onclick="selectThumbnail(3)" type="button">
+<img class="w-full h-full object-cover" data-alt="Golden retriever calmly seated during health checkup at bright clean veterinary clinic being pet kindly by hands" src="https://lh3.googleusercontent.com/aida-public/AB6AXuALVQWJj-vOuWvOSYhqkfTYvn5y12CRxYbjZjzPhnrNzP-YZblEXWJx9LHzcyFyMp8PoCymkTWPiHWpxQVdCrdUmIxYeIxpwK2d_y2Jk2hDV63fshlOfgGIQznmtCMxuhCDgo_w4a_MmedBR-ZzTGxj11n6Sb1_mWolEkavW71KiDmULCpXTYdyjSVrsAg5OlNrxGC-ryJS70yaO_QszKLgRoZqTZdqK6N7n_gk67lQaaAtXhenoM5k"/>
+<div class="thumb-indicator hidden absolute inset-0 bg-primary/20"></div>
+</button>
+<!-- Thumbnail 5: Add Photo slot -->
+<button class="shrink-0 w-16 h-16 rounded-xl bg-surface-container-low text-primary flex flex-col items-center justify-center gap-0.5 active:bg-surface-container-high transition-colors" onclick="triggerAddPhotoModal()" type="button">
+<span class="material-symbols-outlined text-[20px]">add_a_photo</span>
+<span class="font-label-sm text-[10px] leading-tight">Ajouter</span>
+</button>
+</div>
+</div>
+</section>
+<!-- CONTENT CONTAINER -->
+<div class="px-margin-mobile flex flex-col gap-space-lg mt-3">
+<!-- 2. IDENTITY & KEY SPECS CARD -->
+<section class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm">
+<!-- Header with pet title & verified mark -->
+<div class="flex items-start justify-between">
+<div class="flex flex-col">
+<div class="flex items-center gap-2">
+<h2 class="font-headline-md text-headline-md text-on-surface">Milo</h2>
+<span class="w-5 h-5 rounded-full bg-primary flex items-center justify-center text-on-primary" title="Profil vérifié ICAD">
+<span class="material-symbols-outlined text-[13px]">verified</span>
+</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant flex items-center gap-1 mt-0.5">
+            Golden Retriever • Mâle
+            <span class="text-primary font-bold text-[15px]">♂</span>
+</p>
+</div>
+<!-- Quick Pet Age Pill -->
+<div class="px-3 py-1 rounded-full bg-surface-container-low text-primary font-label-md text-label-md">
+          4 ans et 10 mois
+        </div>
+</div>
+<!-- Specs Grid -->
+<div class="grid grid-cols-2 gap-3 mt-5">
+<div class="bg-surface-container-low p-3 rounded-xl flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-lowest text-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[18px]">pets</span>
+</div>
+<div class="min-w-0">
+<span class="font-body-sm text-body-sm text-on-surface-variant block">Espèce</span>
+<span class="font-label-md text-label-md text-on-surface truncate block">Chien</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-3 rounded-xl flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-lowest text-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[18px]">content_cut</span>
+</div>
+<div class="min-w-0">
+<span class="font-body-sm text-body-sm text-on-surface-variant block">Stérilisation</span>
+<span class="font-label-md text-label-md text-on-surface truncate block">Oui (Stérilisé)</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-3 rounded-xl flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-lowest text-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[18px]">cake</span>
+</div>
+<div class="min-w-0">
+<span class="font-body-sm text-body-sm text-on-surface-variant block">Naissance</span>
+<span class="font-label-md text-label-md text-on-surface truncate block">12 mai 2020</span>
+</div>
+</div>
+<div class="bg-surface-container-low p-3 rounded-xl flex items-center gap-3">
+<div class="w-8 h-8 rounded-lg bg-surface-container-lowest text-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[18px]">badge</span>
+</div>
+<div class="min-w-0">
+<span class="font-body-sm text-body-sm text-on-surface-variant block">Identification</span>
+<span class="font-label-md text-label-md text-on-surface truncate block" title="250269608123456">25026960812...</span>
+</div>
+</div>
+</div>
+<!-- Notes du Maître Section -->
+<div class="mt-4 p-4 rounded-xl bg-surface-container-low/70 flex flex-col gap-2 relative">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-1.5 text-secondary">
+<span class="material-symbols-outlined text-[18px]">notes</span>
+<span class="font-label-md text-label-md uppercase tracking-wider">Notes du maître</span>
+</div>
+<button aria-label="Modifier les notes" class="text-on-surface-variant hover:text-primary transition-colors flex items-center p-1 rounded-md" onclick="editMasterNotes()" type="button">
+<span class="material-symbols-outlined text-[16px]">edit</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface italic leading-relaxed" id="master-notes-text">
+          « Milo adore nager et rapporter la balle. Très sociable avec les enfants et les chats. Légère sensibilité digestive aux céréales. »
+        </p>
+</div>
+</section>
+<!-- 3. WEIGHT & GROWTH TRACKING CARD -->
+<section class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-4">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2.5">
+<div class="w-9 h-9 rounded-xl bg-surface-container-low text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[20px]">scale</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Poids &amp; Croissance</h3>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Dernière pesée il y a 8 jours</span>
+</div>
+</div>
+<div class="text-right">
+<div class="font-headline-md text-headline-md text-on-surface tracking-tight">29,5 <span class="font-body-md text-body-md text-on-surface-variant">kg</span></div>
+<span class="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[12px]">trending_flat</span>
+            -0.2 kg ce mois
+          </span>
+</div>
+</div>
+<!-- Sparkline Line Chart (Custom SVG clean graph) -->
+<div class="w-full pt-2">
+<div class="w-full h-32 relative">
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 320 100">
+<defs>
+<lineargradient id="weightGrad" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#0F766E" stop-opacity="0.28"></stop>
+<stop offset="100%" stop-color="#0F766E" stop-opacity="0.0"></stop>
+</lineargradient>
+</defs>
+<!-- Horizontal Guidelines -->
+<line stroke="#E6EEFF" stroke-dasharray="3 3" stroke-width="1" x1="0" x2="320" y1="20" y2="20"></line>
+<line stroke="#E6EEFF" stroke-dasharray="3 3" stroke-width="1" x1="0" x2="320" y1="55" y2="55"></line>
+<line stroke="#E6EEFF" stroke-dasharray="3 3" stroke-width="1" x1="0" x2="320" y1="90" y2="90"></line>
+<!-- Filled Gradient Path -->
+<!-- Coordinates scaled: Nov(28.8kg)-> x:20, y:75 | Jan(29.1kg)-> x:110, y:58 | Fev(29.7kg)-> x:210, y:22 | Mars(29.5kg)-> x:300, y:34 -->
+<path d="M 20 75 Q 65 66 110 58 T 210 22 T 300 34 L 300 100 L 20 100 Z" fill="url(#weightGrad)"></path>
+<!-- Main Curve -->
+<path d="M 20 75 Q 65 66 110 58 T 210 22 T 300 34" fill="none" stroke="#005C55" stroke-linecap="round" stroke-width="3"></path>
+<!-- Data Points -->
+<circle cx="20" cy="75" fill="#ffffff" r="4.5" stroke="#005C55" stroke-width="2.5"></circle>
+<circle cx="110" cy="58" fill="#ffffff" r="4.5" stroke="#005C55" stroke-width="2.5"></circle>
+<circle cx="210" cy="22" fill="#ffffff" r="4.5" stroke="#005C55" stroke-width="2.5"></circle>
+<circle cx="300" cy="34" fill="#005C55" r="5.5" stroke="#ffffff" stroke-width="2.5"></circle>
+<!-- Point values tooltip simulation -->
+<text fill="#3E4947" font-family="Inter" font-size="10" font-weight="600" text-anchor="middle" x="20" y="65">28.8</text>
+<text fill="#3E4947" font-family="Inter" font-size="10" font-weight="600" text-anchor="middle" x="110" y="48">29.1</text>
+<text fill="#3E4947" font-family="Inter" font-size="10" font-weight="600" text-anchor="middle" x="210" y="14">29.7</text>
+<text fill="#005C55" font-family="Inter" font-size="11" font-weight="700" text-anchor="middle" x="300" y="24">29.5</text>
+</svg>
+</div>
+<!-- Chart Timeline Labels -->
+<div class="flex justify-between items-center px-2 mt-2 text-on-surface-variant font-label-sm text-label-sm">
+<span>Nov</span>
+<span>Jan</span>
+<span>Fév</span>
+<span class="text-primary font-bold">Mars (Actuel)</span>
+</div>
+</div>
+<!-- Add Weight Action -->
+<button class="w-full mt-1 py-2.5 px-4 rounded-xl bg-surface-container-low hover:bg-surface-container-high text-primary font-label-md text-label-md flex items-center justify-center gap-1.5 transition-colors" onclick="recordNewWeight()" type="button">
+<span class="material-symbols-outlined text-[18px]">add_circle</span>
+        Ajouter une pesée
+      </button>
+</section>
+<!-- 4. SHORTCUT CARDS (Carnet de santé & Rendez-vous) -->
+<div class="flex flex-col gap-space-md">
+<!-- Card 1: Carnet de santé -->
+<section class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm active:bg-surface-container-low/30 transition-all cursor-pointer" onclick="navigateToHealthBook()">
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">vital_signs</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Carnet de santé</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">4 vaccins valides • 2 vermifuges</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
+</div>
+<!-- Alert Notification Inside Card -->
+<div class="mt-2 p-3.5 rounded-xl bg-amber-50 text-amber-900 flex items-start gap-2.5">
+<span class="material-symbols-outlined text-[20px] text-amber-600 shrink-0 mt-0.5">notification_important</span>
+<div class="flex-1 min-w-0">
+<span class="font-label-md text-label-md text-amber-950 block">Rappel vaccin dans 15 jours</span>
+<p class="font-body-sm text-body-sm text-amber-800 truncate mt-0.5">
+              CHPLR (Clinique des Lilas, Dr. Mercier)
+            </p>
+</div>
+</div>
+<!-- Counters row -->
+<div class="grid grid-cols-2 gap-2 mt-3 pt-3">
+<div class="flex items-center gap-2 text-on-surface">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="font-body-sm text-body-sm">Passeport Européen actif</span>
+</div>
+<div class="flex items-center gap-2 text-on-surface">
+<span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+<span class="font-body-sm text-body-sm">Protection tiques à jour</span>
+</div>
+</div>
+</section>
+<!-- Card 2: Rendez-vous -->
+<section class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm active:bg-surface-container-low/30 transition-all cursor-pointer" onclick="navigateToAppointments()">
+<div class="flex items-center justify-between pb-3">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-secondary-fixed text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[22px]">calendar_month</span>
+</div>
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Rendez-vous</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Prochaine consultation programmée</p>
+</div>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]">chevron_right</span>
+</div>
+<!-- Appointment detail card -->
+<div class="mt-2 p-3.5 rounded-xl bg-surface-container-low flex flex-col gap-1.5">
+<div class="flex items-center justify-between">
+<span class="font-label-md text-label-md text-primary flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[16px]">schedule</span>
+              Samedi 29 mars à 10h30
+            </span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container-lowest text-on-surface-variant">
+              Confirmé
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface font-medium">Visite annuelle de contrôle &amp; rappel</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">location_on</span>
+            Dr. Mercier • Clinique Vétérinaire des Lilas
+          </p>
+</div>
+<!-- Action inside Rendez-vous -->
+<div class="mt-3 flex items-center justify-end">
+<span class="font-label-md text-label-md text-primary flex items-center gap-1 hover:underline">
+            Prendre un nouveau rendez-vous
+            <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+</span>
+</div>
+</section>
+</div>
+<!-- 5. CLINIC & EMERGENCY CONTACTS CARD -->
+<section class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-2">
+<span class="material-symbols-outlined text-secondary text-[20px]">contact_phone</span>
+          Contacts de confiance
+        </h3>
+<button class="text-on-surface-variant hover:text-primary" onclick="editContacts()" type="button">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+<!-- Primary Vet -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-surface-container-low">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary font-bold shadow-sm">
+            Dr
+          </div>
+<div>
+<div class="font-label-md text-label-md text-on-surface">Dr. Mercier (Vétérinaire traitant)</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Clinique des Lilas • 01 42 68 00 12</div>
+</div>
+</div>
+<a aria-label="Appeler Dr. Mercier" class="w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-sm active:scale-95 transition-transform" href="tel:0142680012">
+<span class="material-symbols-outlined text-[18px]">call</span>
+</a>
+</div>
+<!-- 24/7 Urgence Card -->
+<div class="flex items-center justify-between p-3 rounded-xl bg-error-container/40">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full bg-error text-on-error flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[18px]">e911_emergency</span>
+</div>
+<div>
+<div class="font-label-md text-label-md text-on-error-container">Urgence Vétérinaire 24h/7</div>
+<div class="font-body-sm text-body-sm text-on-surface-variant">Hôpital Vétérinaire d'Île-de-France</div>
+</div>
+</div>
+<a aria-label="Appeler les urgences 24/7" class="w-9 h-9 rounded-full bg-error text-on-error flex items-center justify-center shadow-sm active:scale-95 transition-transform" href="tel:3115">
+<span class="material-symbols-outlined text-[18px]">call</span>
+</a>
+</div>
+</section>
+<!-- 6. QUICK BOTTOM ACTIONS -->
+<div class="flex flex-col gap-2.5 pt-2">
+<!-- Edit Profile Action Button -->
+<button class="w-full h-12 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-sm hover:bg-surface-tint active:scale-[0.99] transition-all" onclick="openEditProfileSheet()" type="button">
+<span class="material-symbols-outlined text-[20px]">edit</span>
+        Modifier les informations de Milo
+      </button>
+<!-- Secondary Share / Archive Actions -->
+<div class="grid grid-cols-2 gap-2.5">
+<button class="h-11 rounded-xl bg-surface-container-lowest text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:bg-surface-container-low transition-colors" onclick="sharePetProfile()" type="button">
+<span class="material-symbols-outlined text-[18px] text-on-surface-variant">ios_share</span>
+          Partager la fiche
+        </button>
+<button class="h-11 rounded-xl bg-surface-container-lowest text-secondary font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:bg-surface-container-low transition-colors" onclick="confirmArchivePet()" type="button">
+<span class="material-symbols-outlined text-[18px]">archive</span>
+          Archiver Milo
+        </button>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Simple photo carousel handler
+  const heroImage = document.getElementById('hero-dog-image');
+  const thumbs = document.querySelectorAll('.photo-thumb');
+
+  const photoList = [
+    {
+      src: "placeholder",
+      alt: "A radiant golden retriever named Milo sitting peacefully in a sun-drenched lush clover meadow, soft golden hour rim lighting, warm fur texture, candid, joyful expression, crisp natural background with subtle bokeh, organic teal and earthy tones, professional pet photography 8k"
+    },
+    {
+      src: "placeholder",
+      alt: "Golden retriever Milo playfully catching a bright tennis ball in a park with joyful eyes and flying green grass drops"
+    },
+    {
+      src: "placeholder",
+      alt: "Milo sleeping in gentle natural daylight on a clean linen pet bed in a bright modern Scandinavian apartment"
+    },
+    {
+      src: "placeholder",
+      alt: "Golden retriever Milo attentively looking at the friendly veterinarian with reassuring gentle atmosphere"
+    }
+  ];
+
+  function selectThumbnail(index) {
+    if (index >= photoList.length) return;
+    
+    // Smooth transition
+    heroImage.style.opacity = '0.3';
+    setTimeout(() => {
+      heroImage.src = photoList[index].src;
+      heroImage.setAttribute('data-alt', photoList[index].alt);
+      heroImage.style.opacity = '1';
+    }, 150);
+
+    // Update thumbnail rings
+    thumbs.forEach((th, idx) => {
+      const indicator = th.querySelector('.thumb-indicator');
+      if (idx === index) {
+        th.classList.add('scale-105', 'opacity-100');
+        th.classList.remove('opacity-80');
+        if (indicator) indicator.classList.remove('hidden');
+      } else {
+        th.classList.remove('scale-105', 'opacity-100');
+        th.classList.add('opacity-80');
+        if (indicator) indicator.classList.add('hidden');
+      }
+    });
+  }
+
+  function toggleGalleryViewer() {
+    alert("Galerie complète des photos de Milo (4 photos enregistrées).");
+  }
+
+  function triggerAddPhotoModal() {
+    alert("Ajouter une nouvelle photo de Milo : Choisissez dans la bibliothèque ou prenez un cliché.");
+  }
+
+  function editMasterNotes() {
+    const current = document.getElementById('master-notes-text');
+    const update = prompt("Modifier les notes pour Milo :", current.innerText.replace(/«|»/g, '').trim());
+    if (update !== null && update.trim() !== "") {
+      current.innerHTML = "&laquo;&nbsp;" + update.trim() + "&nbsp;&raquo;";
+    }
+  }
+
+  function recordNewWeight() {
+    const newWeight = prompt("Entrez la nouvelle mesure de poids en kg (ex: 29.4) :", "29.5");
+    if (newWeight) {
+      alert("Pesée enregistrée avec succès : " + newWeight + " kg.");
+    }
+  }
+
+  function navigateToHealthBook() {
+    window.location.hash = "#carnet-de-sante-milo";
+  }
+
+  function navigateToAppointments() {
+    window.location.hash = "#rendez-vous-milo";
+  }
+
+  function editContacts() {
+    alert("Gestion des contacts d'urgence & vétérinaires de Milo.");
+  }
+
+  function openEditProfileSheet() {
+    alert("Ouverture de l'éditeur du profil de Milo.");
+  }
+
+  function sharePetProfile() {
+    if (navigator.share) {
+      navigator.share({
+        title: "Fiche ICAD & Santé de Milo",
+        text: "Retrouvez la fiche de santé complète de Milo sur PetCare Community.",
+        url: window.location.href
+      }).catch(() => {});
+    } else {
+      alert("Lien du profil copié dans le presse-papier !");
+    }
+  }
+
+  function confirmArchivePet() {
+    if (confirm("Voulez-vous vraiment archiver la fiche de Milo ? Toutes ses données médicales resteront consultables.")) {
+      alert("Milo a été placé dans vos archives.");
+    }
+  }
+</script></main></body></html>
