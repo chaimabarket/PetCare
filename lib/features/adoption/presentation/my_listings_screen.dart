@@ -82,7 +82,7 @@ class _MyListingsScreenState extends State<MyListingsScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             debugPrint('MyListingsScreen: ${snapshot.error}');
-            return const EmptyState(icon: Icons.cloud_off, title: 'Annonces indisponibles', text: 'Réessayez plus tard.');
+            return EmptyState.loadError(title: 'Annonces indisponibles', error: snapshot.error);
           }
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
           final all = snapshot.data!;

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/routes.dart';
@@ -635,26 +636,41 @@ class EmptyState extends StatelessWidget {
   final String text;
   final Widget? action;
 
+  /// Erreur de chargement : distingue un accès refusé (règles Firestore) d'un problème de réseau.
+  factory EmptyState.loadError({Key? key, required String title, required Object? error}) {
+    final denied = error is FirebaseException && error.code == 'permission-denied';
+    return EmptyState(
+      key: key,
+      icon: denied ? Icons.lock_outline : Icons.cloud_off,
+      title: title,
+      text: denied
+          ? "Vous n'avez pas accès à ces informations pour le moment."
+          : 'Vérifiez votre connexion puis réessayez.',
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          CircleAvatar(
-            radius: 36,
-            backgroundColor: AdoptionColors.peachLight,
-            child: Icon(icon, size: 34, color: AdoptionColors.brown),
-          ),
-          const SizedBox(height: 16),
-          Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
-          const SizedBox(height: 6),
-          Text(text,
-              textAlign: TextAlign.center,
-              style: const TextStyle(fontSize: 14, height: 1.4, color: AppColors.textSecondary)),
-          if (action != null) ...[const SizedBox(height: 20), action!],
-        ],
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 48, horizontal: 24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            CircleAvatar(
+              radius: 36,
+              backgroundColor: AdoptionColors.peachLight,
+              child: Icon(icon, size: 34, color: AdoptionColors.brown),
+            ),
+            const SizedBox(height: 16),
+            Text(title, textAlign: TextAlign.center, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w600)),
+            const SizedBox(height: 6),
+            Text(text,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontSize: 14, height: 1.4, color: AppColors.textSecondary)),
+            if (action != null) ...[const SizedBox(height: 20), action!],
+          ],
+        ),
       ),
     );
   }

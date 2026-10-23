@@ -66,11 +66,7 @@ class _MyApplicationsScreenState extends State<MyApplicationsScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             debugPrint('MyApplicationsScreen: ${snapshot.error}');
-            return const EmptyState(
-              icon: Icons.cloud_off,
-              title: 'Candidatures indisponibles',
-              text: 'Vérifiez votre connexion puis réessayez.',
-            );
+            return EmptyState.loadError(title: 'Candidatures indisponibles', error: snapshot.error);
           }
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 

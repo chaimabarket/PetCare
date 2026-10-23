@@ -118,11 +118,7 @@ class _AdoptionFeedScreenState extends State<AdoptionFeedScreen> {
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 debugPrint('AdoptionFeedScreen: ${snapshot.error}');
-                return const EmptyState(
-                  icon: Icons.cloud_off,
-                  title: 'Annonces indisponibles',
-                  text: 'Vérifiez votre connexion puis réessayez.',
-                );
+                return EmptyState.loadError(title: 'Annonces indisponibles', error: snapshot.error);
               }
               if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());
 
