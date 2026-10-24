@@ -109,6 +109,65 @@ service cloud.firestore {
       }
     }
 
+    // Module 3 : Rendez-vous et rappels.
+    // Un rendez-vous est lisible par son propriétaire (client) et, pour une réservation, par le prestataire.
+    function isParticipant(data) {
+      return signedIn()
+        && (request.auth.uid == data.ownerId || request.auth.uid == data.get('providerId', null));
+    }
+
+    match /appointments/{appointmentId} {
+      allow read: if isParticipant(resource.data);
+
+      // Le client crée pour lui-même un rendez-vous futur ; un rendez-vous personnel démarre
+      // « confirmé », une réservation « en attente » du prestataire (RG-13, RG-16).
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.version == 1
+        && request.resource.data.startsAt is timestamp
+        && request.resource.data.endsAt is timestamp
+        && request.resource.data.startsAt > request.time
+        && request.resource.data.endsAt > request.resource.data.startsAt
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.petName is string
+        && request.resource.data.petName.size() > 0
+        && ((request.resource.data.providerId == null && request.resource.data.status == 'confirmed')
+          || (request.resource.data.providerId != null && request.resource.data.status == 'planned'));
+
+      // Seul un rendez-vous actif change ; terminé et annulé sont définitifs (RG-20).
+      // Chaque modification augmente la version : une version obsolète est refusée.
+      // Le client et le prestataire ne peuvent pas changer à qui appartient le rendez-vous,
+      // et seul le prestataire confirme une réservation (RG-17).
+      allow update: if isParticipant(resource.data)
+        && resource.data.status in ['planned', 'confirmed']
+        && request.resource.data.status in ['planned', 'confirmed', 'completed', 'cancelled']
+        && request.resource.data.version == resource.data.version + 1
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.get('providerId', null) == resource.data.get('providerId', null)
+        && !(resource.data.get('providerId', null) != null
+          && resource.data.status == 'planned'
+          && request.resource.data.status == 'confirmed'
+          && request.auth.uid != resource.data.providerId);
+
+      // L'historique est conservé : pas de suppression.
+      allow delete: if false;
+    }
+
+    // Rappels de soins personnels : visibles et modifiables uniquement par leur propriétaire.
+    match /reminders/{reminderId} {
+      allow read, delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.dueAt is timestamp;
+      allow update: if signedIn()
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId;
+    }
+
     // Tout le reste reste fermé tant que les autres modules n'ont pas ajouté leurs règles.
     match /{document=**} {
       allow read, write: if false;
