@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-container-low": "#eff4ff", "primary": "#005c55", "on-background": "#121c2a", "secondary-fixed-dim": "#ffb59c", "surface": "#f8f9ff", "on-surface-variant": "#3e4947", "on-error-container": "#93000a", "secondary-fixed": "#ffdbcf", "primary-container": "#0f766e", "secondary-container": "#feae92", "inverse-primary": "#80d5cb", "tertiary-fixed-dim": "#ffb598", "primary-fixed-dim": "#80d5cb", "surface-container-high": "#dee9fc", "tertiary-fixed": "#ffdbce", "surface-tint": "#006a63", "on-tertiary-fixed-variant": "#72361b", "surface-dim": "#d0dbed", "error-container": "#ffdad6", "on-secondary": "#ffffff", "inverse-surface": "#27313f", "on-primary": "#ffffff", "on-secondary-container": "#793f2a", "on-secondary-fixed-variant": "#6f3723", "surface-container": "#e6eeff", "surface-bright": "#f8f9ff", "surface-container-lowest": "#ffffff", "on-surface": "#121c2a", "primary-fixed": "#9cf2e8", "on-tertiary-fixed": "#370e00", "on-primary-fixed": "#00201d", "on-secondary-fixed": "#380d01", "surface-variant": "#d9e3f6", "on-error": "#ffffff", "background": "#f8f9ff", "outline": "#6e7977", "error": "#ba1a1a", "on-tertiary-container": "#ffe5db", "surface-container-highest": "#d9e3f6", "on-primary-fixed-variant": "#00504a", "outline-variant": "#bdc9c6", "tertiary": "#7f4025", "secondary": "#8c4e38", "tertiary-container": "#9c573a", "on-tertiary": "#ffffff", "on-primary-container": "#a3faef", "inverse-on-surface": "#eaf1ff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "space-sm": "0.5rem", "space-xs": "0.25rem", "gutter-mobile": "0.75rem", "margin": "1.5rem", "gutter": "1rem", "space-md": "1rem", "margin-mobile": "1rem", "space-lg": "1.5rem", "space-xl": "2rem" }, fontFamily: { "body-lg": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "headline-sm": ["Inter"], "headline-md": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "label-lg": ["Inter"], "headline-lg-mobile": ["Inter"], "body-sm": ["Inter"] }, fontSize: { "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "fontWeight": "700" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }] } } } };</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;min-height:100vh;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 inset-x-0 z-50 bg-surface/85 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.03)] pt-safe"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><div class="w-9 h-9 rounded-xl bg-primary-container/10 flex items-center justify-center text-primary-container"><span class="material-symbols-outlined text-[22px]">pets</span></div><h1 class="font-headline-sm text-headline-sm text-on-surface tracking-tight font-semibold">Mes Animaux</h1></div><div class="flex items-center gap-space-xs"><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface active:bg-surface-container-high/60 transition-colors"><span class="material-symbols-outlined text-[22px]">notifications</span></button><a aria-label="Mon Profil" class="w-11 h-11 flex items-center justify-center" data-path="profil" href="#"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></a></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface"><div class="flex flex-col w-full pb-16">
+<!-- Top Greeting & Header Section -->
+<div class="px-margin-mobile pt-space-sm pb-space-md">
+<div class="flex items-center justify-between mb-space-xs">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-sm text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-[15px] text-primary" style="font-variation-settings: 'FILL' 1;">pets</span>
+        3 animaux enregistrés
+      </span>
+<button aria-label="Gérer les notifications de santé" class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-primary transition-colors">
+<span class="material-symbols-outlined text-[18px]">tune</span>
+</button>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 leading-snug">
+      Gérez la santé, l'alimentation et le suivi vétérinaire de vos fidèles compagnons au quotidien.
+    </p>
+<!-- Search input -->
+<div class="relative mt-space-md">
+<div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]">search</span>
+</div>
+<input class="w-full h-11 pl-10 pr-10 rounded-xl bg-surface-container-lowest text-on-surface font-body-md text-body-md placeholder:text-outline shadow-sm focus:outline-none focus:bg-surface-container-low transition-all" id="petSearchInput" placeholder="Rechercher par nom, race..." type="text"/>
+<button aria-label="Effacer la recherche" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-outline hover:text-on-surface hidden transition-opacity" id="petSearchClear">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<!-- Filter chips row -->
+<div class="flex items-center gap-space-sm mt-space-md overflow-x-auto no-scrollbar py-0.5">
+<button class="h-9 px-4 rounded-full bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform shrink-0" id="tabActive">
+<span class="material-symbols-outlined text-[16px]">check_circle</span>
+<span>Actifs (3)</span>
+</button>
+<button class="h-9 px-4 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform shrink-0 hover:text-on-surface" id="tabArchived">
+<span class="material-symbols-outlined text-[16px]">inventory_2</span>
+<span>Archivés (1)</span>
+</button>
+<div class="h-5 w-px bg-surface-container-high mx-1 shrink-0"></div>
+<button class="h-9 px-3 rounded-full bg-surface-container-low text-on-surface-variant font-label-md text-label-md flex items-center gap-1 shrink-0 hover:text-primary">
+<span class="material-symbols-outlined text-[16px]">swap_vert</span>
+<span>Récents</span>
+</button>
+</div>
+</div>
+<!-- Smart Health Tip & Upcoming Alert Banner -->
+<div class="px-margin-mobile mb-space-md">
+<div class="bg-secondary-fixed/50 rounded-2xl p-space-md shadow-sm relative overflow-hidden">
+<div class="absolute -right-6 -bottom-6 w-24 h-24 rounded-full bg-secondary-container/40 pointer-events-none"></div>
+<div class="flex items-start gap-3">
+<div class="w-10 h-10 rounded-xl bg-surface-container-lowest flex items-center justify-center text-secondary shadow-sm shrink-0">
+<span class="material-symbols-outlined text-[22px]" style="font-variation-settings: 'FILL' 1;">notifications_active</span>
+</div>
+<div class="flex-1 min-w-0 pr-2">
+<div class="flex items-center gap-1.5">
+<span class="inline-block w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm text-on-secondary-fixed-variant uppercase tracking-wider font-semibold">Prochain rappel</span>
+</div>
+<p class="font-headline-sm text-headline-sm text-on-surface mt-0.5 truncate">
+            Vermifuge de Milo
+          </p>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5">
+            Prévu pour le samedi 15 mars • Clinique des Lilas
+          </p>
+<div class="flex items-center gap-space-sm mt-3">
+<button class="h-8 px-3 rounded-lg bg-secondary text-on-secondary font-label-md text-label-md flex items-center gap-1 shadow-sm active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[16px]">done</span>
+<span>Marquer fait</span>
+</button>
+<button class="h-8 px-2.5 rounded-lg bg-surface-container-lowest/80 text-on-surface-variant font-label-md text-label-md flex items-center gap-1 hover:text-on-surface">
+<span>Décaler</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Pet Cards Feed -->
+<div class="px-margin-mobile flex flex-col gap-space-md" id="petList">
+<!-- Card 1: Nala -->
+<article class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm relative overflow-hidden transition-all duration-200 hover:shadow-md">
+<div class="flex items-start gap-space-md">
+<!-- Avatar 72x72 with organic border ring -->
+<div class="relative shrink-0">
+<div class="w-[72px] h-[72px] rounded-full p-0.5 bg-gradient-to-tr from-primary-container to-secondary-container">
+<img alt="Photo de Nala" class="w-full h-full object-cover rounded-full bg-surface-container" data-alt="Close-up portrait of an adorable ginger european cat named Nala with bright amber eyes, sitting gracefully indoors near soft natural window lighting, rich fur texture, warm teal and coral ambient aesthetic, high quality pet photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBv0XkkMqcrR7EBA4zdIKRJpWrtSl9wfevl-uT9O-LxqTwOcxUOT8RF8ssCbWotu6xdKHyBLpkYtIQ2SbJBofgV53esK4UB4vCldLIKY4mW2RTH8VaSeII1tjybFobXFnXCO5vWF0z0iXSbCFOB2iDL6A364QlgqIV515t6kbsJHREIVF6TxGqXiCtiZoZ3gNMYMGagZgh0aW90nW-fNU7AckR07RCGT4CssMiaTmsW8ArF3QnLb3wc"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary" style="font-variation-settings: 'FILL' 1;">female</span>
+</div>
+</div>
+<!-- Info Column -->
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-1.5 min-w-0">
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">Nala</h2>
+<button aria-label="Coup de cœur Nala" class="text-secondary hover:scale-110 active:scale-90 transition-transform">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<!-- Health Status Tag -->
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed-variant font-label-sm text-label-sm shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+              À jour vaccins
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Chat • Européen</p>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">2 ans et demi • Stérilisée</p>
+<!-- Weight metric pill -->
+<div class="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-primary-container">scale</span>
+<span>Dernier poids : <strong class="font-semibold text-on-surface">4,2 kg</strong></span>
+<span class="text-outline text-label-sm font-label-sm">(il y a 12 j)</span>
+</div>
+</div>
+</div>
+<!-- Quick Action Buttons -->
+<div class="flex items-center justify-between gap-space-sm mt-space-md pt-space-sm bg-surface-container-low/40 -mx-space-md -mb-space-md px-space-md py-2.5 rounded-b-2xl">
+<div class="flex items-center gap-2">
+<button class="h-9 px-3 rounded-xl bg-surface-container-lowest text-primary-container font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-all hover:bg-primary hover:text-on-primary">
+<span class="material-symbols-outlined text-[17px]">medical_services</span>
+<span>Santé</span>
+</button>
+<button class="h-9 px-3 rounded-xl bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-all hover:text-on-surface">
+<span class="material-symbols-outlined text-[17px]">calendar_today</span>
+<span>Rendez-vous</span>
+</button>
+</div>
+<button class="h-9 px-3 rounded-xl text-primary font-label-md text-label-md flex items-center gap-0.5 hover:bg-surface-container transition-colors">
+<span>Profil</span>
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</article>
+<!-- Card 2: Milo -->
+<article class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm relative overflow-hidden transition-all duration-200 hover:shadow-md">
+<div class="flex items-start gap-space-md">
+<!-- Avatar 72x72 -->
+<div class="relative shrink-0">
+<div class="w-[72px] h-[72px] rounded-full p-0.5 bg-gradient-to-tr from-primary-container to-surface-container-high">
+<img alt="Photo de Milo" class="w-full h-full object-cover rounded-full bg-surface-container" data-alt="Joyful healthy golden retriever dog Milo smiling softly at the camera with gentle warm brown eyes, clean shiny coat, natural sunlit park background with soft bokeh, authentic lifestyle pet photography in clean teal balanced tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCQu38tvOSblYMjKllGH5ntxi1H7IZzbWo7nTvvyWT3Hyaze1KgZSIHVpngMHvXghUuDNdm94svZNXoO7nmtMDfzkYQFcKuIJ01Fq2C3-OJIoZ22fq75-QaXjmgewqw-GySso4TaolLIWz0AIebpMgzYc-GLq7GgIYvthgb8XO60RJKAKNRS_wCHzStXW8NS48eQxCS09sWYFHB5fZiTfOT7ItpIKJGEFU6pcuxl1ySUXzoM6IZDsrt"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[15px] text-primary">male</span>
+</div>
+</div>
+<!-- Info Column -->
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-1.5 min-w-0">
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">Milo</h2>
+<span class="material-symbols-outlined text-[16px] text-primary" title="Chien actif">verified</span>
+</div>
+<!-- Health Status Tag (Amber reminder) -->
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-secondary"></span>
+              Rappel vaccin 15 j
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Chien • Golden Retriever</p>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">4 ans • Pucé (ICAD : 25026...)</p>
+<!-- Weight metric pill -->
+<div class="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-primary-container">scale</span>
+<span>Dernier poids : <strong class="font-semibold text-on-surface">29,5 kg</strong></span>
+<span class="text-outline text-label-sm font-label-sm">(il y a 3 sem)</span>
+</div>
+</div>
+</div>
+<!-- Quick Action Buttons -->
+<div class="flex items-center justify-between gap-space-sm mt-space-md pt-space-sm bg-surface-container-low/40 -mx-space-md -mb-space-md px-space-md py-2.5 rounded-b-2xl">
+<div class="flex items-center gap-2">
+<button class="h-9 px-3 rounded-xl bg-surface-container-lowest text-primary-container font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-all hover:bg-primary hover:text-on-primary">
+<span class="material-symbols-outlined text-[17px]">medical_services</span>
+<span>Santé</span>
+</button>
+<button class="h-9 px-3 rounded-xl bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-all hover:text-on-surface">
+<span class="material-symbols-outlined text-[17px]">calendar_today</span>
+<span>Rendez-vous</span>
+</button>
+</div>
+<button class="h-9 px-3 rounded-xl text-primary font-label-md text-label-md flex items-center gap-0.5 hover:bg-surface-container transition-colors">
+<span>Profil</span>
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</article>
+<!-- Card 3: Luna -->
+<article class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm relative overflow-hidden transition-all duration-200 hover:shadow-md">
+<div class="flex items-start gap-space-md">
+<!-- Avatar 72x72 -->
+<div class="relative shrink-0">
+<div class="w-[72px] h-[72px] rounded-full p-0.5 bg-gradient-to-tr from-secondary-container to-surface-container-high">
+<img alt="Photo de Luna" class="w-full h-full object-cover rounded-full bg-surface-container" data-alt="Extremely cute fluffy white and beige dwarf lop rabbit named Luna sitting on a cozy soft fabric blanket, large gentle floppy ears, inquisitive nose, high-detail macro pet photography, warm peaceful indoor studio lighting with organic tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuACU2p0iEHu7U2SLQvIOjFk9TNYyqNQhyqrDSOQdrsbiur5qpoNwt9Ba8s3aMunTlFpTtMMnGfkJW1NYXrEOfi6KN2NPSRoqWmZLloLJRx9M27E9kceS4rKKIuuIVB_lgXu3QguIaGAOGxtlc252C8Njic-8L2QKykAUbJ2kivw2uDZEmvc0XMw2JSIvwKbtMRlwTO6sH3ilwNZadtd5VUKHWTDa32RmNgv5XdbzeSZD1Tl1ukLNozW"/>
+</div>
+<div class="absolute -bottom-1 -right-1 w-6 h-6 rounded-full bg-surface-container-lowest flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[15px] text-secondary" style="font-variation-settings: 'FILL' 1;">female</span>
+</div>
+</div>
+<!-- Info Column -->
+<div class="flex-1 min-w-0">
+<div class="flex items-center justify-between gap-2">
+<div class="flex items-center gap-1.5 min-w-0">
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">Luna</h2>
+</div>
+<!-- Health Status Tag -->
+<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-surface-container-high text-on-surface font-label-sm text-label-sm shrink-0">
+<span class="w-1.5 h-1.5 rounded-full bg-primary-container"></span>
+              Suivi régulier
+            </span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant mt-0.5">Lapin • Bélier nain</p>
+<p class="font-body-sm text-body-sm text-outline mt-0.5">1 an • Santé optimale</p>
+<!-- Weight metric pill -->
+<div class="inline-flex items-center gap-1.5 mt-2.5 px-2.5 py-1 rounded-lg bg-surface-container-low text-on-surface font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-primary-container">scale</span>
+<span>Dernier poids : <strong class="font-semibold text-on-surface">1,8 kg</strong></span>
+<span class="text-outline text-label-sm font-label-sm">(le mois dernier)</span>
+</div>
+</div>
+</div>
+<!-- Quick Action Buttons -->
+<div class="flex items-center justify-between gap-space-sm mt-space-md pt-space-sm bg-surface-container-low/40 -mx-space-md -mb-space-md px-space-md py-2.5 rounded-b-2xl">
+<div class="flex items-center gap-2">
+<button class="h-9 px-3 rounded-xl bg-surface-container-lowest text-primary-container font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-all hover:bg-primary hover:text-on-primary">
+<span class="material-symbols-outlined text-[17px]">medical_services</span>
+<span>Santé</span>
+</button>
+<button class="h-9 px-3 rounded-xl bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-all hover:text-on-surface">
+<span class="material-symbols-outlined text-[17px]">calendar_today</span>
+<span>Rendez-vous</span>
+</button>
+</div>
+<button class="h-9 px-3 rounded-xl text-primary font-label-md text-label-md flex items-center gap-0.5 hover:bg-surface-container transition-colors">
+<span>Profil</span>
+<span class="material-symbols-outlined text-[18px]">chevron_right</span>
+</button>
+</div>
+</article>
+</div>
+<!-- Foster / Community Care micro-card -->
+<div class="px-margin-mobile mt-space-lg mb-space-md">
+<div class="p-space-md rounded-2xl bg-surface-container-low flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-xl bg-primary-fixed flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[20px]">volunteer_activism</span>
+</div>
+<div>
+<h3 class="font-label-lg text-label-lg text-on-surface">Famille d'accueil ou bénévole ?</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Liez les fiches temporaires de votre association</p>
+</div>
+</div>
+<button aria-label="Synchroniser une association" class="w-8 h-8 rounded-full bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm hover:scale-105 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-[18px]">add</span>
+</button>
+</div>
+</div>
+<!-- Floating Action Button (FAB) anchored safely above bottom navigation -->
+<div class="fixed bottom-20 right-4 z-40">
+<button aria-label="Ajouter un nouvel animal" class="h-12 px-5 rounded-full bg-primary-container text-on-primary font-label-lg text-label-lg shadow-xl flex items-center gap-2 hover:bg-primary active:scale-95 transition-all transform duration-150" id="btnAddPet">
+<span class="material-symbols-outlined text-[22px]">add</span>
+<span>Ajouter un animal</span>
+</button>
+</div>
+</div>
+<script>
+  (function() {
+    // Search input clear interaction
+    const searchInput = document.getElementById('petSearchInput');
+    const clearBtn = document.getElementById('petSearchClear');
+    const petList = document.getElementById('petList');
+
+    if (searchInput && clearBtn) {
+      searchInput.addEventListener('input', (e) => {
+        const val = e.target.value.trim().toLowerCase();
+        if (val.length > 0) {
+          clearBtn.classList.remove('hidden');
+        } else {
+          clearBtn.classList.add('hidden');
+        }
+
+        // Live filtering of visible cards
+        if (petList) {
+          const cards = petList.querySelectorAll('article');
+          cards.forEach(card => {
+            const cardText = card.textContent.toLowerCase();
+            if (cardText.includes(val)) {
+              card.style.display = 'block';
+            } else {
+              card.style.display = 'none';
+            }
+          });
+        }
+      });
+
+      clearBtn.addEventListener('click', () => {
+        searchInput.value = '';
+        clearBtn.classList.add('hidden');
+        searchInput.focus();
+        if (petList) {
+          const cards = petList.querySelectorAll('article');
+          cards.forEach(card => card.style.display = 'block');
+        }
+      });
+    }
+
+    // Toggle filter chips active state
+    const tabActive = document.getElementById('tabActive');
+    const tabArchived = document.getElementById('tabArchived');
+
+    if (tabActive && tabArchived) {
+      tabActive.addEventListener('click', () => {
+        tabActive.className = "h-9 px-4 rounded-full bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform shrink-0";
+        tabArchived.className = "h-9 px-4 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform shrink-0 hover:text-on-surface";
+      });
+
+      tabArchived.addEventListener('click', () => {
+        tabArchived.className = "h-9 px-4 rounded-full bg-primary-container text-on-primary font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform shrink-0";
+        tabActive.className = "h-9 px-4 rounded-full bg-surface-container-lowest text-on-surface-variant font-label-md text-label-md flex items-center gap-1.5 shadow-sm active:scale-95 transition-transform shrink-0 hover:text-on-surface";
+      });
+    }
+  })();
+</script></main><nav class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container font-semibold"><div class="flex justify-around items-center h-16 px-space-xs"><a class="flex flex-col items-center justify-center w-16 h-12 gap-space-xs text-on-surface-variant transition-colors" data-path="accueil" href="#"><span class="material-symbols-outlined text-[24px]">home</span><span class="font-label-sm text-label-sm">Accueil</span></a><a aria-current="page" class="flex flex-col items-center justify-center w-16 h-12 gap-space-xs transition-colors text-primary-container font-semibold" data-path="mes-animaux" href="#"><span class="material-symbols-outlined text-[24px]">pets</span><span class="font-label-sm text-label-sm">Mes animaux</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-space-xs text-on-surface-variant transition-colors" data-path="communaute" href="#"><span class="material-symbols-outlined text-[24px]">forum</span><span class="font-label-sm text-label-sm">Communauté</span></a><a class="flex flex-col items-center justify-center w-16 h-12 gap-space-xs text-on-surface-variant transition-colors" data-path="services" href="#"><span class="material-symbols-outlined text-[24px]">medical_services</span><span class="font-label-sm text-label-sm">Services</span></a></div></nav></body></html>
