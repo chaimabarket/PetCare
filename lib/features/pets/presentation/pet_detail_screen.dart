@@ -577,19 +577,18 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                       ],
                     ),
                     const SizedBox(height: 2),
-                    Text.rich(
-                      TextSpan(
-                        style: PetText.bodyMd,
-                        children: [
-                          TextSpan(
-                            text: '${pet.hasBreed ? pet.breed : speciesLabel(l, pet.species)} • ${sexLabel(l, pet.sex)} ',
+                    Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            '${pet.hasBreed ? pet.breed : speciesLabel(l, pet.species)} • ${sexLabel(l, pet.sex)} ',
+                            style: PetText.bodyMd,
+                            overflow: TextOverflow.ellipsis,
                           ),
-                          TextSpan(
-                            text: pet.sex.symbol,
-                            style: const TextStyle(color: PetColors.primary, fontWeight: FontWeight.w700, fontSize: 15),
-                          ),
-                        ],
-                      ),
+                        ),
+                        // Icône plutôt que le caractère ♂/♀, rendu en emoji coloré sur le web.
+                        Icon(pet.isFemale ? Icons.female : Icons.male, size: 16, color: PetColors.primary),
+                      ],
                     ),
                   ],
                 ),
@@ -679,9 +678,10 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     if (last != null && previous != null) {
       final diff = last.weightKg - previous.weightKg;
       final days = last.measuredOn.difference(previous.measuredOn).inDays;
+      final month = formatShortMonth(l, previous.measuredOn);
       final period = days <= 31
           ? l.petsWeightThisMonth
-          : l.petsWeightSince(formatShortMonth(l, previous.measuredOn).toLowerCase());
+          : l.petsWeightSince(l.localeName.startsWith('fr') ? month.toLowerCase() : month);
       final stable = diff.abs() < 0.005;
       final text = stable ? l.petsWeightStable(period) : '${diff > 0 ? '+' : '-'}${formatKg(l, diff.abs())} kg $period';
       trend = Container(
@@ -1480,7 +1480,12 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
             style: PetText.bodyLg,
-            decoration: InputDecoration(labelText: l.petsWeightLabel, suffixText: 'kg', errorText: _error),
+            decoration: InputDecoration(
+              labelText: l.petsWeightLabel,
+              suffixText: 'kg',
+              errorText: _error,
+              errorMaxLines: 3,
+            ),
           ),
           const SizedBox(height: 12),
           InkWell(

@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -468,7 +467,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
                     Expanded(
                       child: _SegmentButton(
                         icon: sex == PetSex.male ? Icons.male : Icons.female,
-                        label: '${sexLabel(l, sex)} ${sex.symbol}',
+                        label: sexLabel(l, sex),
                         selected: _sex == sex,
                         onTap: () => setState(() => _sex = sex),
                       ),

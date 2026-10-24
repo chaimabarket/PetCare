@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -40,23 +41,52 @@ class PetRepository {
   Stream<Pet?> watch(String petId) =>
       _pets.doc(petId).snapshots().map((doc) => doc.exists ? Pet.fromFirestore(doc) : null);
 
-  Stream<List<PetPhoto>> watchPhotos(String petId) => _photos(petId)
-      .orderBy('sortOrder')
-      .snapshots()
-      .map((snap) => snap.docs.map(PetPhoto.fromFirestore).toList());
+  Stream<List<PetPhoto>> watchPhotos(String petId) => _retryWhileUnconfirmed(
+        () => _photos(petId).orderBy('sortOrder').snapshots().map((snap) => snap.docs.map(PetPhoto.fromFirestore).toList()),
+      );
 
   /// Photo principale (position 0), ou `null` si la galerie est vide.
-  Stream<PetPhoto?> watchCover(String petId) => _photos(petId)
-      .orderBy('sortOrder')
-      .limit(1)
-      .snapshots()
-      .map((snap) => snap.docs.isEmpty ? null : PetPhoto.fromFirestore(snap.docs.first));
+  Stream<PetPhoto?> watchCover(String petId) => _retryWhileUnconfirmed(
+        () => _photos(petId)
+            .orderBy('sortOrder')
+            .limit(1)
+            .snapshots()
+            .map((snap) => snap.docs.isEmpty ? null : PetPhoto.fromFirestore(snap.docs.first)),
+      );
 
   /// Pesées, la plus récente d'abord.
-  Stream<List<WeightEntry>> watchWeights(String petId, {int? limit}) {
-    Query<Map<String, dynamic>> query = _weights(petId).orderBy('measuredOn', descending: true);
-    if (limit != null) query = query.limit(limit);
-    return query.snapshots().map((snap) => snap.docs.map(WeightEntry.fromFirestore).toList());
+  Stream<List<WeightEntry>> watchWeights(String petId, {int? limit}) => _retryWhileUnconfirmed(() {
+        Query<Map<String, dynamic>> query = _weights(petId).orderBy('measuredOn', descending: true);
+        if (limit != null) query = query.limit(limit);
+        return query.snapshots().map((snap) => snap.docs.map(WeightEntry.fromFirestore).toList());
+      });
+
+  /// Juste après une création, la fiche n'existe encore que localement : les règles (qui lisent la
+  /// fiche côté serveur) refusent alors la lecture des sous-collections. On réessaie quelques fois.
+  Stream<T> _retryWhileUnconfirmed<T>(Stream<T> Function() open) {
+    late final StreamController<T> controller;
+    StreamSubscription<T>? subscription;
+    var attempt = 0;
+
+    void listen() {
+      subscription = open().listen(
+        controller.add,
+        onError: (Object error, StackTrace stack) {
+          if (error is FirebaseException && error.code == 'permission-denied' && attempt < 6) {
+            attempt++;
+            subscription?.cancel();
+            Future<void>.delayed(Duration(milliseconds: 500 * attempt), () {
+              if (!controller.isClosed) listen();
+            });
+          } else {
+            controller.addError(error, stack);
+          }
+        },
+      );
+    }
+
+    controller = StreamController<T>(onListen: listen, onCancel: () => subscription?.cancel());
+    return controller.stream;
   }
 
   /// Crée l'animal, ses photos et sa première pesée en une seule écriture atomique.
@@ -143,14 +173,17 @@ class PetRepository {
   }
 
   /// Enregistre une pesée. Lève [DuplicateWeightException] si une mesure existe déjà ce jour-là.
-  Future<void> addWeight(String petId, {required DateTime date, required double weightKg, String? note}) {
+  Future<void> addWeight(String petId, {required DateTime date, required double weightKg, String? note}) async {
     final day = DateTime(date.year, date.month, date.day);
     final ref = _weights(petId).doc(WeightEntry.idFor(day));
-    return _firestore.runTransaction((tx) async {
+    // L'exception est levée hors de la transaction : sur le web, une erreur levée à l'intérieur la bloque.
+    final created = await _firestore.runTransaction((tx) async {
       final existing = await tx.get(ref);
-      if (existing.exists) throw const DuplicateWeightException();
+      if (existing.exists) return false;
       tx.set(ref, _weightData(day, weightKg, note));
+      return true;
     });
+    if (!created) throw const DuplicateWeightException();
   }
 
   Future<void> deleteWeight(String petId, String entryId) => _weights(petId).doc(entryId).delete();
