@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../data/pet_media.dart';
 import '../../data/pet_repository.dart';
 import '../pet_style.dart';
@@ -12,6 +13,7 @@ const _maxPhotoBytes = 700 * 1024;
 
 /// Demande la source (galerie ou appareil photo), puis renvoie l'image compressée.
 Future<Uint8List?> pickPetPhoto(BuildContext context) async {
+  final l = AppLocalizations.of(context);
   final source = await showModalBottomSheet<ImageSource>(
     context: context,
     backgroundColor: PetColors.surfaceLowest,
@@ -22,12 +24,12 @@ Future<Uint8List?> pickPetPhoto(BuildContext context) async {
         children: [
           ListTile(
             leading: const Icon(Icons.photo_library_outlined, color: PetColors.primary),
-            title: const Text('Choisir dans la galerie', style: PetText.labelLg),
+            title: Text(l.petsPhotoFromGallery, style: PetText.labelLg),
             onTap: () => Navigator.of(context).pop(ImageSource.gallery),
           ),
           ListTile(
             leading: const Icon(Icons.photo_camera_outlined, color: PetColors.primary),
-            title: const Text('Prendre une photo', style: PetText.labelLg),
+            title: Text(l.petsPhotoFromCamera, style: PetText.labelLg),
             onTap: () => Navigator.of(context).pop(ImageSource.camera),
           ),
         ],
@@ -42,7 +44,7 @@ Future<Uint8List?> pickPetPhoto(BuildContext context) async {
   if (bytes.length > _maxPhotoBytes) {
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Photo trop lourde. Choisissez une autre image.')),
+        SnackBar(content: Text(l.petsPhotoTooLarge)),
       );
     }
     return null;

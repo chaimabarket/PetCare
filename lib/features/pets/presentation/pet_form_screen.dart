@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 import '../../../core/routes.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/pet.dart';
 import '../data/pet_media.dart';
 import '../data/pet_repository.dart';
@@ -30,7 +31,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
   late final _name = TextEditingController(text: widget.pet?.name);
   late final _breed = TextEditingController(text: widget.pet?.breed);
   late final _weight = TextEditingController(
-    text: widget.currentWeight == null ? '' : formatKg(widget.currentWeight!.weightKg),
+    text: widget.currentWeight == null ? '' : widget.currentWeight!.weightKg.toString(),
   );
   late final _chip = TextEditingController(text: widget.pet?.chipNumber);
   late final _notes = TextEditingController(text: widget.pet?.notes);
@@ -65,14 +66,14 @@ class _PetFormScreenState extends State<PetFormScreen> {
     super.dispose();
   }
 
-  String? get _nameError {
+  String? _nameError(AppLocalizations l) {
     final length = _name.text.trim().length;
-    if (length < 2) return '⚠️ Le nom de votre animal est obligatoire (au moins 2 caractères).';
-    if (length > 80) return '⚠️ Le nom ne doit pas dépasser 80 caractères.';
+    if (length < 2) return l.petsFormNameError;
+    if (length > 80) return l.petsFormNameTooLong;
     return null;
   }
 
-  String? get _birthError => _birthDate == null ? '⚠️ La date de naissance est obligatoire.' : null;
+  String? _birthError(AppLocalizations l) => _birthDate == null ? l.petsFormBirthError : null;
 
   /// Poids saisi en kg, `null` si le champ est vide.
   double? get _weightValue {
@@ -80,18 +81,18 @@ class _PetFormScreenState extends State<PetFormScreen> {
     return text.isEmpty ? null : double.tryParse(text);
   }
 
-  String? get _weightError {
+  String? _weightError(AppLocalizations l) {
     if (_weight.text.trim().isEmpty) return null;
     final value = _weightValue;
-    if (value == null || value <= 0 || value > 500) return '⚠️ Indiquez un poids entre 0,01 et 500 kg.';
-    if ((value * 100).roundToDouble() != value * 100) return '⚠️ Deux décimales au maximum.';
+    if (value == null || value <= 0 || value > 500) return l.petsFormWeightError;
+    if ((value * 100).roundToDouble() != value * 100) return l.petsFormWeightDecimals;
     return null;
   }
 
-  String? get _chipError {
+  String? _chipError(AppLocalizations l) {
     final chip = _chip.text.trim();
     if (chip.isEmpty || RegExp(r'^\d{15}$').hasMatch(chip)) return null;
-    return '⚠️ Le numéro I-CAD doit contenir exactement 15 chiffres.';
+    return l.petsFormChipError;
   }
 
   Future<void> _pickBirthDate() async {
@@ -101,13 +102,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
       initialDate: _birthDate ?? DateTime(now.year - 1, now.month, now.day),
       firstDate: DateTime(now.year - 40),
       lastDate: now,
-      helpText: 'Date de naissance',
-      cancelText: 'Annuler',
-      confirmText: 'Valider',
-      fieldLabelText: 'Date de naissance',
-      fieldHintText: 'JJ/MM/AAAA',
-      errorFormatText: 'Format de date invalide',
-      errorInvalidText: 'La date ne peut pas être dans le futur',
+      helpText: AppLocalizations.of(context).petsFormBirthDate,
     );
     if (picked != null) setState(() => _birthDate = picked);
   }
@@ -130,11 +125,11 @@ class _PetFormScreenState extends State<PetFormScreen> {
   void _removePhoto(int index) => setState(() => _photos.removeAt(index));
 
   Future<void> _save() async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     setState(() => _submitted = true);
-    if (_nameError != null || _birthError != null || _weightError != null || _chipError != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vérifiez les champs signalés en rouge.')),
-      );
+    if (_nameError(l) != null || _birthError(l) != null || _weightError(l) != null || _chipError(l) != null) {
+      messenger.showSnackBar(SnackBar(content: Text(l.petsFormCheckFields)));
       return;
     }
 
@@ -176,21 +171,18 @@ class _PetFormScreenState extends State<PetFormScreen> {
         );
       }
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('La fiche de ${draft.name.trim()} est enregistrée.')),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l.petsFormSaved(draft.name.trim()))));
       Navigator.of(context).pop();
     } on FirebaseException {
       if (!mounted) return;
       setState(() => _saving = false);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("L'enregistrement a échoué. Vérifiez votre connexion et réessayez.")),
-      );
+      messenger.showSnackBar(SnackBar(content: Text(l.petsFormSaveError)));
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Scaffold(
       backgroundColor: PetColors.surface,
       appBar: AppBar(
@@ -203,9 +195,9 @@ class _PetFormScreenState extends State<PetFormScreen> {
           onPressed: () => Navigator.of(context).maybePop(),
           style: TextButton.styleFrom(foregroundColor: PetColors.primary),
           icon: const Icon(Icons.arrow_back_ios_new, size: 20),
-          label: Text('Annuler', style: PetText.labelLg.copyWith(color: PetColors.primary)),
+          label: Text(l.petsCancel, style: PetText.labelLg.copyWith(color: PetColors.primary)),
         ),
-        title: Text(_editing ? 'Modifier Un Animal' : 'Ajouter Un Animal', style: PetText.headlineSm),
+        title: Text(_editing ? l.petsFormTitleEdit : l.petsFormTitleAdd, style: PetText.headlineSm),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
@@ -220,31 +212,37 @@ class _PetFormScreenState extends State<PetFormScreen> {
           ),
         ],
       ),
-      body: Stack(
-        children: [
-          ListView(
-            padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+      body: Align(
+        alignment: Alignment.topCenter,
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 640),
+          child: Stack(
             children: [
-              _intro(),
-              const SizedBox(height: 16),
-              _photosSection(),
-              const SizedBox(height: 24),
-              _identitySection(),
-              const SizedBox(height: 24),
-              _healthSection(),
-              const SizedBox(height: 24),
-              _notesSection(),
-              const SizedBox(height: 24),
-              _heartBanner(),
+              ListView(
+                padding: const EdgeInsets.fromLTRB(16, 16, 16, 96),
+                children: [
+                  _intro(l),
+                  const SizedBox(height: 16),
+                  _photosSection(l),
+                  const SizedBox(height: 24),
+                  _identitySection(l),
+                  const SizedBox(height: 24),
+                  _healthSection(l),
+                  const SizedBox(height: 24),
+                  _notesSection(l),
+                  const SizedBox(height: 24),
+                  _heartBanner(l),
+                ],
+              ),
+              Positioned(left: 16, right: 16, bottom: 12, child: SafeArea(top: false, child: _actionBar(l))),
             ],
           ),
-          Positioned(left: 16, right: 16, bottom: 12, child: SafeArea(top: false, child: _actionBar())),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _intro() {
+  Widget _intro(AppLocalizations l) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -260,40 +258,34 @@ class _PetFormScreenState extends State<PetFormScreen> {
             children: [
               const Icon(Icons.pets, size: 14, color: PetColors.onSecondaryContainer),
               const SizedBox(width: 4),
-              Text(
-                'Carnet de santé & profil',
-                style: PetText.labelSm.copyWith(color: PetColors.onSecondaryContainer),
-              ),
+              Text(l.petsFormBadge, style: PetText.labelSm.copyWith(color: PetColors.onSecondaryContainer)),
             ],
           ),
         ),
         const SizedBox(height: 4),
         Text(
-          _editing ? 'Modifier ${widget.pet!.name}' : 'Nouveau compagnon',
+          _editing ? l.petsFormHeadingEdit(widget.pet!.name) : l.petsFormHeadingNew,
           style: PetText.headlineLgMobile.copyWith(letterSpacing: -0.5),
         ),
         const SizedBox(height: 2),
-        const Text(
-          'Renseignez les informations essentielles pour créer son profil et suivre sa santé au quotidien.',
-          style: PetText.bodyMd,
-        ),
+        Text(l.petsFormIntro, style: PetText.bodyMd),
       ],
     );
   }
 
-  Widget _photosSection() {
+  Widget _photosSection(AppLocalizations l) {
     final count = _photos.length;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Row(
           children: [
-            const Expanded(child: Text('Photos de votre animal', style: PetText.headlineSm)),
+            Expanded(child: Text(l.petsFormPhotosTitle, style: PetText.headlineSm)),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
               decoration: BoxDecoration(color: PetColors.surfaceHighest, borderRadius: BorderRadius.circular(999)),
               child: Text(
-                '$count / $maxPetPhotos ${count > 1 ? 'ajoutées' : 'ajoutée'}',
+                l.petsFormPhotosCount(count, maxPetPhotos),
                 style: PetText.labelMd.copyWith(color: PetColors.primary),
               ),
             ),
@@ -308,7 +300,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
             return Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                SizedBox(width: main, height: main, child: _mainPhotoSlot()),
+                SizedBox(width: main, height: main, child: _mainPhotoSlot(l)),
                 const SizedBox(width: gap),
                 SizedBox(
                   width: main,
@@ -316,7 +308,8 @@ class _PetFormScreenState extends State<PetFormScreen> {
                     spacing: gap,
                     runSpacing: gap,
                     children: [
-                      for (var i = 1; i < maxPetPhotos; i++) SizedBox(width: cell, height: cell, child: _photoSlot(i)),
+                      for (var i = 1; i < maxPetPhotos; i++)
+                        SizedBox(width: cell, height: cell, child: _photoSlot(l, i)),
                     ],
                   ),
                 ),
@@ -328,17 +321,12 @@ class _PetFormScreenState extends State<PetFormScreen> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(color: PetColors.surfaceLow, borderRadius: BorderRadius.circular(12)),
-          child: const Row(
+          child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('💡', style: TextStyle(fontSize: 16)),
-              SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  'Une photo nette, de face et lumineuse facilite la reconnaissance visuelle et le suivi en clinique.',
-                  style: PetText.bodySm,
-                ),
-              ),
+              const Text('💡', style: TextStyle(fontSize: 16)),
+              const SizedBox(width: 4),
+              Expanded(child: Text(l.petsFormPhotoTip, style: PetText.bodySm)),
             ],
           ),
         ),
@@ -346,8 +334,8 @@ class _PetFormScreenState extends State<PetFormScreen> {
     );
   }
 
-  Widget _mainPhotoSlot() {
-    if (_photos.isEmpty) return _AddPhotoSlot(onTap: _addPhoto, large: true);
+  Widget _mainPhotoSlot(AppLocalizations l) {
+    if (_photos.isEmpty) return _AddPhotoSlot(onTap: _addPhoto, label: l.petsFormPhotoMainSlot, large: true);
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Stack(
@@ -378,7 +366,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
                 children: [
                   const Icon(Icons.star, size: 12, color: Colors.white),
                   const SizedBox(width: 4),
-                  Text('Principale', style: PetText.labelSm.copyWith(color: Colors.white)),
+                  Text(l.petsFormPhotoMain, style: PetText.labelSm.copyWith(color: Colors.white)),
                 ],
               ),
             ),
@@ -388,7 +376,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
             right: 8,
             child: _MiniCircleButton(
               icon: Icons.edit_outlined,
-              tooltip: 'Remplacer la photo',
+              tooltip: l.petsFormPhotoReplace,
               onTap: () => _addPhoto(replaceIndex: 0),
             ),
           ),
@@ -397,8 +385,8 @@ class _PetFormScreenState extends State<PetFormScreen> {
     );
   }
 
-  Widget _photoSlot(int index) {
-    if (index >= _photos.length) return _AddPhotoSlot(onTap: _addPhoto);
+  Widget _photoSlot(AppLocalizations l, int index) {
+    if (index >= _photos.length) return _AddPhotoSlot(onTap: _addPhoto, label: l.petsAdd);
     return ClipRRect(
       borderRadius: BorderRadius.circular(12),
       child: Stack(
@@ -407,7 +395,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
           PetImage(bytes: _photos[index].bytes, iconSize: 20),
           Positioned.fill(
             child: Tooltip(
-              message: 'Définir comme photo principale',
+              message: l.petsFormPhotoMakeMain,
               child: Material(
                 color: Colors.transparent,
                 child: InkWell(onTap: () => _makeCover(index)),
@@ -417,30 +405,30 @@ class _PetFormScreenState extends State<PetFormScreen> {
           Positioned(
             top: 4,
             right: 4,
-            child: _MiniCircleButton(icon: Icons.close, tooltip: 'Retirer la photo', onTap: () => _removePhoto(index)),
+            child: _MiniCircleButton(icon: Icons.close, tooltip: l.petsFormPhotoRemove, onTap: () => _removePhoto(index)),
           ),
         ],
       ),
     );
   }
 
-  Widget _identitySection() {
+  Widget _identitySection(AppLocalizations l) {
     return _SectionCard(
       icon: Icons.badge_outlined,
-      title: 'Identité',
+      title: l.petsFormIdentity,
       children: [
         _Field(
-          label: "Nom de l'animal",
+          label: l.petsFormName,
           required: true,
           controller: _name,
-          hint: 'Ex: Rio, Bella, Pixel...',
-          error: _submitted ? _nameError : null,
+          hint: l.petsFormNameHint,
+          error: _submitted ? _nameError(l) : null,
           textCapitalization: TextCapitalization.words,
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _Label(text: 'Espèce', required: true),
+            _Label(text: l.petsFormSpecies, required: true),
             const SizedBox(height: 4),
             Wrap(
               spacing: 4,
@@ -448,7 +436,8 @@ class _PetFormScreenState extends State<PetFormScreen> {
               children: [
                 for (final species in PetSpecies.values)
                   _SpeciesChip(
-                    species: species,
+                    emoji: species.emoji,
+                    label: speciesLabel(l, species),
                     selected: _species == species,
                     onTap: () => setState(() => _species = species),
                   ),
@@ -457,17 +446,17 @@ class _PetFormScreenState extends State<PetFormScreen> {
           ],
         ),
         _Field(
-          label: 'Race',
+          label: l.petsFormBreed,
           controller: _breed,
-          hint: 'Ex: Golden Retriever, Européen, Bélier...',
-          help: 'Laissez vide si croisé ou race inconnue.',
+          hint: l.petsFormBreedHint,
+          help: l.petsFormBreedHelp,
           maxLength: 80,
           textCapitalization: TextCapitalization.words,
         ),
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const _Label(text: 'Sexe', required: true),
+            _Label(text: l.petsFormSex, required: true),
             const SizedBox(height: 8),
             Container(
               padding: const EdgeInsets.all(4),
@@ -479,7 +468,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
                     Expanded(
                       child: _SegmentButton(
                         icon: sex == PetSex.male ? Icons.male : Icons.female,
-                        label: '${sex.label} ${sex.symbol}',
+                        label: '${sexLabel(l, sex)} ${sex.symbol}',
                         selected: _sex == sex,
                         onTap: () => setState(() => _sex = sex),
                       ),
@@ -501,7 +490,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
                     children: [
                       const Icon(Icons.medical_services_outlined, size: 20, color: PetColors.primary),
                       const SizedBox(width: 4),
-                      const Expanded(child: Text('Animal stérilisé / castré', style: PetText.labelLg)),
+                      Expanded(child: Text(l.petsFormSterilized, style: PetText.labelLg)),
                       Switch(
                         value: _sterilized,
                         onChanged: (value) => setState(() => _sterilized = value),
@@ -522,16 +511,16 @@ class _PetFormScreenState extends State<PetFormScreen> {
     );
   }
 
-  Widget _healthSection() {
-    final birthError = _submitted ? _birthError : null;
+  Widget _healthSection(AppLocalizations l) {
+    final birthError = _submitted ? _birthError(l) : null;
     return _SectionCard(
       icon: Icons.monitor_heart_outlined,
-      title: 'Santé & Mensurations',
+      title: l.petsFormHealth,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const _Label(text: 'Date de naissance', required: true),
+            _Label(text: l.petsFormBirthDate, required: true),
             const SizedBox(height: 4),
             Material(
               color: birthError == null ? PetColors.surfaceContainer : PetColors.errorContainer,
@@ -546,7 +535,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
                     children: [
                       Expanded(
                         child: Text(
-                          _birthDate == null ? 'JJ / MM / AAAA' : formatInputDate(_birthDate!),
+                          _birthDate == null ? l.petsFormDateHint : formatInputDate(_birthDate!),
                           style: PetText.bodyLg.copyWith(color: _birthDate == null ? PetColors.outline : null),
                         ),
                       ),
@@ -573,20 +562,18 @@ class _PetFormScreenState extends State<PetFormScreen> {
                     ),
                   ),
                   const SizedBox(width: 4),
-                  const Expanded(
-                    child: Text('Date approximative / estimée par un vétérinaire', style: PetText.bodySm),
-                  ),
+                  Expanded(child: Text(l.petsFormBirthEstimated, style: PetText.bodySm)),
                 ],
               ),
             ),
           ],
         ),
         _Field(
-          label: 'Poids actuel',
+          label: l.petsFormWeight,
           controller: _weight,
-          hint: 'Ex: 8.5',
-          help: 'Permet de calculer le dosage des antiparasitaires et vaccins.',
-          error: _submitted ? _weightError : null,
+          hint: l.petsFormWeightHint,
+          help: l.petsFormWeightHelp,
+          error: _submitted ? _weightError(l) : null,
           keyboardType: const TextInputType.numberWithOptions(decimal: true),
           inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.,]'))],
           suffix: Container(
@@ -596,11 +583,11 @@ class _PetFormScreenState extends State<PetFormScreen> {
           ),
         ),
         _Field(
-          label: 'Identification',
-          optional: true,
+          label: l.petsFormIdentification,
+          optionalLabel: l.petsFormOptional,
           controller: _chip,
-          hint: 'Numéro de puce ou tatouage (15 chiffres I-CAD)',
-          error: _submitted ? _chipError : null,
+          hint: l.petsFormChipHint,
+          error: _submitted ? _chipError(l) : null,
           keyboardType: TextInputType.number,
           inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(15)],
           monospace: true,
@@ -610,15 +597,15 @@ class _PetFormScreenState extends State<PetFormScreen> {
     );
   }
 
-  Widget _notesSection() {
+  Widget _notesSection(AppLocalizations l) {
     return _SectionCard(
       icon: Icons.edit_note,
-      title: 'Notes du maître',
+      title: l.petsFormNotes,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            const _Label(text: 'Particularités & tempérament'),
+            _Label(text: l.petsFormNotesLabel),
             const SizedBox(height: 4),
             TextField(
               controller: _notes,
@@ -626,15 +613,12 @@ class _PetFormScreenState extends State<PetFormScreen> {
               maxLines: 6,
               style: PetText.bodyLg,
               inputFormatters: [LengthLimitingTextInputFormatter(_notesMax)],
-              decoration: _decoration(
-                hint: 'Caractère, habitudes, allergies connues, friandises favorites, vétérinaire habituel...',
-                padding: const EdgeInsets.all(16),
-              ),
+              decoration: _decoration(hint: l.petsFormNotesHint, padding: const EdgeInsets.all(16)),
             ),
             const SizedBox(height: 4),
             Row(
               children: [
-                const Expanded(child: Text('Visible uniquement sur votre carnet', style: PetText.bodySm)),
+                Expanded(child: Text(l.petsFormNotesPrivate, style: PetText.bodySm)),
                 Text('${_notes.text.length} / $_notesMax', style: PetText.labelSm),
               ],
             ),
@@ -644,7 +628,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
     );
   }
 
-  Widget _heartBanner() {
+  Widget _heartBanner(AppLocalizations l) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -666,11 +650,11 @@ class _PetFormScreenState extends State<PetFormScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Un engagement de cœur',
+                  l.petsFormHeartTitle,
                   style: PetText.labelLg.copyWith(color: PetColors.onTertiaryFixed, fontWeight: FontWeight.w700),
                 ),
                 Text(
-                  'Toutes les données de santé restent privées et protégées.',
+                  l.petsFormHeartBody,
                   style: PetText.bodySm.copyWith(color: PetColors.onTertiaryFixed.withValues(alpha: 0.9)),
                 ),
               ],
@@ -681,7 +665,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
     );
   }
 
-  Widget _actionBar() {
+  Widget _actionBar(AppLocalizations l) {
     return Container(
       padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
@@ -700,7 +684,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
-            child: const Text('Annuler', style: PetText.labelLg),
+            child: Text(l.petsCancel, style: PetText.labelLg),
           ),
           const SizedBox(width: 4),
           Expanded(
@@ -725,7 +709,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
                         const SizedBox(width: 8),
                         Flexible(
                           child: Text(
-                            'Enregistrer le compagnon',
+                            l.petsFormSave,
                             overflow: TextOverflow.ellipsis,
                             style: PetText.labelLg.copyWith(color: Colors.white),
                           ),
@@ -803,11 +787,11 @@ class _SectionCard extends StatelessWidget {
 }
 
 class _Label extends StatelessWidget {
-  const _Label({required this.text, this.required = false, this.optional = false});
+  const _Label({required this.text, this.required = false, this.optionalLabel});
 
   final String text;
   final bool required;
-  final bool optional;
+  final String? optionalLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -825,7 +809,7 @@ class _Label extends StatelessWidget {
             ),
           ),
         ),
-        if (optional) const Text('Optionnel', style: PetText.labelSm),
+        if (optionalLabel != null) Text(optionalLabel!, style: PetText.labelSm),
       ],
     );
   }
@@ -851,7 +835,7 @@ class _Field extends StatelessWidget {
     required this.controller,
     required this.hint,
     this.required = false,
-    this.optional = false,
+    this.optionalLabel,
     this.help,
     this.error,
     this.suffix,
@@ -866,7 +850,7 @@ class _Field extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
   final bool required;
-  final bool optional;
+  final String? optionalLabel;
   final String? help;
   final String? error;
   final Widget? suffix;
@@ -882,7 +866,7 @@ class _Field extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _Label(text: label, required: required, optional: optional),
+        _Label(text: label, required: required, optionalLabel: optionalLabel),
         const SizedBox(height: 4),
         TextField(
           controller: controller,
@@ -909,9 +893,10 @@ class _Field extends StatelessWidget {
 }
 
 class _SpeciesChip extends StatelessWidget {
-  const _SpeciesChip({required this.species, required this.selected, required this.onTap});
+  const _SpeciesChip({required this.emoji, required this.label, required this.selected, required this.onTap});
 
-  final PetSpecies species;
+  final String emoji;
+  final String label;
   final bool selected;
   final VoidCallback onTap;
 
@@ -933,12 +918,9 @@ class _SpeciesChip extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(species.emoji),
+                Text(emoji),
                 const SizedBox(width: 6),
-                Text(
-                  species.label,
-                  style: PetText.labelMd.copyWith(color: selected ? Colors.white : PetColors.onSurface),
-                ),
+                Text(label, style: PetText.labelMd.copyWith(color: selected ? Colors.white : PetColors.onSurface)),
               ],
             ),
           ),
@@ -983,9 +965,10 @@ class _SegmentButton extends StatelessWidget {
 }
 
 class _AddPhotoSlot extends StatelessWidget {
-  const _AddPhotoSlot({required this.onTap, this.large = false});
+  const _AddPhotoSlot({required this.onTap, required this.label, this.large = false});
 
   final VoidCallback onTap;
+  final String label;
   final bool large;
 
   @override
@@ -1008,7 +991,7 @@ class _AddPhotoSlot extends StatelessWidget {
               child: Icon(Icons.add, size: large ? 24 : 18, color: PetColors.onPrimaryFixed),
             ),
             const SizedBox(height: 4),
-            Text(large ? 'Photo principale' : 'Ajouter', style: PetText.labelSm),
+            Text(label, style: PetText.labelSm, textAlign: TextAlign.center),
           ],
         ),
       ),

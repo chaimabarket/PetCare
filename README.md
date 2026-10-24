@@ -42,6 +42,17 @@ lib/
     pets/          Mes animaux, fiche animal, ajout / modification, archivage
 ```
 
+## Langues (français / anglais)
+
+L'utilisateur choisit la langue avec le bouton 🌐 de l'en-tête ; le choix est mémorisé sur l'appareil (`LocaleController`). Les textes sont dans `lib/l10n/app_fr.arb` (modèle) et `lib/l10n/app_en.arb`, générés par `flutter gen-l10n` (automatique avec `flutter pub get` / `flutter run`).
+
+Pour traduire un écran : ajouter la clé dans les deux fichiers `.arb`, puis
+
+```dart
+final l = AppLocalizations.of(context);
+Text(l.maCle)
+```
+
 ## Module Profils des animaux (branche `animals`)
 
 Maquettes utilisées : `designs/animals/` (copie des écrans Stitch du module 1).

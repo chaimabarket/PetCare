@@ -1,18 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
-/// Espèces proposées dans le formulaire (maquette « Ajouter un animal »).
+/// Espèces proposées dans le formulaire (maquette « Ajouter un animal »). Libellés : voir `speciesLabel`.
 enum PetSpecies {
-  dog('dog', 'Chien', '🐕'),
-  cat('cat', 'Chat', '🐈'),
-  rabbit('rabbit', 'Lapin', '🐇'),
-  rodent('rodent', 'Rongeur', '🐹'),
-  bird('bird', 'Oiseau', '🦜'),
-  other('other', 'Autre', '🐾');
+  dog('dog', '🐕'),
+  cat('cat', '🐈'),
+  rabbit('rabbit', '🐇'),
+  rodent('rodent', '🐹'),
+  bird('bird', '🦜'),
+  other('other', '🐾');
 
-  const PetSpecies(this.code, this.label, this.emoji);
+  const PetSpecies(this.code, this.emoji);
 
   final String code;
-  final String label;
   final String emoji;
 
   static PetSpecies fromCode(String? code) =>
@@ -20,13 +19,12 @@ enum PetSpecies {
 }
 
 enum PetSex {
-  male('male', 'Mâle', '♂'),
-  female('female', 'Femelle', '♀');
+  male('male', '♂'),
+  female('female', '♀');
 
-  const PetSex(this.code, this.label, this.symbol);
+  const PetSex(this.code, this.symbol);
 
   final String code;
-  final String label;
   final String symbol;
 
   static PetSex fromCode(String? code) => code == 'female' ? PetSex.female : PetSex.male;

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../../data/pet_media.dart';
 import '../pet_format.dart';
 import '../pet_style.dart';
@@ -13,10 +14,11 @@ class WeightChart extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final months = entries.map((e) => '${e.measuredOn.year}-${e.measuredOn.month}').toSet();
     final sameMonth = months.length < entries.length;
     String label(WeightEntry e) =>
-        sameMonth ? '${e.measuredOn.day} ${formatShortMonth(e.measuredOn)}' : formatShortMonth(e.measuredOn);
+        sameMonth ? '${e.measuredOn.day} ${formatShortMonth(l, e.measuredOn)}' : formatShortMonth(l, e.measuredOn);
 
     return Padding(
       padding: const EdgeInsets.only(top: 8),
@@ -25,7 +27,9 @@ class WeightChart extends StatelessWidget {
           SizedBox(
             height: 128,
             width: double.infinity,
-            child: CustomPaint(painter: _WeightPainter(entries.map((e) => e.weightKg).toList())),
+            child: CustomPaint(
+              painter: _WeightPainter(entries.map((e) => e.weightKg).toList(), (kg) => formatKg(l, kg)),
+            ),
           ),
           const SizedBox(height: 8),
           Padding(
@@ -35,7 +39,7 @@ class WeightChart extends StatelessWidget {
               children: [
                 for (var i = 0; i < entries.length; i++)
                   Text(
-                    i == entries.length - 1 ? '${label(entries[i])} (Actuel)' : label(entries[i]),
+                    i == entries.length - 1 ? '${label(entries[i])} ${l.petsWeightCurrent}' : label(entries[i]),
                     style: i == entries.length - 1
                         ? PetText.labelSm.copyWith(color: PetColors.primary, fontWeight: FontWeight.w700)
                         : PetText.labelSm,
@@ -50,9 +54,10 @@ class WeightChart extends StatelessWidget {
 }
 
 class _WeightPainter extends CustomPainter {
-  _WeightPainter(this.values);
+  _WeightPainter(this.values, this.format);
 
   final List<double> values;
+  final String Function(double kg) format;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -132,7 +137,7 @@ class _WeightPainter extends CustomPainter {
 
       final text = TextPainter(
         text: TextSpan(
-          text: formatKg(values[i]).replaceAll(',', '.'),
+          text: format(values[i]),
           style: TextStyle(
             fontSize: last ? 11 : 10,
             fontWeight: last ? FontWeight.w700 : FontWeight.w600,

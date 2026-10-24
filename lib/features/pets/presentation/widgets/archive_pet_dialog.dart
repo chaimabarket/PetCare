@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 
+import '../../../../l10n/app_localizations.dart';
 import '../pet_style.dart';
 
 /// Élément en cours qui empêche l'archivage (rendez-vous à venir, annonce ouverte… RG-06).
@@ -25,34 +26,33 @@ class ArchiveBlocker {
 }
 
 /// Boîte de dialogue « Archiver la fiche de … ? ». Renvoie `true` si l'utilisateur confirme.
+///
+/// [checksPending] affiche l'encadré « Bientôt disponible » tant que les modules qui fournissent
+/// les éléments bloquants ne sont pas branchés.
 Future<bool> showArchivePetDialog(
   BuildContext context, {
   required String petName,
   List<ArchiveBlocker> blockers = const [],
+  bool checksPending = false,
 }) async {
   final confirmed = await showDialog<bool>(
     context: context,
     barrierColor: Colors.black.withValues(alpha: 0.45),
-    builder: (_) => _ArchivePetDialog(petName: petName, blockers: blockers),
+    builder: (_) => _ArchivePetDialog(petName: petName, blockers: blockers, checksPending: checksPending),
   );
   return confirmed ?? false;
 }
 
 class _ArchivePetDialog extends StatelessWidget {
-  const _ArchivePetDialog({required this.petName, required this.blockers});
+  const _ArchivePetDialog({required this.petName, required this.blockers, required this.checksPending});
 
   final String petName;
   final List<ArchiveBlocker> blockers;
-
-  String get _blockersTitle {
-    final count = blockers.length;
-    return count == 1
-        ? "Avant d'archiver : 1 élément en cours"
-        : "Avant d'archiver : $count éléments en cours";
-  }
+  final bool checksPending;
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final blocked = blockers.isNotEmpty;
 
     return Dialog(
@@ -84,16 +84,10 @@ class _ArchivePetDialog extends StatelessWidget {
                           child: const Icon(Icons.archive, size: 32, color: PetColors.onSecondaryContainer),
                         ),
                         const SizedBox(height: 16),
-                        Text(
-                          'Archiver la fiche de $petName ?',
-                          textAlign: TextAlign.center,
-                          style: PetText.headlineSm,
-                        ),
+                        Text(l.petsArchiveTitle(petName), textAlign: TextAlign.center, style: PetText.headlineSm),
                         const SizedBox(height: 4),
                         Text(
-                          "L'historique médical, les pesées et les souvenirs de $petName restent précieusement "
-                          'conservés. Il ne sera plus affiché dans votre liste principale d\'animaux actifs mais '
-                          'restera accessible à tout moment dans l\'onglet « Archivés ».',
+                          l.petsArchiveBody(petName),
                           textAlign: TextAlign.center,
                           style: PetText.bodyMd.copyWith(height: 1.625),
                         ),
@@ -104,7 +98,7 @@ class _ArchivePetDialog extends StatelessWidget {
                     top: 16,
                     right: 16,
                     child: IconButton(
-                      tooltip: 'Fermer la boîte de dialogue',
+                      tooltip: l.petsArchiveCloseTooltip,
                       onPressed: () => Navigator.of(context).pop(false),
                       icon: const Icon(Icons.close, size: 20, color: PetColors.onSurfaceVariant),
                     ),
@@ -114,7 +108,12 @@ class _ArchivePetDialog extends StatelessWidget {
               if (blocked)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
-                  child: _BlockersCard(title: _blockersTitle, blockers: blockers),
+                  child: _BlockersCard(blockers: blockers),
+                )
+              else if (checksPending)
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                  child: _ChecksPendingCard(),
                 ),
               Padding(
                 padding: const EdgeInsets.all(24),
@@ -125,7 +124,7 @@ class _ArchivePetDialog extends StatelessWidget {
                       height: 48,
                       child: blocked
                           ? Tooltip(
-                              message: 'Complétez les actions en suspens pour pouvoir archiver',
+                              message: l.petsArchiveLockedTooltip,
                               child: Container(
                                 decoration: BoxDecoration(
                                   color: PetColors.surfaceContainer,
@@ -136,7 +135,7 @@ class _ArchivePetDialog extends StatelessWidget {
                                   children: [
                                     const Icon(Icons.lock_outline, size: 18, color: PetColors.outline),
                                     const SizedBox(width: 4),
-                                    Text('Archiver', style: PetText.labelLg.copyWith(color: PetColors.outline)),
+                                    Text(l.petsMenuArchive, style: PetText.labelLg.copyWith(color: PetColors.outline)),
                                   ],
                                 ),
                               ),
@@ -148,7 +147,7 @@ class _ArchivePetDialog extends StatelessWidget {
                                 minimumSize: const Size.fromHeight(48),
                               ),
                               icon: const Icon(Icons.archive_outlined, size: 18),
-                              label: Text('Archiver', style: PetText.labelLg.copyWith(color: Colors.white)),
+                              label: Text(l.petsMenuArchive, style: PetText.labelLg.copyWith(color: Colors.white)),
                             ),
                     ),
                     const SizedBox(height: 8),
@@ -161,7 +160,7 @@ class _ArchivePetDialog extends StatelessWidget {
                           foregroundColor: PetColors.onSurface,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: const Text('Annuler', style: PetText.labelLg),
+                        child: Text(l.petsCancel, style: PetText.labelLg),
                       ),
                     ),
                   ],
@@ -175,14 +174,59 @@ class _ArchivePetDialog extends StatelessWidget {
   }
 }
 
-class _BlockersCard extends StatelessWidget {
-  const _BlockersCard({required this.title, required this.blockers});
+class _ChecksPendingCard extends StatelessWidget {
+  const _ChecksPendingCard();
 
-  final String title;
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: PetColors.secondaryFixed.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Padding(
+            padding: EdgeInsets.only(top: 2),
+            child: Icon(Icons.schedule, size: 20, color: PetColors.secondary),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(l.petsArchiveChecksTitle, style: PetText.labelLg.copyWith(color: PetColors.onSecondaryFixed)),
+                const SizedBox(height: 2),
+                Text(l.petsArchiveChecksBody, style: PetText.bodySm.copyWith(color: PetColors.secondary)),
+                const SizedBox(height: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: PetColors.surfaceLowest,
+                    borderRadius: BorderRadius.circular(999),
+                  ),
+                  child: Text(l.comingSoon, style: PetText.labelSm.copyWith(color: PetColors.onSurface)),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _BlockersCard extends StatelessWidget {
+  const _BlockersCard({required this.blockers});
+
   final List<ArchiveBlocker> blockers;
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -204,12 +248,12 @@ class _BlockersCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(title, style: PetText.labelLg.copyWith(color: PetColors.onSecondaryFixed)),
-                    const SizedBox(height: 2),
                     Text(
-                      "Pour éviter tout conflit ou oubli, vous devez d'abord traiter ou annuler ces éléments en cours :",
-                      style: PetText.bodySm.copyWith(color: PetColors.secondary),
+                      l.petsArchiveBlockersTitle(blockers.length),
+                      style: PetText.labelLg.copyWith(color: PetColors.onSecondaryFixed),
                     ),
+                    const SizedBox(height: 2),
+                    Text(l.petsArchiveBlockersBody, style: PetText.bodySm.copyWith(color: PetColors.secondary)),
                   ],
                 ),
               ),
@@ -234,7 +278,7 @@ class _BlockersCard extends StatelessWidget {
                   InkWell(
                     onTap: blocker.onAction,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+                      padding: const EdgeInsets.all(4),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -255,14 +299,7 @@ class _BlockersCard extends StatelessWidget {
             children: [
               const Icon(Icons.info_outline, size: 16, color: PetColors.outline),
               const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  blockers.length == 1
-                      ? "L'archivage sera débloqué dès la résolution de cet élément."
-                      : "L'archivage sera débloqué dès la résolution de ces ${blockers.length} éléments.",
-                  style: PetText.labelSm,
-                ),
-              ),
+              Expanded(child: Text(l.petsArchiveBlockersFooter(blockers.length), style: PetText.labelSm)),
             ],
           ),
         ],

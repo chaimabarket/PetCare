@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/routes.dart';
 import '../../../core/widgets/coming_soon_screen.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/pet.dart';
 import '../data/pet_media.dart';
 import '../data/pet_repository.dart';
@@ -46,13 +47,13 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
         MaterialPageRoute<void>(builder: (_) => ComingSoonScreen(title: title)),
       );
 
-  List<Pet> _visible(List<Pet> pets) {
+  List<Pet> _visible(AppLocalizations l, List<Pet> pets) {
     final query = _search.text.trim().toLowerCase();
     final list = pets.where((p) => p.isArchived == _showArchived).where((p) {
       if (query.isEmpty) return true;
       return p.name.toLowerCase().contains(query) ||
           (p.breed ?? '').toLowerCase().contains(query) ||
-          p.species.label.toLowerCase().contains(query) ||
+          speciesLabel(l, p.species).toLowerCase().contains(query) ||
           (p.chipNumber ?? '').contains(query);
     }).toList();
     if (_sortByName) {
@@ -67,17 +68,13 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     if (_user == null) return const _VisitorState();
 
     return StreamBuilder<List<Pet>>(
       stream: _petsStream,
       builder: (context, snapshot) {
-        if (snapshot.hasError) {
-          return const _MessageState(
-            icon: Icons.error_outline,
-            text: 'Impossible de charger vos animaux. Vérifiez votre connexion.',
-          );
-        }
+        if (snapshot.hasError) return _MessageState(icon: Icons.error_outline, text: l.petsLoadError);
         if (!snapshot.hasData) return const Center(child: CircularProgressIndicator(color: PetColors.primary));
 
         final pets = snapshot.data!;
@@ -85,135 +82,301 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
 
         final activeCount = pets.where((p) => !p.isArchived).length;
         final archivedCount = pets.length - activeCount;
-        final visible = _visible(pets);
+        final visible = _visible(l, pets);
 
         return Scaffold(
           backgroundColor: Colors.transparent,
           floatingActionButton: FloatingActionButton.extended(
             onPressed: _openForm,
-            tooltip: 'Ajouter un nouvel animal',
+            tooltip: l.petsAddPetTooltip,
             backgroundColor: PetColors.primaryContainer,
             foregroundColor: Colors.white,
             elevation: 6,
             shape: const StadiumBorder(),
             icon: const Icon(Icons.add, size: 22),
-            label: Text('Ajouter un animal', style: PetText.labelLg.copyWith(color: Colors.white)),
+            label: Text(l.petsAddPetFab, style: PetText.labelLg.copyWith(color: Colors.white)),
           ),
-          body: ListView(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                    decoration: const BoxDecoration(
-                      color: PetColors.primaryFixed,
-                      borderRadius: BorderRadius.all(Radius.circular(999)),
-                      boxShadow: petCardShadow,
-                    ),
-                    child: Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        const Icon(Icons.pets, size: 15, color: PetColors.primary),
-                        const SizedBox(width: 6),
-                        Text(
-                          activeCount == 1 ? '1 animal enregistré' : '$activeCount animaux enregistrés',
-                          style: PetText.labelSm.copyWith(color: PetColors.onPrimaryFixed),
-                        ),
-                      ],
-                    ),
-                  ),
-                  const Spacer(),
-                  _RoundIconButton(
-                    icon: Icons.tune,
-                    tooltip: 'Gérer les notifications de santé',
-                    onTap: () => _openComingSoon('Rappels de santé'),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                "Gérez la santé, l'alimentation et le suivi vétérinaire de vos fidèles compagnons au quotidien.",
-                style: PetText.bodyMd,
-              ),
-              const SizedBox(height: 16),
-              _SearchField(controller: _search),
-              const SizedBox(height: 16),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    _FilterChip(
-                      icon: Icons.check_circle_outline,
-                      label: 'Actifs ($activeCount)',
-                      selected: !_showArchived,
-                      onTap: () => setState(() => _showArchived = false),
-                    ),
-                    const SizedBox(width: 8),
-                    _FilterChip(
-                      icon: Icons.inventory_2_outlined,
-                      label: 'Archivés ($archivedCount)',
-                      selected: _showArchived,
-                      onTap: () => setState(() => _showArchived = true),
-                    ),
-                    Container(
-                      width: 1,
-                      height: 20,
-                      margin: const EdgeInsets.symmetric(horizontal: 12),
-                      color: PetColors.surfaceHigh,
-                    ),
-                    Material(
-                      color: PetColors.surfaceLow,
-                      shape: const StadiumBorder(),
-                      child: InkWell(
-                        customBorder: const StadiumBorder(),
-                        onTap: () => setState(() => _sortByName = !_sortByName),
-                        child: Container(
-                          height: 36,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          child: Row(
-                            children: [
-                              const Icon(Icons.swap_vert, size: 16, color: PetColors.onSurfaceVariant),
-                              const SizedBox(width: 4),
-                              Text(
-                                _sortByName ? 'Nom (A-Z)' : 'Récents',
-                                style: PetText.labelMd.copyWith(color: PetColors.onSurfaceVariant),
-                              ),
-                            ],
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              final contentWidth = (constraints.maxWidth > 1200 ? 1200 : constraints.maxWidth) - 32;
+              final columns = contentWidth >= 1000 ? 3 : (contentWidth >= 640 ? 2 : 1);
+              final cardWidth = (contentWidth - (columns - 1) * 16) / columns;
+
+              return Align(
+                alignment: Alignment.topCenter,
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 1200),
+                  child: ListView(
+                    padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                            decoration: const BoxDecoration(
+                              color: PetColors.primaryFixed,
+                              borderRadius: BorderRadius.all(Radius.circular(999)),
+                              boxShadow: petCardShadow,
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.pets, size: 15, color: PetColors.primary),
+                                const SizedBox(width: 6),
+                                Text(
+                                  l.petsRegisteredCount(activeCount),
+                                  style: PetText.labelSm.copyWith(color: PetColors.onPrimaryFixed),
+                                ),
+                              ],
+                            ),
                           ),
+                          const Spacer(),
+                          _RoundIconButton(
+                            icon: Icons.tune,
+                            tooltip: l.petsHealthNotificationsTooltip,
+                            onTap: () => _openComingSoon(l.petsScreenReminders),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(l.petsListIntro, style: PetText.bodyMd),
+                      const SizedBox(height: 16),
+                      _SearchField(controller: _search),
+                      const SizedBox(height: 16),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _FilterChip(
+                              icon: Icons.check_circle_outline,
+                              label: l.petsFilterActive(activeCount),
+                              selected: !_showArchived,
+                              onTap: () => setState(() => _showArchived = false),
+                            ),
+                            const SizedBox(width: 8),
+                            _FilterChip(
+                              icon: Icons.inventory_2_outlined,
+                              label: l.petsFilterArchived(archivedCount),
+                              selected: _showArchived,
+                              onTap: () => setState(() => _showArchived = true),
+                            ),
+                            Container(
+                              width: 1,
+                              height: 20,
+                              margin: const EdgeInsets.symmetric(horizontal: 12),
+                              color: PetColors.surfaceHigh,
+                            ),
+                            Material(
+                              color: PetColors.surfaceLow,
+                              shape: const StadiumBorder(),
+                              child: InkWell(
+                                customBorder: const StadiumBorder(),
+                                onTap: () => setState(() => _sortByName = !_sortByName),
+                                child: Container(
+                                  height: 36,
+                                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.swap_vert, size: 16, color: PetColors.onSurfaceVariant),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        _sortByName ? l.petsSortName : l.petsSortRecent,
+                                        style: PetText.labelMd.copyWith(color: PetColors.onSurfaceVariant),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 16),
-              if (visible.isEmpty)
-                _NoResult(
-                  text: _search.text.trim().isNotEmpty
-                      ? 'Aucun animal ne correspond à « ${_search.text.trim()} ».'
-                      : _showArchived
-                          ? 'Aucun animal archivé.'
-                          : 'Aucun animal actif. Ajoutez un compagnon avec le bouton ci-dessous.',
-                  actionLabel: _search.text.trim().isNotEmpty ? 'Réinitialiser la recherche' : null,
-                  onAction: _search.clear,
-                )
-              else
-                for (var i = 0; i < visible.length; i++) ...[
-                  _PetCard(
-                    key: ValueKey(visible[i].id),
-                    pet: visible[i],
-                    ringIndex: i,
-                    onComingSoon: _openComingSoon,
+                      const SizedBox(height: 16),
+                      // Module 2 (Santé) : alimentera ce bandeau avec le prochain rappel réel.
+                      _ReminderBanner(onTap: () => _openComingSoon(l.petsScreenReminders)),
+                      const SizedBox(height: 16),
+                      if (visible.isEmpty)
+                        _NoResult(
+                          text: _search.text.trim().isNotEmpty
+                              ? l.petsNoMatch(_search.text.trim())
+                              : _showArchived
+                                  ? l.petsNoArchived
+                                  : l.petsNoActive,
+                          actionLabel: _search.text.trim().isNotEmpty ? l.petsResetSearch : null,
+                          onAction: _search.clear,
+                        )
+                      else
+                        Wrap(
+                          spacing: 16,
+                          runSpacing: 16,
+                          children: [
+                            for (var i = 0; i < visible.length; i++)
+                              SizedBox(
+                                width: cardWidth,
+                                child: _PetCard(
+                                  key: ValueKey(visible[i].id),
+                                  pet: visible[i],
+                                  ringIndex: i,
+                                  onComingSoon: _openComingSoon,
+                                ),
+                              ),
+                          ],
+                        ),
+                      const SizedBox(height: 24),
+                      _FosterCard(onTap: () => _openComingSoon(l.petsScreenFoster)),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                ],
-              const SizedBox(height: 8),
-              _FosterCard(onTap: () => _openComingSoon("Famille d'accueil")),
-            ],
+                ),
+              );
+            },
           ),
         );
       },
+    );
+  }
+}
+
+/// Petite pastille « Bientôt disponible » utilisée pour les données des autres modules.
+class _SoonPill extends StatelessWidget {
+  const _SoonPill({this.background = PetColors.surfaceHigh});
+
+  final Color background;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 2),
+      decoration: BoxDecoration(color: background, borderRadius: BorderRadius.circular(999)),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Container(
+            width: 6,
+            height: 6,
+            decoration: const BoxDecoration(color: PetColors.primaryContainer, shape: BoxShape.circle),
+          ),
+          const SizedBox(width: 4),
+          Text(
+            AppLocalizations.of(context).comingSoon,
+            style: PetText.labelSm.copyWith(color: PetColors.onSurface),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ReminderBanner extends StatelessWidget {
+  const _ReminderBanner({required this.onTap});
+
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Container(
+      clipBehavior: Clip.antiAlias,
+      decoration: BoxDecoration(
+        color: PetColors.secondaryFixed.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: petCardShadow,
+      ),
+      child: Stack(
+        children: [
+          Positioned(
+            right: -24,
+            bottom: -24,
+            child: Container(
+              width: 96,
+              height: 96,
+              decoration: BoxDecoration(
+                color: PetColors.secondaryContainer.withValues(alpha: 0.4),
+                shape: BoxShape.circle,
+              ),
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    color: PetColors.surfaceLowest,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: petCardShadow,
+                  ),
+                  child: const Icon(Icons.notifications_active, size: 22, color: PetColors.secondary),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 8,
+                            height: 8,
+                            decoration: const BoxDecoration(color: PetColors.secondary, shape: BoxShape.circle),
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            l.petsReminderLabel,
+                            style: PetText.labelSm.copyWith(
+                              color: PetColors.onSecondaryContainer,
+                              fontWeight: FontWeight.w600,
+                              letterSpacing: 0.8,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const _SoonPill(background: PetColors.surfaceLowest),
+                        ],
+                      ),
+                      const SizedBox(height: 2),
+                      Text(l.petsReminderTitle, style: PetText.headlineSm),
+                      const SizedBox(height: 2),
+                      Text(l.petsReminderBody, style: PetText.bodySm),
+                      const SizedBox(height: 12),
+                      Row(
+                        children: [
+                          FilledButton.icon(
+                            onPressed: onTap,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: PetColors.secondary,
+                              minimumSize: const Size(0, 32),
+                              padding: const EdgeInsets.symmetric(horizontal: 12),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            icon: const Icon(Icons.done, size: 16),
+                            label: Text(l.petsReminderDone, style: PetText.labelMd.copyWith(color: Colors.white)),
+                          ),
+                          const SizedBox(width: 8),
+                          TextButton(
+                            onPressed: onTap,
+                            style: TextButton.styleFrom(
+                              backgroundColor: PetColors.surfaceLowest.withValues(alpha: 0.8),
+                              minimumSize: const Size(0, 32),
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                            ),
+                            child: Text(
+                              l.petsReminderPostpone,
+                              style: PetText.labelMd.copyWith(color: PetColors.onSurfaceVariant),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -249,6 +412,7 @@ class _SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Container(
       height: 44,
       decoration: BoxDecoration(
@@ -266,13 +430,13 @@ class _SearchField extends StatelessWidget {
           border: InputBorder.none,
           enabledBorder: InputBorder.none,
           focusedBorder: InputBorder.none,
-          hintText: 'Rechercher par nom, race...',
+          hintText: l.petsSearchHint,
           hintStyle: PetText.bodyMd.copyWith(color: PetColors.outline),
           prefixIcon: const Icon(Icons.search, size: 20, color: PetColors.onSurfaceVariant),
           suffixIcon: controller.text.isEmpty
               ? null
               : IconButton(
-                  tooltip: 'Effacer la recherche',
+                  tooltip: l.petsSearchClear,
                   onPressed: controller.clear,
                   icon: const Icon(Icons.close, size: 18, color: PetColors.outline),
                 ),
@@ -344,14 +508,15 @@ class _PetCardState extends State<_PetCard> {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     final pet = widget.pet;
     final ring = _rings[widget.ringIndex % _rings.length];
     final details = [
-      formatAge(pet.birthDate),
+      formatAge(l, pet.birthDate),
       if (pet.hasChip)
-        'Pucé (ICAD : ${truncateChip(pet.chipNumber!)})'
+        l.petsChipped(truncateChip(pet.chipNumber!))
       else if (pet.sterilized)
-        sterilizedLabel(pet),
+        sterilizedLabel(l, pet),
     ].join(' • ');
 
     return Material(
@@ -386,10 +551,13 @@ class _PetCardState extends State<_PetCard> {
                               const Icon(Icons.favorite, size: 18, color: PetColors.secondary)
                             else if (pet.hasChip)
                               const Icon(Icons.verified_outlined, size: 16, color: PetColors.primary),
+                            const Spacer(),
+                            // Module 2 (Santé) : remplacera cette pastille par l'état vaccinal réel.
+                            const _SoonPill(),
                           ],
                         ),
                         const SizedBox(height: 2),
-                        Text(speciesAndBreed(pet), style: PetText.bodyMd),
+                        Text(speciesAndBreed(l, pet), style: PetText.bodyMd),
                         const SizedBox(height: 2),
                         Text(details, style: PetText.bodySm.copyWith(color: PetColors.outline)),
                         StreamBuilder<List<WeightEntry>>(
@@ -416,16 +584,16 @@ class _PetCardState extends State<_PetCard> {
                 children: [
                   _QuickButton(
                     icon: Icons.medical_services_outlined,
-                    label: 'Santé',
+                    label: l.petsActionHealth,
                     color: PetColors.primaryContainer,
-                    onTap: () => widget.onComingSoon('Carnet de santé'),
+                    onTap: () => widget.onComingSoon(l.petsScreenHealthBook),
                   ),
                   const SizedBox(width: 8),
                   _QuickButton(
                     icon: Icons.calendar_today_outlined,
-                    label: 'Rendez-vous',
+                    label: l.petsActionAppointments,
                     color: PetColors.onSurfaceVariant,
-                    onTap: () => widget.onComingSoon('Rendez-vous'),
+                    onTap: () => widget.onComingSoon(l.petsScreenAppointments),
                   ),
                   const Spacer(),
                   TextButton(
@@ -439,7 +607,7 @@ class _PetCardState extends State<_PetCard> {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('Profil', style: PetText.labelMd.copyWith(color: PetColors.primary)),
+                        Text(l.petsActionProfile, style: PetText.labelMd.copyWith(color: PetColors.primary)),
                         const Icon(Icons.chevron_right, size: 18),
                       ],
                     ),
@@ -510,6 +678,7 @@ class _WeightPill extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(color: PetColors.surfaceLow, borderRadius: BorderRadius.circular(8)),
@@ -523,13 +692,13 @@ class _WeightPill extends StatelessWidget {
               TextSpan(
                 style: PetText.bodySm.copyWith(color: PetColors.onSurface),
                 children: [
-                  const TextSpan(text: 'Dernier poids : '),
+                  TextSpan(text: l.petsWeightLast),
                   TextSpan(
-                    text: '${formatKg(entry.weightKg)} kg',
+                    text: '${formatKg(l, entry.weightKg)} kg',
                     style: const TextStyle(fontWeight: FontWeight.w600),
                   ),
                   TextSpan(
-                    text: '  (${formatSince(entry.measuredOn)})',
+                    text: '  (${formatSince(l, entry.measuredOn)})',
                     style: PetText.labelSm.copyWith(color: PetColors.outline),
                   ),
                 ],
@@ -583,6 +752,7 @@ class _FosterCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(color: PetColors.surfaceLow, borderRadius: BorderRadius.circular(16)),
@@ -595,12 +765,12 @@ class _FosterCard extends StatelessWidget {
             child: const Icon(Icons.volunteer_activism_outlined, size: 20, color: PetColors.primary),
           ),
           const SizedBox(width: 12),
-          const Expanded(
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("Famille d'accueil ou bénévole ?", style: PetText.labelLg),
-                Text('Liez les fiches temporaires de votre association', style: PetText.bodySm),
+                Text(l.petsFosterTitle, style: PetText.labelLg),
+                Text(l.petsFosterBody, style: PetText.bodySm),
               ],
             ),
           ),
@@ -612,10 +782,10 @@ class _FosterCard extends StatelessWidget {
             child: InkWell(
               customBorder: const CircleBorder(),
               onTap: onTap,
-              child: const SizedBox(
+              child: SizedBox(
                 width: 32,
                 height: 32,
-                child: Icon(Icons.add, size: 18, color: PetColors.primary, semanticLabel: 'Synchroniser une association'),
+                child: Icon(Icons.add, size: 18, color: PetColors.primary, semanticLabel: l.petsFosterAction),
               ),
             ),
           ),
@@ -688,12 +858,13 @@ class _VisitorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return _MessageState(
       icon: Icons.pets,
-      text: 'Connectez-vous pour créer le profil de vos animaux et suivre leur santé.',
+      text: l.petsVisitorText,
       action: FilledButton(
         onPressed: () => Navigator.of(context).pushNamed(AppRoutes.login),
-        child: const Text('Se connecter'),
+        child: Text(l.shellSignIn),
       ),
     );
   }
@@ -708,130 +879,134 @@ class _EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
-      children: [
-        Row(
+    final l = AppLocalizations.of(context);
+    return Align(
+      alignment: Alignment.topCenter,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 720),
+        child: ListView(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 32),
           children: [
-            const Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(l.petsEmptyHeader, style: PetText.headlineLgMobile),
+                      Text(l.petsEmptyHeaderBody, style: PetText.bodyMd),
+                    ],
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Container(
+                  width: 40,
+                  height: 40,
+                  decoration: const BoxDecoration(
+                    color: PetColors.secondaryFixed,
+                    shape: BoxShape.circle,
+                    boxShadow: petCardShadow,
+                  ),
+                  child: const Icon(Icons.favorite, size: 20, color: PetColors.onSecondaryFixed),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              decoration: BoxDecoration(color: PetColors.surfaceLow, borderRadius: BorderRadius.circular(12)),
+              child: Row(
                 children: [
-                  Text('Mes compagnons', style: PetText.headlineLgMobile),
-                  Text('Gérez la santé et le suivi de vos fidèles amis au quotidien.', style: PetText.bodyMd),
+                  const Icon(Icons.search, size: 20, color: PetColors.outline),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(l.petsEmptySearchHint, style: PetText.bodyMd.copyWith(color: PetColors.outline)),
+                  ),
+                  const Icon(Icons.tune, size: 18, color: PetColors.outline),
                 ],
               ),
             ),
-            const SizedBox(width: 8),
-            Container(
-              width: 40,
-              height: 40,
-              decoration: const BoxDecoration(
-                color: PetColors.secondaryFixed,
-                shape: BoxShape.circle,
-                boxShadow: petCardShadow,
-              ),
-              child: const Icon(Icons.favorite, size: 20, color: PetColors.onSecondaryFixed),
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                _CountChip(label: l.petsEmptyActive, selected: true),
+                const SizedBox(width: 8),
+                _CountChip(label: l.petsEmptyArchived, selected: false),
+              ],
             ),
-          ],
-        ),
-        const SizedBox(height: 16),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-          decoration: BoxDecoration(color: PetColors.surfaceLow, borderRadius: BorderRadius.circular(12)),
-          child: Row(
-            children: [
-              const Icon(Icons.search, size: 20, color: PetColors.outline),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  'Rechercher par nom, race, puce...',
-                  style: PetText.bodyMd.copyWith(color: PetColors.outline),
+            const SizedBox(height: 24),
+            _EmptyCard(onAdd: onAdd, onImport: () => onComingSoon(l.petsScreenImport)),
+            const SizedBox(height: 24),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 4),
+              child: Row(
+                children: [
+                  Expanded(child: Text(l.petsBenefitsTitle, style: PetText.labelLg)),
+                  Text(l.petsBenefitsCount, style: PetText.labelSm.copyWith(color: PetColors.primary)),
+                ],
+              ),
+            ),
+            const SizedBox(height: 8),
+            _BenefitTile(
+              icon: Icons.menu_book_outlined,
+              iconBackground: const Color(0x1A0F766E),
+              iconColor: PetColors.primaryContainer,
+              title: l.petsBenefit1Title,
+              text: l.petsBenefit1Body,
+            ),
+            const SizedBox(height: 8),
+            _BenefitTile(
+              icon: Icons.notifications_active_outlined,
+              iconBackground: PetColors.secondaryFixed,
+              iconColor: PetColors.secondary,
+              title: l.petsBenefit2Title,
+              text: l.petsBenefit2Body,
+            ),
+            const SizedBox(height: 8),
+            _BenefitTile(
+              icon: Icons.diversity_1_outlined,
+              iconBackground: PetColors.tertiaryFixed,
+              iconColor: PetColors.tertiary,
+              title: l.petsBenefit3Title,
+              text: l.petsBenefit3Body,
+            ),
+            const SizedBox(height: 24),
+            Material(
+              borderRadius: BorderRadius.circular(16),
+              clipBehavior: Clip.antiAlias,
+              child: Ink(
+                decoration: const BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [PetColors.surfaceHigh, PetColors.surfaceContainer, PetColors.surfaceLow],
+                  ),
                 ),
-              ),
-              const Icon(Icons.tune, size: 18, color: PetColors.outline),
-            ],
-          ),
-        ),
-        const SizedBox(height: 16),
-        const Row(
-          children: [
-            _CountChip(label: 'Actifs', selected: true),
-            SizedBox(width: 8),
-            _CountChip(label: 'Archivés', selected: false),
-          ],
-        ),
-        const SizedBox(height: 24),
-        _EmptyCard(onAdd: onAdd, onImport: () => onComingSoon('Importer une fiche')),
-        const SizedBox(height: 24),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 4),
-          child: Row(
-            children: [
-              const Expanded(child: Text('Ce qui vous attend avec PetCare', style: PetText.labelLg)),
-              Text('3 outils clés', style: PetText.labelSm.copyWith(color: PetColors.primary)),
-            ],
-          ),
-        ),
-        const SizedBox(height: 8),
-        const _BenefitTile(
-          icon: Icons.menu_book_outlined,
-          iconBackground: Color(0x1A0F766E),
-          iconColor: PetColors.primaryContainer,
-          title: 'Carnet de santé numérique',
-          text: 'Poids, antécédents, stérilisation et ordonnances toujours accessibles.',
-        ),
-        const SizedBox(height: 8),
-        const _BenefitTile(
-          icon: Icons.notifications_active_outlined,
-          iconBackground: PetColors.secondaryFixed,
-          iconColor: PetColors.secondary,
-          title: 'Rappels intelligents',
-          text: 'Alertes automatiques pour vermifuges, vaccins et visites médicales.',
-        ),
-        const SizedBox(height: 8),
-        const _BenefitTile(
-          icon: Icons.diversity_1_outlined,
-          iconBackground: PetColors.tertiaryFixed,
-          iconColor: PetColors.tertiary,
-          title: 'Réseau bienveillant',
-          text: 'Garde entre passionnés vérifiés et conseils certifiés.',
-        ),
-        const SizedBox(height: 24),
-        Material(
-          borderRadius: BorderRadius.circular(16),
-          clipBehavior: Clip.antiAlias,
-          child: Ink(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                colors: [PetColors.surfaceHigh, PetColors.surfaceContainer, PetColors.surfaceLow],
-              ),
-            ),
-            child: InkWell(
-              onTap: () => onComingSoon('Guide de bienvenue'),
-              child: const Padding(
-                padding: EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Icon(Icons.lightbulb_outline, size: 26, color: PetColors.primaryContainer),
-                    SizedBox(width: 8),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Besoin d'aide pour démarrer ?", style: PetText.labelMd),
-                          Text('Consultez notre guide de bienvenue', style: PetText.bodySm),
-                        ],
-                      ),
+                child: InkWell(
+                  onTap: () => onComingSoon(l.petsScreenGuide),
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.lightbulb_outline, size: 26, color: PetColors.primaryContainer),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(l.petsHelpTitle, style: PetText.labelMd),
+                              Text(l.petsHelpBody, style: PetText.bodySm),
+                            ],
+                          ),
+                        ),
+                        const Icon(Icons.chevron_right, size: 20, color: PetColors.outline),
+                      ],
                     ),
-                    Icon(Icons.chevron_right, size: 20, color: PetColors.outline),
-                  ],
+                  ),
                 ),
               ),
             ),
-          ),
+          ],
         ),
-      ],
+      ),
     );
   }
 }
@@ -879,6 +1054,7 @@ class _EmptyCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
     return Container(
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
@@ -922,7 +1098,7 @@ class _EmptyCard extends StatelessWidget {
                               ),
                               const SizedBox(width: 4),
                               Text(
-                                'Nouveau départ',
+                                l.petsEmptyBadge,
                                 style: PetText.labelSm.copyWith(color: PetColors.onSurface, fontWeight: FontWeight.w600),
                               ),
                             ],
@@ -933,18 +1109,9 @@ class _EmptyCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  "Vous n'avez pas encore ajouté d'animal",
-                  textAlign: TextAlign.center,
-                  style: PetText.headlineMd,
-                ),
+                Text(l.petsEmptyTitle, textAlign: TextAlign.center, style: PetText.headlineMd),
                 const SizedBox(height: 4),
-                const Text(
-                  'Créez le profil de votre protégé pour gérer son carnet de santé, planifier ses vaccins et '
-                  'veiller sur son bien-être en toute quiétude.',
-                  textAlign: TextAlign.center,
-                  style: PetText.bodyMd,
-                ),
+                Text(l.petsEmptyBody, textAlign: TextAlign.center, style: PetText.bodyMd),
                 const SizedBox(height: 24),
                 ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 320),
@@ -956,7 +1123,7 @@ class _EmptyCard extends StatelessWidget {
                       elevation: 3,
                     ),
                     icon: const Icon(Icons.add_circle_outline, size: 20),
-                    label: Text('Ajouter mon premier compagnon', style: PetText.labelLg.copyWith(color: Colors.white)),
+                    label: Text(l.petsEmptyCta, style: PetText.labelLg.copyWith(color: Colors.white)),
                   ),
                 ),
                 const SizedBox(height: 16),
@@ -971,11 +1138,11 @@ class _EmptyCard extends StatelessWidget {
                         child: Text.rich(
                           TextSpan(
                             style: PetText.labelMd.copyWith(color: PetColors.onSurfaceVariant),
-                            children: const [
-                              TextSpan(text: 'Vous venez d\'adopter sur PetCare ? '),
+                            children: [
+                              TextSpan(text: l.petsEmptyImportQuestion),
                               TextSpan(
-                                text: 'Importer la fiche',
-                                style: TextStyle(
+                                text: l.petsEmptyImportLink,
+                                style: const TextStyle(
                                   color: PetColors.primary,
                                   fontWeight: FontWeight.w700,
                                   decoration: TextDecoration.underline,
