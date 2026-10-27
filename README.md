@@ -4,6 +4,8 @@ Application mobile Flutter de **PetCare Community** : gérer ses animaux, trouve
 
 ## Lancer l'application
 
+Guide pas à pas (installation, émulateur ou téléphone, APK) : [docs/LANCER_SUR_MOBILE.md](docs/LANCER_SUR_MOBILE.md).
+
 Prérequis : Flutter (canal stable), un émulateur Android ou un téléphone en mode développeur.
 
 ```bash
