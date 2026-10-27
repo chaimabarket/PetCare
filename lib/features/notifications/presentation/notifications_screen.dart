@@ -48,10 +48,15 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         stream: _service.watch(_uid),
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            return const _Message(
-              icon: Icons.cloud_off,
+            debugPrint('NotificationsScreen: ${snapshot.error}');
+            final denied = snapshot.error is FirebaseException &&
+                (snapshot.error! as FirebaseException).code == 'permission-denied';
+            return _Message(
+              icon: denied ? Icons.lock_outline : Icons.cloud_off,
               title: 'Notifications indisponibles',
-              text: 'Vérifiez votre connexion puis réessayez.',
+              text: denied
+                  ? "Vous n'avez pas accès à ces informations pour le moment."
+                  : 'Vérifiez votre connexion puis réessayez.',
             );
           }
           if (!snapshot.hasData) return const Center(child: CircularProgressIndicator());

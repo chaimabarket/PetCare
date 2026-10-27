@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../core/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/coming_soon_screen.dart';
+import '../../community/presentation/community_screen.dart';
 import '../../notifications/data/notification_service.dart';
 import '../../profile/data/profile_repository.dart';
 import '../../profile/data/user_profile.dart';
@@ -40,8 +41,8 @@ class _MainShellState extends State<MainShell> {
           HomeScreen(onOpenTab: _selectTab),
           // Module 1 (Profils des animaux) : remplacer par l'écran « Mes animaux ».
           const ComingSoonScreen(title: 'Mes animaux', embedded: true),
-          // Modules 4 et 5 (Perdus & trouvés, Adoption) : remplacer par l'écran « Communauté ».
-          const ComingSoonScreen(title: 'Communauté', embedded: true),
+          // Modules 4 et 5 : écran « Communauté » (Adoption, Perdus & trouvés, Happy Tails).
+          const CommunityScreen(),
           // Module 6 (Services) : remplacer par l'annuaire des prestataires.
           const ComingSoonScreen(title: 'Services', embedded: true),
         ],

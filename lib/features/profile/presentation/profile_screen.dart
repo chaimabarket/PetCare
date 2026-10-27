@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/coming_soon_screen.dart';
 import '../../auth/data/auth_service.dart';
 import '../../notifications/data/notification_service.dart';
 import '../data/profile_repository.dart';
@@ -27,10 +26,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   void _editProfile(UserProfile profile) =>
       Navigator.of(context).pushNamed(AppRoutes.editProfile, arguments: profile);
-
-  void _openComingSoon(String title) => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => ComingSoonScreen(title: title)),
-      );
 
   Future<void> _changePassword(UserProfile profile) async {
     final confirmed = await showDialog<bool>(
@@ -118,23 +113,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 _Card(
                   child: Column(
                     children: [
-                      // Modules 4 et 5 : remplacer par l'écran « Mes annonces ».
+                      // Module 4 : ajouter ici « Mes annonces perdus / trouvés ».
                       _MenuTile(
                         icon: Icons.campaign_outlined,
                         iconBackground: const Color(0xFFD9F5F1),
                         iconColor: AppColors.teal,
                         title: 'Mes annonces',
-                        subtitle: "Gérer les fiches d'adoption et d'animaux perdus",
-                        onTap: () => _openComingSoon('Mes annonces'),
+                        subtitle: "Gérer les fiches d'adoption et leurs candidatures",
+                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.myListings),
                       ),
-                      // Module 5 : remplacer par l'écran « Mes candidatures ».
                       _MenuTile(
                         icon: Icons.assignment_ind_outlined,
                         iconBackground: const Color(0xFFFFF0EB),
                         iconColor: const Color(0xFF8C4E38),
                         title: 'Mes candidatures',
                         subtitle: "Suivi de vos demandes d'adoption",
-                        onTap: () => _openComingSoon('Mes candidatures'),
+                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.myApplications),
+                      ),
+                      _MenuTile(
+                        icon: Icons.favorite_border,
+                        iconBackground: const Color(0xFFFFF0EB),
+                        iconColor: AppColors.coralText,
+                        title: 'Mes favoris',
+                        subtitle: 'Les animaux que vous avez enregistrés',
+                        onTap: () => Navigator.of(context).pushNamed(AppRoutes.adoptionFavorites),
                       ),
                       StreamBuilder<int>(
                         stream: _unreadStream,

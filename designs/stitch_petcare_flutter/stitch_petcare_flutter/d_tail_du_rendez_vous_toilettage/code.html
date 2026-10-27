@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "inverse-surface": "#27313f", "tertiary-container": "#9c573a", "surface-dim": "#d0dbed", "primary-fixed-dim": "#80d5cb", "on-primary-fixed": "#00201d", "surface-tint": "#006a63", "inverse-primary": "#80d5cb", "surface": "#f8f9ff", "tertiary": "#7f4025", "surface-container-high": "#dee9fc", "primary-fixed": "#9cf2e8", "on-tertiary-container": "#ffe5db", "on-surface-variant": "#3e4947", "error": "#ba1a1a", "on-error-container": "#93000a", "primary": "#005c55", "on-background": "#121c2a", "secondary": "#8c4e38", "on-tertiary-fixed": "#370e00", "surface-container": "#e6eeff", "secondary-container": "#feae92", "on-secondary-container": "#793f2a", "on-secondary-fixed-variant": "#6f3723", "on-secondary": "#ffffff", "error-container": "#ffdad6", "outline-variant": "#bdc9c6", "tertiary-fixed": "#ffdbce", "surface-container-low": "#eff4ff", "on-secondary-fixed": "#380d01", "on-primary-container": "#a3faef", "on-primary-fixed-variant": "#00504a", "on-surface": "#121c2a", "secondary-fixed-dim": "#ffb59c", "surface-bright": "#f8f9ff", "background": "#f8f9ff", "on-tertiary": "#ffffff", "inverse-on-surface": "#eaf1ff", "on-tertiary-fixed-variant": "#72361b", "surface-container-highest": "#d9e3f6", "primary-container": "#0f766e", "secondary-fixed": "#ffdbcf", "tertiary-fixed-dim": "#ffb598", "on-primary": "#ffffff", "outline": "#6e7977", "surface-variant": "#d9e3f6", "on-error": "#ffffff", "surface-container-lowest": "#ffffff" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "space-lg": "1.5rem", "margin": "1.5rem", "space-sm": "0.5rem", "space-xl": "2rem", "gutter-mobile": "0.75rem", "gutter": "1rem", "space-xs": "0.25rem", "space-md": "1rem", "margin-mobile": "1rem" }, "fontFamily": { "label-lg": ["Inter"], "headline-lg-mobile": ["Inter"], "headline-lg": ["Inter"], "body-lg": ["Inter"], "headline-sm": ["Inter"], "label-sm": ["Inter"], "body-sm": ["Inter"], "body-md": ["Inter"], "headline-md": ["Inter"], "label-md": ["Inter"] }, "fontSize": { "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "fontWeight": "700" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }] } } } };</script><style>@layer base { html, body { width: 100vw; margin: 0; padding: 0; } body { overscroll-behavior: none; } .pb-safe { padding-bottom: env(safe-area-inset-bottom, 0px); } .pt-safe { padding-top: env(safe-area-inset-top, 0px); } main > :first-child { margin-top: 0 !important; } main > :last-child { margin-bottom: 0 !important; } } ::-webkit-scrollbar { display: none; }</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center min-w-0"><button aria-label="Retour aux rendez-vous" class="min-w-[44px] min-h-[44px] flex items-center gap-space-xs text-primary font-label-lg text-label-lg rounded-xl hover:bg-surface-container-low transition-colors -ml-2 px-space-xs" onclick="history.back()"><span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span><span class="truncate hidden sm:inline">Rendez-vous</span></button></div><h1 class="font-headline-sm text-headline-sm text-on-surface truncate text-center flex-1 px-space-xs">Détail Du Rendez Vous</h1><div class="flex items-center justify-end gap-space-xs"><button aria-label="Partager" class="w-11 h-11 min-w-[44px] min-h-[44px] flex items-center justify-center text-on-surface-variant hover:text-primary rounded-full hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[22px]">share</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-safe bg-surface flex-1"><div class="flex flex-col w-full pb-8">
+<div class="px-margin-mobile flex flex-col gap-space-lg max-w-xl mx-auto w-full">
+<!-- En-tête de synthèse du rendez-vous -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col gap-space-md relative overflow-hidden">
+<div class="flex items-center justify-between gap-space-sm flex-wrap">
+<span class="inline-flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px]">hourglass_top</span>
+          En attente de confirmation
+        </span>
+<span class="inline-flex items-center gap-space-xs px-space-sm py-1 rounded-full bg-surface-container-high text-on-surface-variant font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">schedule</span>
+          Dans 3 jours
+        </span>
+</div>
+<div class="flex items-start justify-between gap-space-sm">
+<div class="flex items-center gap-space-md">
+<div class="w-12 h-12 rounded-xl bg-surface-container-high flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[28px]">content_cut</span>
+</div>
+<div class="flex flex-col min-w-0">
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">Toilettage – 45 min</h2>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Soin complet, brossage &amp; bain doux</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs text-primary font-label-lg text-label-lg">
+<span class="material-symbols-outlined text-[20px]">event</span>
+<span>Mardi 12 novembre 2024</span>
+</div>
+<div class="flex items-center justify-between text-on-surface-variant font-body-md text-body-md pl-7">
+<span>14:00 à 14:45</span>
+<span class="font-headline-sm text-headline-sm text-primary">45,00 €</span>
+</div>
+<div class="text-right text-on-surface-variant font-body-sm text-body-sm">
+          Règlement sur place
+        </div>
+</div>
+</section>
+<!-- Fiche Animal Concerné -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-lg text-label-lg text-on-surface flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">pets</span>
+          Animal concerné
+        </span>
+<span class="font-label-sm text-label-sm px-2 py-0.5 rounded-full bg-surface-container text-on-surface-variant">Fiche à jour</span>
+</div>
+<div class="flex items-center gap-space-md">
+<img class="w-16 h-16 rounded-xl object-cover shrink-0 bg-surface-container-high" data-alt="Close up portrait of Nala a graceful striped European shorthair tabby cat with expressive amber green eyes sitting quietly indoors soft ambient light modern warm tone pet photography" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCE3AJ9fG3Mpo0oZiP4Oz5MZEV_c9vF4pu0hN3k-d_89fkaMjP7VgCPVLCkMHDeA-JmHywdN5q7aIVi5gAx2JHgQquvlVy84gkhJNtQmLUgAMogVlB6_q18zA0Rg5BQ_L_Swcyq9yHSsMNzSRXUxNbmc8W_NXPak0c5TY3Yk2FlQYAPktrZxBGOq7bY3eOZum6FQdRhw6Y8jrXbAGwpRGjqp9FJQtkhCvgQC2yKTARl58nvijehgiRN"/>
+<div class="flex flex-col min-w-0 flex-1">
+<div class="flex items-center gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Nala</h3>
+<span class="material-symbols-outlined text-secondary text-[16px]" title="Femelle">female</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Chatte Européenne • 2 ans • Foyer Lina</p>
+<div class="flex items-center gap-space-xs mt-1">
+<span class="font-label-sm text-label-sm px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant">4.2 kg</span>
+<span class="font-label-sm text-label-sm px-space-xs py-0.5 rounded bg-surface-container-high text-on-surface-variant">Pucée</span>
+</div>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-xs">
+<div class="flex items-center gap-space-xs font-label-md text-label-md text-secondary">
+<span class="material-symbols-outlined text-[18px]">favorite</span>
+<span>Notes de soin pour le prestataire</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+          Pelage mi-long, sensible au brossage sur l'arrière-train. Shampoing hypoallergénique doux souhaité. Très douce mais craintive avec les bruits stridents de pulseur.
+        </p>
+</div>
+</section>
+<!-- Fiche Prestataire (Salon de toilettage) -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-lg text-label-lg text-on-surface flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">storefront</span>
+          Prestataire de soin
+        </span>
+<div class="flex items-center gap-1 font-label-md text-label-md text-on-surface">
+<span class="material-symbols-outlined text-[16px] text-secondary" style="font-variation-settings: 'FILL' 1;">star</span>
+<span class="font-semibold">4.9</span>
+<span class="text-on-surface-variant font-normal">(128 avis)</span>
+</div>
+</div>
+<div class="flex flex-col gap-space-xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Salon Toutou &amp; Minou Choyés</h3>
+<p class="font-body-md text-body-md text-on-surface-variant">8 bis Avenue Gambetta, 75020 Paris</p>
+<div class="flex items-center gap-space-xs text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[16px]">near_me</span>
+<span>1.8 km de votre domicile • Métro Gambetta</span>
+</div>
+</div>
+<!-- Mini-carte intégrée -->
+<div class="w-full h-32 rounded-xl bg-surface-container-high bg-cover bg-center flex items-end p-space-sm" data-location="8 bis Avenue Gambetta, 75020 Paris" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuDtwkeqyKKBwuQ7r57bxfoqI40opc-q6W9DmMPFzfdV7TIavLoR86f2Xv2UIC5ET6jzKiMHUjwAchzWFx803YCfOSb1a9muNvTXYNJxQrvBuZTKTxKdY07ZnHV6mHwmRvXLVBGR0ibseNBum3u7lptB-vRnysiE6BtNnYM1yA9nF9gFfvmAZQbO3PjtEAgnMHf5nJzBzzlD-Z0MR9NGly2YeQbc_0meY_ZdJYv6oDFQEGl9u7-mqbEg')">
+<div class="bg-surface-container-lowest/90 backdrop-blur-sm px-space-sm py-1 rounded-lg flex items-center gap-space-xs text-on-surface font-label-sm text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-primary text-[16px]">location_on</span>
+<span>Paris 20e • Quartier Père Lachaise</span>
+</div>
+</div>
+<!-- Actions rapides prestataire -->
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<a class="min-h-[44px] flex items-center justify-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-container-low hover:bg-surface-container-high text-primary font-label-lg text-label-lg transition-colors" href="geo:0,0?q=8+bis+Avenue+Gambetta+75020+Paris">
+<span class="material-symbols-outlined text-[20px]">directions</span>
+<span>Itinéraire</span>
+</a>
+<a class="min-h-[44px] flex items-center justify-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-container-low hover:bg-surface-container-high text-primary font-label-lg text-label-lg transition-colors" href="tel:+33140302010">
+<span class="material-symbols-outlined text-[20px]">call</span>
+<span>Appeler</span>
+</a>
+</div>
+</section>
+<!-- Paramètres de Rappel & Notifications -->
+<section class="bg-surface-container-lowest rounded-xl shadow-sm p-space-md flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-lg text-label-lg text-on-surface flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">notifications_active</span>
+          Rappels &amp; Alertes
+        </span>
+</div>
+<div class="flex items-center justify-between gap-space-sm py-space-xs">
+<div class="flex flex-col min-w-0 flex-1">
+<span class="font-label-lg text-label-lg text-on-surface">Me rappeler 1 jour avant</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Lundi 11 nov. à 10:00 (Push &amp; SMS)</span>
+</div>
+<button aria-checked="true" class="w-12 h-7 bg-primary rounded-full relative transition-colors p-0.5 shrink-0" id="reminder-toggle" onclick="toggleReminder(this)" role="switch" type="button">
+<span class="w-6 h-6 bg-surface-container-lowest rounded-full block shadow-sm transform translate-x-5 transition-transform"></span>
+</button>
+</div>
+<button class="min-h-[44px] w-full flex items-center justify-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-container text-on-surface font-label-lg text-label-lg hover:bg-surface-container-high transition-colors" onclick="addToCalendar()" type="button">
+<span class="material-symbols-outlined text-primary text-[20px]">calendar_add_on</span>
+<span>Ajouter à Google Agenda / Apple Calendar</span>
+</button>
+</section>
+<!-- Vue Prestataire / Encadré Mode Professionnel -->
+<section class="bg-surface-container-low rounded-xl p-space-md flex flex-col gap-space-md shadow-sm">
+<div class="flex items-center justify-between flex-wrap gap-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">badge</span>
+<span class="font-label-lg text-label-lg text-on-surface">Espace Prestataire</span>
+</div>
+<span class="font-label-sm text-label-sm px-space-sm py-0.5 rounded-full bg-primary-fixed text-on-primary-fixed">Vue salon partenaire</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+        Cette demande de réservation est en attente de votre validation pour bloquer définitivement le créneau de 14:00.
+      </p>
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<button class="min-h-[48px] w-full flex items-center justify-center gap-space-xs px-space-md py-space-sm rounded-xl bg-primary text-on-primary font-label-lg text-label-lg hover:bg-primary-container transition-colors shadow-sm" id="btn-confirm-appt" onclick="confirmAppointment(this)" type="button">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span>Confirmer le rendez-vous</span>
+</button>
+<button class="min-h-[44px] w-full flex items-center justify-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-container-lowest text-primary font-label-lg text-label-lg hover:bg-surface-container transition-colors" onclick="proposeAlternateTime()" type="button">
+<span class="material-symbols-outlined text-[20px]">update</span>
+<span>Proposer un autre horaire</span>
+</button>
+</div>
+</section>
+<!-- Actions Client (Propriétaire) -->
+<div class="flex flex-col gap-space-sm pt-space-xs">
+<button class="min-h-[48px] w-full flex items-center justify-center gap-space-xs px-space-md py-space-sm rounded-xl bg-surface-container text-primary font-label-lg text-label-lg hover:bg-surface-container-high transition-colors" onclick="rescheduleAppointment()" type="button">
+<span class="material-symbols-outlined text-[20px]">sync</span>
+<span>Reporter le rendez-vous</span>
+</button>
+<button class="min-h-[44px] w-full flex items-center justify-center gap-space-xs px-space-md py-space-sm rounded-xl text-error hover:bg-error-container/20 font-label-lg text-label-lg transition-colors" onclick="promptCancelAppointment()" type="button">
+<span class="material-symbols-outlined text-[20px]">cancel</span>
+<span>Annuler le rendez-vous</span>
+</button>
+</div>
+<!-- Bannière d'aide & bienveillance -->
+<div class="bg-surface-container-lowest rounded-xl p-space-md flex items-center gap-space-md shadow-sm">
+<div class="w-10 h-10 rounded-full bg-secondary-fixed flex items-center justify-center text-on-secondary-fixed shrink-0">
+<span class="material-symbols-outlined text-[20px]">verified_user</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-md text-label-md text-on-surface">Annulation gratuite jusqu'à 24h avant</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Pour toute urgence concernant Nala, contactez directement l'équipe du salon.</span>
+</div>
+</div>
+</div>
+</div>
+<script>
+  function toggleReminder(btn) {
+    const isChecked = btn.getAttribute('aria-checked') === 'true';
+    const thumb = btn.querySelector('span');
+    if (isChecked) {
+      btn.setAttribute('aria-checked', 'false');
+      btn.classList.remove('bg-primary');
+      btn.classList.add('bg-outline-variant');
+      thumb.classList.remove('translate-x-5');
+      thumb.classList.add('translate-x-0');
+    } else {
+      btn.setAttribute('aria-checked', 'true');
+      btn.classList.remove('bg-outline-variant');
+      btn.classList.add('bg-primary');
+      thumb.classList.remove('translate-x-0');
+      thumb.classList.add('translate-x-5');
+    }
+  }
+
+  function confirmAppointment(btn) {
+    btn.innerHTML = '<span class="material-symbols-outlined text-[20px]">check</span><span>Rendez-vous confirmé !</span>';
+    btn.classList.add('opacity-90');
+    btn.disabled = true;
+  }
+
+  function proposeAlternateTime() {
+    alert('Ouverture du planning pour sélectionner un nouveau créneau disponible.');
+  }
+
+  function rescheduleAppointment() {
+    alert('Redirection vers le calendrier de réservation du Salon Toutou & Minou Choyés.');
+  }
+
+  function promptCancelAppointment() {
+    if (confirm('Êtes-vous sûr de vouloir annuler le rendez-vous de Nala prévu le Mardi 12 novembre à 14:00 ?')) {
+      alert('La demande d\'annulation a été transmise.');
+    }
+  }
+
+  function addToCalendar() {
+    alert('Événement généré pour l\'agenda : Toilettage Nala - 12 nov. 14:00 à 14:45.');
+  }
+</script></main></body></html>

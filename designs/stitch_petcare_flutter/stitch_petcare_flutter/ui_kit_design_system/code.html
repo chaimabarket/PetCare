@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "on-error-container": "#93000a", "surface-container-high": "#dee9fc", "error": "#ba1a1a", "inverse-surface": "#27313f", "surface-dim": "#d0dbed", "surface-variant": "#d9e3f6", "primary": "#005c55", "primary-fixed": "#9cf2e8", "on-secondary-container": "#793f2a", "on-secondary-fixed-variant": "#6f3723", "surface-container-highest": "#d9e3f6", "secondary": "#8c4e38", "surface": "#f8f9ff", "surface-container-low": "#eff4ff", "tertiary-container": "#9c573a", "surface-container": "#e6eeff", "on-tertiary": "#ffffff", "tertiary": "#7f4025", "outline": "#6e7977", "inverse-primary": "#80d5cb", "on-surface-variant": "#3e4947", "on-secondary": "#ffffff", "on-primary-container": "#a3faef", "on-secondary-fixed": "#380d01", "primary-fixed-dim": "#80d5cb", "on-tertiary-fixed-variant": "#72361b", "on-background": "#121c2a", "on-error": "#ffffff", "tertiary-fixed-dim": "#ffb598", "primary-container": "#0f766e", "on-surface": "#121c2a", "surface-bright": "#f8f9ff", "on-tertiary-fixed": "#370e00", "on-primary": "#ffffff", "surface-container-lowest": "#ffffff", "on-tertiary-container": "#ffe5db", "secondary-fixed-dim": "#ffb59c", "background": "#f8f9ff", "surface-tint": "#006a63", "error-container": "#ffdad6", "secondary-container": "#feae92", "secondary-fixed": "#ffdbcf", "on-primary-fixed-variant": "#00504a", "on-primary-fixed": "#00201d", "inverse-on-surface": "#eaf1ff", "outline-variant": "#bdc9c6", "tertiary-fixed": "#ffdbce" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "margin-mobile": "1rem", "space-lg": "1.5rem", "space-xs": "0.25rem", "space-md": "1rem", "gutter": "1rem", "space-xl": "2rem", "space-sm": "0.5rem", "margin": "1.5rem", "gutter-mobile": "0.75rem" }, fontFamily: { "label-sm": ["Inter"], "headline-md": ["Inter"], "body-sm": ["Inter"], "body-lg": ["Inter"], "label-lg": ["Inter"], "headline-lg-mobile": ["Inter"], "label-md": ["Inter"], "body-md": ["Inter"], "headline-sm": ["Inter"], "headline-lg": ["Inter"] }, fontSize: { "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }] } } } };</script><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface antialiased flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)] pt-safe"><div class="h-16 px-margin-mobile flex items-center justify-between"><div class="flex items-center gap-space-sm"><img alt="PetCare Community Logo" class="h-8 w-auto object-contain" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCyfMtkgQ6c6NJkv7PE-orGypFMbRZ019ZuinHrhWCwJ7GpPChjjQIrEub9Su1NiiHOvDTsUo6ltZ__6DkQFz7NZxn2Hq8l01zYSwzRNB0FazBe5P3bZldJ_7O4UvtNfIcEZ0H-E1ZS8wfamqETj5cKmsj5fSACnMu-CtfZjgRS6AwyYHAuL5oxH0Mdad5AO-rPCysSGNGkC-fUpJoF1kjUKv2FwmmEqJdD3LGr8AlYr5xH1Av4q5tW"/><div class="flex flex-col"><span class="font-label-sm text-label-sm text-on-surface-variant leading-none">PetCare Community</span><span class="font-headline-sm text-headline-sm text-on-surface tracking-tight leading-tight">Accueil</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-low transition-colors"><span class="material-symbols-outlined text-[22px]">notifications</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-24 bg-surface"><div class="flex flex-col w-full">
+<!-- SECTION 1: HEADER & SYSTEM BADGE -->
+<header class="px-margin-mobile pt-space-md pb-space-lg">
+<div class="inline-flex items-center gap-space-xs px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant mb-space-sm shadow-sm">
+<span class="material-symbols-outlined text-[15px]" style="font-variation-settings: 'FILL' 1;">pets</span>
+<span class="font-label-sm text-label-sm">PetCare Community — Design System Mobile v1.0</span>
+</div>
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface tracking-tight">
+      Guide & Composants UI
+    </h1>
+<p class="font-body-md text-body-md text-on-surface-variant mt-space-xs">
+      Référence exhaustive des styles, palettes bienveillantes, états interactifs et composants mobiles de notre réseau d'adoption.
+    </p>
+</header>
+<div class="flex flex-col gap-space-xl px-margin-mobile pb-space-xl">
+<!-- SECTION 2: PALETTE DE COULEURS -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">palette</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">1. Palette de Couleurs</h2>
+</div>
+<!-- Color Grid: Roles & Swatches -->
+<div class="grid grid-cols-2 gap-gutter-mobile">
+<!-- Primaire Sarcelle -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex flex-col gap-2">
+<div class="h-14 w-full rounded-lg bg-primary-container flex items-end p-1.5 shadow-inner">
+<span class="font-label-sm text-label-sm text-on-primary bg-black/20 px-1.5 py-0.5 rounded backdrop-blur-sm">#0F766E</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Primaire Sarcelle</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Actions maîtresses</p>
+</div>
+</div>
+<!-- Accent Émotionnel -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex flex-col gap-2">
+<div class="h-14 w-full rounded-lg bg-secondary-container flex items-end p-1.5 shadow-inner">
+<span class="font-label-sm text-label-sm text-on-secondary-container bg-black/10 px-1.5 py-0.5 rounded backdrop-blur-sm">#F4A58A / #E07A5F</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Corail Émotionnel</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Coups de cœur, dons</p>
+</div>
+</div>
+<!-- Fond Écran & Surface -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex flex-col gap-2">
+<div class="h-14 w-full rounded-lg bg-surface-container-low flex items-end p-1.5 shadow-inner">
+<span class="font-label-sm text-label-sm text-on-surface bg-black/5 px-1.5 py-0.5 rounded backdrop-blur-sm">#F8FAF9 / #FFFFFF</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Surfaces & Fond</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Canvas organique neutre</p>
+</div>
+</div>
+<!-- Neutres / Texte -->
+<div class="bg-surface-container-lowest p-space-sm rounded-xl shadow-sm flex flex-col gap-2">
+<div class="h-14 w-full rounded-lg bg-inverse-surface flex items-end p-1.5 shadow-inner">
+<span class="font-label-sm text-label-sm text-inverse-on-surface bg-white/10 px-1.5 py-0.5 rounded backdrop-blur-sm">#1F2937 / #6B7280</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Neutres Sombre</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Titres et corps de texte</p>
+</div>
+</div>
+</div>
+<!-- Statuts Palette Row -->
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<span class="font-label-md text-label-md text-on-surface">Teintes Sémantiques</span>
+<div class="grid grid-cols-5 gap-space-xs text-center">
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-xs">
+<span class="material-symbols-outlined text-[16px]">check</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant leading-none">Succès<br/>#10B981</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-secondary-fixed-dim flex items-center justify-center text-on-secondary-fixed shadow-xs">
+<span class="material-symbols-outlined text-[16px]">hourglass_top</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant leading-none">Attente<br/>#F59E0B</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shadow-xs">
+<span class="material-symbols-outlined text-[16px]">volunteer_activism</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant leading-none">Adopté<br/>#F4A58A</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-surface-container-highest flex items-center justify-center text-on-surface-variant shadow-xs">
+<span class="material-symbols-outlined text-[16px]">archive</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant leading-none">Archivé<br/>#6B7280</span>
+</div>
+<div class="flex flex-col items-center gap-1">
+<div class="w-8 h-8 rounded-full bg-error flex items-center justify-center text-on-error shadow-xs">
+<span class="material-symbols-outlined text-[16px]">priority_high</span>
+</div>
+<span class="font-label-sm text-[10px] text-on-surface-variant leading-none">Erreur<br/>#DC2626</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 3: TYPOGRAPHY SCALE -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">text_fields</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">2. Échelle Typographique</h2>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-md">
+<!-- H1 Scale -->
+<div class="flex flex-col pb-space-sm bg-surface-container-low/40 p-space-sm rounded-lg">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-label-sm text-label-sm text-primary">Titre Principal H1</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">24px / Bold / #1F2937</span>
+</div>
+<p class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Trouvez votre compagnon</p>
+</div>
+<!-- H2 Scale -->
+<div class="flex flex-col pb-space-sm bg-surface-container-low/40 p-space-sm rounded-lg">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-label-sm text-label-sm text-primary">Sous-titre H2</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">18px / Semibold / #1F2937</span>
+</div>
+<p class="font-headline-sm text-headline-sm text-on-surface">Nos animaux prêts à être adoptés</p>
+</div>
+<!-- Body Scale -->
+<div class="flex flex-col pb-space-sm bg-surface-container-low/40 p-space-sm rounded-lg">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-label-sm text-label-sm text-primary">Corps de texte (Body)</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">14px / Regular / #1F2937</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface">Offrez un foyer chaleureux à un animal dans le besoin grâce à notre réseau associatif et solidaire.</p>
+</div>
+<!-- Caption Scale -->
+<div class="flex flex-col bg-surface-container-low/40 p-space-sm rounded-lg">
+<div class="flex justify-between items-baseline mb-1">
+<span class="font-label-sm text-label-sm text-primary">Légende & Métadonnées</span>
+<span class="font-label-sm text-[10px] text-on-surface-variant">12px / Medium / #6B7280</span>
+</div>
+<p class="font-label-md text-label-md text-on-surface-variant">Dernière mise à jour : il y a 2 heures</p>
+</div>
+</div>
+</section>
+<!-- SECTION 4: BOUTONS INTERACTIFS -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">smart_button</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">3. Boutons Interactifs</h2>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-md">
+<!-- Bouton Primaire -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Bouton Primaire (Sarcelle #0F766E)</span>
+<button class="w-full h-12 bg-primary-container active:scale-[0.99] text-on-primary rounded-xl font-label-lg text-label-lg shadow-sm flex items-center justify-center gap-space-xs transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">pets</span>
+<span>Adopter maintenant</span>
+</button>
+</div>
+<!-- Bouton Secondaire -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Bouton Secondaire Conteneur</span>
+<button class="w-full h-12 bg-surface-container-high text-primary active:bg-surface-variant rounded-xl font-label-lg text-label-lg shadow-sm flex items-center justify-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">info</span>
+<span>En savoir plus</span>
+</button>
+</div>
+<!-- Bouton Émotion Corail -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Bouton Coup de Cœur & Don (#F4A58A)</span>
+<button class="w-full h-12 bg-secondary-container text-on-secondary-container active:bg-secondary active:text-on-secondary rounded-xl font-label-lg text-label-lg shadow-sm flex items-center justify-center gap-space-xs transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span>Coup de cœur</span>
+</button>
+</div>
+<!-- Bouton Désactivé -->
+<div class="flex flex-col gap-1">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Bouton Désactivé / Inerte</span>
+<button class="w-full h-12 bg-surface-container-highest text-outline cursor-not-allowed rounded-xl font-label-lg text-label-lg flex items-center justify-center gap-space-xs" disabled="" type="button">
+<span class="material-symbols-outlined text-[20px]">block</span>
+<span>Action indisponible</span>
+</button>
+</div>
+</div>
+</section>
+<!-- SECTION 5: CHAMPS DE FORMULAIRE -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">edit_note</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">4. Formulaires & Saisies</h2>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-md">
+<!-- État Normal -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-on-surface flex items-center gap-1">
+<span>Nom de votre animal</span>
+</label>
+<div class="relative flex items-center">
+<input class="w-full h-12 px-space-md pr-10 rounded-xl bg-surface-container-low text-on-surface placeholder:text-outline focus:outline-none focus:bg-surface-container-lowest transition-colors font-body-md text-body-md shadow-xs" placeholder="Ex. Milo ou Luna" type="text"/>
+<span class="material-symbols-outlined absolute right-3 text-outline text-[20px] pointer-events-none">pets</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Précisez le prénom habituel du compagnon.</span>
+</div>
+<!-- État Focus -->
+<div class="flex flex-col gap-1.5">
+<div class="flex justify-between items-center">
+<label class="font-label-md text-label-md text-on-surface">Adresse e-mail</label>
+<span class="font-label-sm text-[11px] text-primary bg-primary-fixed px-2 py-0.5 rounded-full">En saisie</span>
+</div>
+<div class="relative flex items-center">
+<input class="w-full h-12 px-space-md pr-10 rounded-xl bg-surface-container-lowest text-on-surface shadow-md font-body-md text-body-md transition-shadow" type="email" value="clara.dupont@exemple.fr"/>
+<span class="material-symbols-outlined absolute right-3 text-primary text-[20px]">mail</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Notification d'acceptation de dossier.</span>
+</div>
+<!-- État Erreur -->
+<div class="flex flex-col gap-1.5">
+<label class="font-label-md text-label-md text-error flex items-center justify-between">
+<span>Numéro d'identification (ICAD)</span>
+<span class="font-label-sm text-[10px] text-error font-medium">Invalide</span>
+</label>
+<div class="relative flex items-center">
+<input class="w-full h-12 px-space-md pr-10 rounded-xl bg-error-container/40 text-on-error-container font-body-md text-body-md shadow-xs focus:outline-none" type="text" value="123-AB"/>
+<span class="material-symbols-outlined absolute right-3 text-error text-[20px]">error</span>
+</div>
+<p class="font-body-sm text-body-sm text-error flex items-center gap-1">
+<span class="material-symbols-outlined text-[15px]">info</span>
+<span>Le format doit comporter 15 chiffres valides.</span>
+</p>
+</div>
+</div>
+</section>
+<!-- SECTION 6: CARTE D'ANIMAL -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">badge</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">5. Carte d'Animal (Spécimen)</h2>
+</div>
+<div class="bg-surface-container-lowest rounded-xl shadow-md overflow-hidden flex flex-col">
+<!-- Photo de Luna -->
+<div class="relative w-full h-52 bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Chien Berger Australien affectueux et souriant aux yeux clairs, pelage soyeux noir, feu et blanc, assis paisiblement dans un parc ensoleillé avec une lumière dorée et douce, ambiance protectrice et chaleureuse pour PetCare Community." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA9dMggMAYcT_yk4UEW5dzX8jbaU07o_84fjbVpYI7I5Y-QmVsZ2-9AupGX3oM-Lk1i73dnnX2OOEygrNfgdG2SqZSSxTipOQy6meF6XJzD9pJiwalJp2sc0DXYKFrYwf9n1yFf04zXYVYfKuvFVk933ewBIDlLn8RC1033JU5DkKzJkdPhJlC0_OaUN8_FoboQm8LFJ5s8MyMhKZ8l7ciORpFpfIJVJ_fyM16ltEIASaCz_F6fMSFP"/>
+<!-- Statut en superposition -->
+<div class="absolute top-3 left-3 bg-surface-container-lowest/90 backdrop-blur-md px-3 py-1 rounded-full shadow-sm flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary-container"></span>
+<span class="font-label-sm text-label-sm text-primary-container font-semibold">Disponible</span>
+</div>
+<!-- Bouton Favori Rapide -->
+<button aria-label="Ajouter aux favoris" class="absolute top-3 right-3 w-10 h-10 rounded-full bg-surface-container-lowest/90 backdrop-blur-md shadow-sm flex items-center justify-center text-secondary active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+</button>
+</div>
+<!-- Contenu descriptif -->
+<div class="p-space-md flex flex-col gap-space-sm">
+<div class="flex justify-between items-start">
+<div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Luna</h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Berger Australien • Femelle • 2 ans</p>
+</div>
+<div class="flex items-center gap-1 bg-surface-container-high px-2.5 py-1 rounded-full">
+<span class="material-symbols-outlined text-primary text-[14px]">location_on</span>
+<span class="font-label-sm text-label-sm text-on-surface">8 km</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant line-clamp-2">
+            Douce, sociable et curieuse, Luna adore les balades en forêt et s'entend très bien avec les enfants et les congénères.
+          </p>
+<div class="flex items-center gap-2 pt-space-xs">
+<div class="w-7 h-7 rounded-full bg-primary-fixed flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined text-[16px]">shield</span>
+</div>
+<span class="font-label-md text-label-md text-on-surface">Refuge de l'Espoir (Aquitaine)</span>
+</div>
+<div class="pt-space-xs flex gap-space-xs">
+<button class="flex-1 h-11 bg-primary-container active:scale-[0.99] text-on-primary rounded-xl font-label-lg text-label-lg shadow-sm flex items-center justify-center gap-1.5 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">send</span>
+<span>Postuler</span>
+</button>
+<button aria-label="Partager la fiche" class="w-11 h-11 bg-surface-container-high text-primary rounded-xl flex items-center justify-center active:bg-surface-variant transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">share</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 7: PASTILLES DE STATUT -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">flaky</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">6. Pastilles de Statut (Status Pills)</h2>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-1">
+          Huit états normalisés conçus pour clarifier le cycle de vie d'une adoption :
+        </p>
+<div class="flex flex-wrap gap-2">
+<!-- 1. Disponible -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed-variant shadow-xs">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+<span class="font-label-sm text-label-sm font-semibold">Disponible</span>
+</div>
+<!-- 2. En attente -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed text-on-secondary-fixed-variant shadow-xs">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+<span class="font-label-sm text-label-sm font-semibold">En attente</span>
+</div>
+<!-- 3. Réservé -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-fixed-dim text-on-secondary-fixed shadow-xs">
+<span class="w-2 h-2 rounded-full bg-secondary-container"></span>
+<span class="font-label-sm text-label-sm font-semibold">Réservé</span>
+</div>
+<!-- 4. Adopté -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-secondary-container text-on-secondary-container shadow-xs">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-label-sm text-label-sm font-semibold">Adopté</span>
+</div>
+<!-- 5. Refusé -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container-highest text-on-surface-variant shadow-xs">
+<span class="w-2 h-2 rounded-full bg-outline"></span>
+<span class="font-label-sm text-label-sm font-semibold">Refusé</span>
+</div>
+<!-- 6. Annulé -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-container text-outline shadow-xs">
+<span class="material-symbols-outlined text-[13px]">cancel</span>
+<span class="font-label-sm text-label-sm font-semibold">Annulé</span>
+</div>
+<!-- 7. Confirmé -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-container text-on-primary shadow-xs">
+<span class="material-symbols-outlined text-[13px]">verified</span>
+<span class="font-label-sm text-label-sm font-semibold">Confirmé</span>
+</div>
+<!-- 8. Archivé -->
+<div class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-surface-dim text-on-surface-variant shadow-xs">
+<span class="material-symbols-outlined text-[13px]">inventory_2</span>
+<span class="font-label-sm text-label-sm font-semibold">Archivé</span>
+</div>
+</div>
+</div>
+</section>
+<!-- SECTION 8: PUCES DE FILTRES -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">tune</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">7. Puces de Filtres (Filter Chips)</h2>
+</div>
+<div class="bg-surface-container-lowest p-space-md rounded-xl shadow-sm flex flex-col gap-space-sm">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Carrousel horizontal interactif :</span>
+<div class="flex items-center gap-2 overflow-x-auto py-1 scrollbar-none">
+<!-- Actifs -->
+<button class="h-9 px-4 rounded-full bg-primary-container text-on-primary flex items-center gap-1.5 font-label-md text-label-md shadow-xs shrink-0" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span>Chiens</span>
+</button>
+<button class="h-9 px-4 rounded-full bg-primary-container text-on-primary flex items-center gap-1.5 font-label-md text-label-md shadow-xs shrink-0" type="button">
+<span class="material-symbols-outlined text-[16px]">check</span>
+<span>Chats</span>
+</button>
+<!-- Inactifs -->
+<button class="h-9 px-4 rounded-full bg-surface-container-high text-on-surface-variant flex items-center gap-1 font-label-md text-label-md shadow-xs shrink-0 active:bg-surface-variant" type="button">
+<span>Oiseaux</span>
+</button>
+<button class="h-9 px-4 rounded-full bg-surface-container-high text-on-surface-variant flex items-center gap-1 font-label-md text-label-md shadow-xs shrink-0 active:bg-surface-variant" type="button">
+<span>NAC</span>
+</button>
+<button class="h-9 px-4 rounded-full bg-secondary-container text-on-secondary-container flex items-center gap-1 font-label-md text-label-md shadow-xs shrink-0" type="button">
+<span class="material-symbols-outlined text-[16px]">notification_important</span>
+<span>Urgences</span>
+</button>
+</div>
+</div>
+</section>
+<!-- SECTION 9: ÉTAT VIDE (EMPTY STATE) -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">inbox</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">8. État Vide (Empty State)</h2>
+</div>
+<div class="bg-surface-container-lowest p-space-lg rounded-xl shadow-sm flex flex-col items-center text-center">
+<!-- Illustration douce avec superposition -->
+<div class="relative w-20 h-20 rounded-full bg-surface-container-high flex items-center justify-center mb-space-md">
+<span class="material-symbols-outlined text-primary text-[40px]">inventory</span>
+<div class="absolute -bottom-1 -right-1 w-7 h-7 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container shadow-xs">
+<span class="material-symbols-outlined text-[16px]">pets</span>
+</div>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Aucune demande en cours</h3>
+<p class="font-body-md text-body-md text-on-surface-variant mt-1 max-w-xs">
+          Vos futures démarches d'adoption apparaîtront ici dès leur soumission aux refuges.
+        </p>
+<button class="mt-space-md h-11 px-6 bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg shadow-sm flex items-center gap-2 active:scale-95 transition-transform" type="button">
+<span class="material-symbols-outlined text-[18px]">search</span>
+<span>Explorer les animaux</span>
+</button>
+</div>
+</section>
+<!-- SECTION 10: BOÎTE DE DIALOGUE (MODAL PREVIEW) -->
+<section class="flex flex-col gap-space-md">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[22px]">chat_bubble_outline</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">9. Dialogue de Confirmation</h2>
+</div>
+<!-- Preview stylisée de la modale dans le flux -->
+<div class="relative bg-surface-container-low p-space-md rounded-xl flex flex-col items-center justify-center">
+<div class="w-full bg-surface-container-lowest rounded-xl shadow-xl p-space-md flex flex-col gap-space-md">
+<div class="flex items-start gap-space-sm">
+<div class="w-12 h-12 rounded-full bg-primary-fixed shrink-0 flex items-center justify-center text-on-primary-fixed-variant">
+<span class="material-symbols-outlined text-[24px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+</div>
+<div class="flex flex-col">
+<h3 class="font-headline-sm text-headline-sm text-on-surface leading-tight">
+                Confirmer la demande d'adoption
+              </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">
+                Dossier n° PCA-2024-89
+              </p>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+            Êtes-vous sûr de vouloir transmettre votre dossier pour l'adoption de <strong class="text-on-surface font-semibold">Luna</strong> au refuge partenaire ?
+          </p>
+<!-- Notification bienveillante -->
+<div class="p- space-sm bg-surface-container-high rounded-lg flex items-center gap-2 p-2.5">
+<span class="material-symbols-outlined text-primary text-[18px]">schedule</span>
+<span class="font-label-sm text-label-sm text-on-surface">Temps de réponse moyen estimé : 24 à 48h.</span>
+</div>
+<!-- Actions de la modale -->
+<div class="flex flex-col gap-2 pt-space-xs">
+<button class="w-full h-12 bg-primary-container text-on-primary rounded-xl font-label-lg text-label-lg shadow-sm flex items-center justify-center gap-2 active:bg-primary transition-colors" type="button">
+<span class="material-symbols-outlined text-[20px]">check_circle</span>
+<span>Confirmer la demande</span>
+</button>
+<button class="w-full h-11 bg-surface-container-high text-on-surface rounded-xl font-label-lg text-label-lg flex items-center justify-center active:bg-surface-variant transition-colors" type="button">
+<span>Annuler</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- PIED DE DOCUMENTATION UI KIT -->
+<footer class="pt-space-md pb-space-lg text-center flex flex-col items-center gap-1">
+<div class="w-8 h-1 rounded-full bg-surface-container-highest mb-2"></div>
+<p class="font-label-md text-label-md text-on-surface">PetCare Community UX Core System</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Conçu avec bienveillance pour le bien-être animal.</p>
+</footer>
+</div>
+</div></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container font-semibold"><div class="flex justify-around items-center h-16 px-space-xs"><a aria-current="page" class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] flex-1 py-space-xs transition-colors text-primary-container font-semibold" data-path="accueil" href="#"><span class="material-symbols-outlined text-[24px]">home</span><span class="font-label-sm text-label-sm mt-0.5">Accueil</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] flex-1 py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="animaux" href="#"><span class="material-symbols-outlined text-[24px]">pets</span><span class="font-label-sm text-label-sm mt-0.5">Animaux</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] flex-1 py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="favoris" href="#"><span class="material-symbols-outlined text-[24px]">favorite</span><span class="font-label-sm text-label-sm mt-0.5">Favoris</span></a><a class="flex flex-col items-center justify-center min-w-[44px] min-h-[44px] flex-1 py-space-xs text-on-surface-variant hover:text-on-surface transition-colors" data-path="profil" href="#"><span class="material-symbols-outlined text-[24px]">account_circle</span><span class="font-label-sm text-label-sm mt-0.5">Profil</span></a></div></nav></body></html>
