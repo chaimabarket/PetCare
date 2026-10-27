@@ -164,6 +164,129 @@ service cloud.firestore {
       allow read: if signedIn() && userRole() == 'admin';
     }
 
+    // Module Profils des animaux : chaque fiche, ses photos et ses pesées sont privées à son propriétaire.
+    match /pets/{petId} {
+      // Les écritures en lot (fiche + photos + pesée) sont vérifiées sur l'état après écriture.
+      function petOwnerAfter() {
+        return signedIn()
+          && getAfter(/databases/$(database)/documents/pets/$(petId)).data.ownerId == request.auth.uid;
+      }
+
+      function petOwner() {
+        return signedIn()
+          && get(/databases/$(database)/documents/pets/$(petId)).data.ownerId == request.auth.uid;
+      }
+
+      function validPet(d) {
+        return d.keys().hasOnly(['ownerId', 'name', 'species', 'sex', 'breed', 'birthDate',
+            'birthDateEstimated', 'chipNumber', 'sterilized', 'notes', 'status', 'archivedReason',
+            'favorite', 'contacts', 'createdAt', 'updatedAt'])
+          && d.name is string && d.name.size() >= 2 && d.name.size() <= 80
+          && d.species in ['dog', 'cat', 'rabbit', 'rodent', 'bird', 'other']
+          && d.sex in ['male', 'female']
+          && d.status in ['active', 'archived']
+          && (d.breed == null || (d.breed is string && d.breed.size() <= 80))
+          && (d.notes == null || (d.notes is string && d.notes.size() <= 500))
+          && (d.chipNumber == null || (d.chipNumber is string && d.chipNumber.matches('^[0-9]{15}$')))
+          && (d.birthDate == null || d.birthDate <= request.time)
+          && d.contacts is list && d.contacts.size() <= 5;
+      }
+
+      allow read: if signedIn() && resource.data.ownerId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.status == 'active'
+        && validPet(request.resource.data);
+      allow update: if signedIn()
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId
+        && validPet(request.resource.data);
+      // Pas de suppression physique depuis l'application : l'animal est archivé (RG-06, RG-07).
+      allow delete: if false;
+
+      // Galerie privée : 5 photos maximum (contrôlé par l'application), images compressées.
+      match /photos/{photoId} {
+        allow read: if petOwner();
+        allow delete: if petOwnerAfter();
+        allow create, update: if petOwnerAfter()
+          && request.resource.data.keys().hasOnly(['data', 'sortOrder', 'createdAt'])
+          && request.resource.data.data is bytes
+          && request.resource.data.data.size() <= 750000
+          && request.resource.data.sortOrder is int
+          && request.resource.data.sortOrder >= 0 && request.resource.data.sortOrder <= 4;
+      }
+
+      // Pesées : une par jour (identifiant AAAA-MM-JJ), poids entre 0 et 500 kg, date non future.
+      match /weights/{entryId} {
+        allow read: if petOwner();
+        allow delete: if petOwnerAfter();
+        allow create, update: if petOwnerAfter()
+          && request.resource.data.keys().hasOnly(['measuredOn', 'weightKg', 'note', 'createdAt'])
+          && request.resource.data.weightKg is number
+          && request.resource.data.weightKg > 0 && request.resource.data.weightKg <= 500
+          && request.resource.data.measuredOn <= request.time;
+      }
+    }
+
+    // Module 3 : Rendez-vous et rappels.
+    // Un rendez-vous est lisible par son propriétaire (client) et, pour une réservation, par le prestataire.
+    function isParticipant(data) {
+      return signedIn()
+        && (request.auth.uid == data.ownerId || request.auth.uid == data.get('providerId', null));
+    }
+
+    match /appointments/{appointmentId} {
+      allow read: if isParticipant(resource.data);
+
+      // Le client crée pour lui-même un rendez-vous futur ; un rendez-vous personnel démarre
+      // « confirmé », une réservation « en attente » du prestataire (RG-13, RG-16).
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.version == 1
+        && request.resource.data.startsAt is timestamp
+        && request.resource.data.endsAt is timestamp
+        && request.resource.data.startsAt > request.time
+        && request.resource.data.endsAt > request.resource.data.startsAt
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.petName is string
+        && request.resource.data.petName.size() > 0
+        && ((request.resource.data.providerId == null && request.resource.data.status == 'confirmed')
+          || (request.resource.data.providerId != null && request.resource.data.status == 'planned'));
+
+      // Seul un rendez-vous actif change ; terminé et annulé sont définitifs (RG-20).
+      // Chaque modification augmente la version : une version obsolète est refusée.
+      // Le client et le prestataire ne peuvent pas changer à qui appartient le rendez-vous,
+      // et seul le prestataire confirme une réservation (RG-17).
+      allow update: if isParticipant(resource.data)
+        && resource.data.status in ['planned', 'confirmed']
+        && request.resource.data.status in ['planned', 'confirmed', 'completed', 'cancelled']
+        && request.resource.data.version == resource.data.version + 1
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.get('providerId', null) == resource.data.get('providerId', null)
+        && !(resource.data.get('providerId', null) != null
+          && resource.data.status == 'planned'
+          && request.resource.data.status == 'confirmed'
+          && request.auth.uid != resource.data.providerId);
+
+      // L'historique est conservé : pas de suppression.
+      allow delete: if false;
+    }
+
+    // Rappels de soins personnels : visibles et modifiables uniquement par leur propriétaire.
+    match /reminders/{reminderId} {
+      allow read, delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.dueAt is timestamp;
+      allow update: if signedIn()
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId;
+    }
+
     // Tout le reste reste fermé tant que les autres modules n'ont pas ajouté leurs règles.
     match /{document=**} {
       allow read, write: if false;

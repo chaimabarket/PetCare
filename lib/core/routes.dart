@@ -12,6 +12,11 @@ import '../features/adoption/presentation/my_applications_screen.dart';
 import '../features/adoption/presentation/my_listings_screen.dart';
 import '../features/adoption/presentation/received_applications_screen.dart';
 import '../features/adoption/presentation/share_happy_tail_screen.dart';
+
+import '../features/appointments/presentation/agenda_screen.dart';
+import '../features/appointments/presentation/appointment_detail_screen.dart';
+import '../features/appointments/presentation/appointment_form_screen.dart';
+import '../features/appointments/presentation/reminders_screen.dart';
 import '../features/auth/presentation/forgot_password_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
@@ -46,6 +51,12 @@ abstract final class AppRoutes {
 
   static Object? _args(BuildContext context) => ModalRoute.of(context)?.settings.arguments;
 
+  // Module 3 (Rendez-vous et rappels).
+  static const agenda = '/agenda';
+  static const appointmentDetail = '/agenda/detail';
+  static const appointmentForm = '/agenda/new';
+  static const reminders = '/reminders';
+
   static Map<String, WidgetBuilder> get all => {
         login: (_) => const LoginScreen(),
         register: (_) => const RegisterScreen(),
@@ -69,5 +80,14 @@ abstract final class AppRoutes {
         applicationReview: (context) => ApplicationReviewScreen(applicationId: _args(context)! as String),
         happyTails: (_) => const HappyTailsScreen(),
         shareHappyTail: (context) => ShareHappyTailScreen(listing: _args(context)! as AdoptionListing),
+
+        agenda: (context) => AgendaScreen(initialPet: ModalRoute.of(context)?.settings.arguments as String?),
+        appointmentDetail: (context) => AppointmentDetailScreen(
+              appointmentId: ModalRoute.of(context)!.settings.arguments! as String,
+            ),
+        appointmentForm: (context) => AppointmentFormScreen(
+              args: ModalRoute.of(context)?.settings.arguments as AppointmentFormArgs? ?? const AppointmentFormArgs(),
+            ),
+        reminders: (_) => const RemindersScreen(),
       };
 }
