@@ -1,0 +1,15 @@
+{
+  "name": "petcare-api",
+  "version": "1.0.0",
+  "private": true,
+  "description": "API REST PetCare : module Utilisateurs (profil et notifications)",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "express": "^4.21.2"
+  }
+}

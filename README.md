@@ -21,6 +21,12 @@ Pour générer l'APK de démonstration :
 flutter build apk --release
 ```
 
+## API REST (module Utilisateurs)
+
+Le profil et les notifications passent par une API REST Node.js dans [backend/](backend/README.md) :
+`cd backend && npm install && npm start`, puis lancer l'application. Si le serveur est éteint,
+l'application utilise Firestore directement.
+
 ## Backend : Firebase
 
 Le projet utilise le projet Firebase `petcare-communit` (Authentication e-mail / mot de passe et Cloud Firestore). La configuration est déjà dans `lib/firebase_options.dart` et `android/app/google-services.json`.
