@@ -26,15 +26,16 @@ class ApiClient {
 
   Future<dynamic> put(String path, Map<String, dynamic> body) => _send('PUT', path, body);
 
+  Future<dynamic> delete(String path) => _send('DELETE', path);
+
   Future<dynamic> patch(String path, [Map<String, dynamic>? body]) => _send('PATCH', path, body);
 
   Future<dynamic> _send(String method, String path, [Map<String, dynamic>? body]) async {
-    final user = _auth.currentUser;
-    if (user == null) throw const ApiException(401, 'Connexion requise.');
-
     final request = http.Request(method, Uri.parse('$baseUrl$path'))
-      ..headers['Authorization'] = 'Bearer ${await user.getIdToken()}'
       ..headers['Content-Type'] = 'application/json';
+    // Un visiteur n'a pas de jeton : le serveur ne lui sert que les routes publiques.
+    final user = _auth.currentUser;
+    if (user != null) request.headers['Authorization'] = 'Bearer ${await user.getIdToken()}';
     if (body != null) request.body = jsonEncode(body);
 
     final http.Response response;

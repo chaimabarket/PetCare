@@ -45,6 +45,30 @@ La clé web est dans `lib/firebase_options.dart` (`apiKey` de `web`). Le champ `
 | PATCH | `/api/users/me/notifications/{id}/read` | Marque une notification comme lue (204) |
 | POST | `/api/users/me/notifications/read-all` | Marque tout comme lu |
 
+### Module Adoption (étape 1)
+
+Le fil et les fiches d'annonces sont publics : un visiteur sans jeton peut les lire. Le reste exige un jeton.
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/api/adoptions` | Fil : annonces disponibles et réservées, récentes d'abord. Filtres facultatifs : `q`, `species=chat,chien`, `age=baby,young,adult,senior`, `sex`, `size`, `city`, `badges`, `urgent=1` |
+| GET | `/api/adoptions/{id}` | Détail d'une annonce |
+| GET | `/api/adoptions/{id}/photos` | `{"photos": ["<base64>", ...]}` dans l'ordre de l'annonce |
+| GET | `/api/adoptions/mine` | Mes annonces (brouillons et archivées comprises) |
+| POST | `/api/adoptions` | Crée une annonce ; `publish: false` pour un brouillon, `photos` : 5 images base64 de 350 Ko maximum |
+| PUT | `/api/adoptions/{id}` | Modifie mon annonce (une annonce réservée ou adoptée garde son statut) |
+| POST | `/api/adoptions/{id}/archive` | Archive l'annonce et refuse ses candidatures ouvertes (impossible si elle est réservée) |
+| GET | `/api/adoptions/favorites` | `{"ids": [...]}` |
+| PUT / DELETE | `/api/adoptions/{id}/favorite` | Ajoute ou retire un favori |
+| POST | `/api/adoptions/{id}/applications` | Envoie une candidature ; le serveur calcule le score de compatibilité |
+| GET | `/api/adoptions/{id}/applications/me` | Ma candidature pour cette annonce, ou `null` |
+| GET | `/api/applications/mine` | Mes candidatures |
+| GET | `/api/applications/received?listingId=` | Candidatures reçues, meilleur score d'abord |
+| GET | `/api/applications/{id}` | Une candidature |
+
+Les décisions de l'annonceur (en étude, accepter, refuser, retirer, confirmer l'adoption), les signalements et les
+Happy Tails ne sont pas encore dans l'API (étape 2) : l'application les écrit directement dans Firestore.
+
 Erreurs : JSON `{"error": "message en français"}` avec le code HTTP `400` (champ invalide), `401` (jeton manquant
 ou expiré), `403` (refusé par les règles), `404`, `409` (profil déjà créé).
 

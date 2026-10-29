@@ -3,6 +3,8 @@ import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../../core/api/api_client.dart';
+import '../../../core/api/polling.dart';
 import '../../auth/data/user_role.dart';
 import '../../notifications/data/app_notification.dart';
 import '../../notifications/data/notification_service.dart';
@@ -24,16 +26,22 @@ class AdoptionException implements Exception {
 
 /// Annonces, candidatures et favoris du module Adoption.
 ///
+/// Les annonces, les candidatures (lecture et envoi) et les favoris passent par l'API REST PetCare ;
+/// si le serveur est injoignable, elles passent directement par Firestore (mêmes règles de sécurité).
+/// Les décisions sur une candidature (étude, acceptation, refus, retrait, adoption) restent directes.
+///
 /// Les règles du cahier des charges sont appliquées ici (transactions) et vérifiées par
 /// `firestore.rules` : une seule candidature acceptée à la fois, annonce réservée après
 /// acceptation puis adoptée, autres candidatures refusées à l'adoption.
 class AdoptionRepository {
-  AdoptionRepository({FirebaseFirestore? firestore, NotificationService? notifications})
+  AdoptionRepository({FirebaseFirestore? firestore, NotificationService? notifications, ApiClient? api})
       : _firestore = firestore ?? FirebaseFirestore.instance,
-        _notifications = notifications ?? NotificationService(firestore: firestore);
+        _notifications = notifications ?? NotificationService(firestore: firestore),
+        _api = api ?? ApiClient();
 
   final FirebaseFirestore _firestore;
   final NotificationService _notifications;
+  final ApiClient _api;
 
   static const maxPhotos = 5;
 
@@ -46,29 +54,83 @@ class AdoptionRepository {
 
   static int _newestFirst(DateTime? a, DateTime? b) => (b ?? DateTime(0)).compareTo(a ?? DateTime(0));
 
+  /// Lit par l'API ; si le serveur est éteint, [viaFirestore] prend le relais.
+  Future<T> _read<T>(Future<T> Function() viaApi, Future<T> Function() viaFirestore) async {
+    try {
+      return await viaApi();
+    } on ApiException catch (e) {
+      if (e.isUnreachable) return viaFirestore();
+      rethrow;
+    }
+  }
+
+  /// Écrit par l'API ; un refus du serveur devient une erreur métier affichable.
+  Future<T> _write<T>(Future<T> Function() viaApi, Future<T> Function() viaFirestore) async {
+    try {
+      return await viaApi();
+    } on ApiException catch (e) {
+      if (e.isUnreachable) return viaFirestore();
+      throw AdoptionException(e.message);
+    }
+  }
+
+  static List<AdoptionListing> _listingsFrom(dynamic json) =>
+      [for (final item in json as List<dynamic>) AdoptionListing.fromJson(item as Map<String, dynamic>)];
+
+  static List<AdoptionApplication> _applicationsFrom(dynamic json) =>
+      [for (final item in json as List<dynamic>) AdoptionApplication.fromJson(item as Map<String, dynamic>)];
+
   // ---------------------------------------------------------------- Annonces
 
   /// Fil d'adoption : annonces disponibles et réservées. Le tri se fait ici pour éviter un index composite.
-  Stream<List<AdoptionListing>> watchPublicListings() => _listings
+  Stream<List<AdoptionListing>> watchPublicListings() => poll(() => _read(
+        () async => _listingsFrom(await _api.get('/api/adoptions')),
+        () => _publicListingsFirestore().first,
+      ));
+
+  Stream<List<AdoptionListing>> _publicListingsFirestore() => _listings
       .where('status', whereIn: [ListingStatus.available.firestoreValue, ListingStatus.reserved.firestoreValue])
       .snapshots()
       .map((snap) => snap.docs.map(AdoptionListing.fromFirestore).toList()
         ..sort((a, b) => _newestFirst(a.createdAt, b.createdAt)));
 
-  Stream<AdoptionListing?> watchListing(String id) =>
-      _listings.doc(id).snapshots().map((doc) => doc.exists ? AdoptionListing.fromFirestore(doc) : null);
+  Stream<AdoptionListing?> watchListing(String id) => poll(() => _read<AdoptionListing?>(
+        () async {
+          try {
+            return AdoptionListing.fromJson(await _api.get('/api/adoptions/$id') as Map<String, dynamic>);
+          } on ApiException catch (e) {
+            if (e.statusCode == 404) return null;
+            rethrow;
+          }
+        },
+        () async {
+          final doc = await _listings.doc(id).get();
+          return doc.exists ? AdoptionListing.fromFirestore(doc) : null;
+        },
+      ));
 
-  Stream<List<AdoptionListing>> watchMyListings(String uid) => _listings
+  Stream<List<AdoptionListing>> watchMyListings(String uid) => poll(() => _read(
+        () async => _listingsFrom(await _api.get('/api/adoptions/mine')),
+        () => _myListingsFirestore(uid).first,
+      ));
+
+  Stream<List<AdoptionListing>> _myListingsFirestore(String uid) => _listings
       .where('publisherId', isEqualTo: uid)
       .snapshots()
       .map((snap) => snap.docs.map(AdoptionListing.fromFirestore).toList()
         ..sort((a, b) => _newestFirst(a.createdAt, b.createdAt)));
 
-  Future<List<Uint8List>> fetchPhotos(String listingId) async {
-    final snap = await _photos(listingId).get();
-    final docs = snap.docs.toList()..sort((a, b) => int.parse(a.id).compareTo(int.parse(b.id)));
-    return [for (final d in docs) base64Decode(d.data()['data'] as String)];
-  }
+  Future<List<Uint8List>> fetchPhotos(String listingId) => _read(
+        () async {
+          final json = await _api.get('/api/adoptions/$listingId/photos') as Map<String, dynamic>;
+          return [for (final p in json['photos'] as List<dynamic>) base64Decode(p as String)];
+        },
+        () async {
+          final snap = await _photos(listingId).get();
+          final docs = snap.docs.toList()..sort((a, b) => int.parse(a.id).compareTo(int.parse(b.id)));
+          return [for (final d in docs) base64Decode(d.data()['data'] as String)];
+        },
+      );
 
   /// Crée ou modifie une annonce. [publish] = faux enregistre un brouillon.
   Future<String> saveListing({
@@ -81,6 +143,32 @@ class AdoptionRepository {
     if (publisher.role == UserRole.provider) {
       throw const AdoptionException('Seuls les propriétaires et les refuges peuvent publier une annonce.');
     }
+    return _write(
+      () async {
+        final body = draft.toApiJson(publish: publish);
+        final json = id == null
+            ? await _api.post('/api/adoptions', body)
+            : await _api.put('/api/adoptions/$id', body);
+        notifyApiDataChanged();
+        return (json as Map<String, dynamic>)['id'] as String;
+      },
+      () => _saveListingFirestore(
+        id: id,
+        draft: draft,
+        publisher: publisher,
+        publish: publish,
+        currentStatus: currentStatus,
+      ),
+    );
+  }
+
+  Future<String> _saveListingFirestore({
+    String? id,
+    required ListingDraft draft,
+    required UserProfile publisher,
+    required bool publish,
+    ListingStatus? currentStatus,
+  }) async {
     final doc = id == null ? _listings.doc() : _listings.doc(id);
     final batch = _firestore.batch();
 
@@ -124,6 +212,16 @@ class AdoptionRepository {
       throw const AdoptionException(
           "Annulez d'abord l'acceptation en cours : une annonce réservée ne peut pas être archivée.");
     }
+    await _write(
+      () async {
+        await _api.post('/api/adoptions/${listing.id}/archive');
+        notifyApiDataChanged();
+      },
+      () => _archiveFirestore(listing),
+    );
+  }
+
+  Future<void> _archiveFirestore(AdoptionListing listing) async {
     final open = await _openApplications(listing);
     final batch = _firestore.batch();
     batch.update(_listings.doc(listing.id), {
@@ -145,10 +243,16 @@ class AdoptionRepository {
 
   // ------------------------------------------------------------ Candidatures
 
-  Future<AdoptionApplication?> findMyApplication(String listingId, String uid) async {
-    final doc = await _applications.doc(AdoptionApplication.idFor(listingId, uid)).get();
-    return doc.exists ? AdoptionApplication.fromFirestore(doc) : null;
-  }
+  Future<AdoptionApplication?> findMyApplication(String listingId, String uid) => _read(
+        () async {
+          final json = await _api.get('/api/adoptions/$listingId/applications/me');
+          return json == null ? null : AdoptionApplication.fromJson(json as Map<String, dynamic>);
+        },
+        () async {
+          final doc = await _applications.doc(AdoptionApplication.idFor(listingId, uid)).get();
+          return doc.exists ? AdoptionApplication.fromFirestore(doc) : null;
+        },
+      );
 
   /// Envoie une candidature. Le score est calculé ici puis stocké avec le dossier.
   Future<AdoptionApplication> apply({
@@ -162,6 +266,21 @@ class AdoptionRepository {
     if (listing.status != ListingStatus.available && listing.status != ListingStatus.reserved) {
       throw AdoptionException("${listing.name} n'est plus proposé(e) à l'adoption.");
     }
+    return _write(
+      () async {
+        final json = await _api.post('/api/adoptions/${listing.id}/applications', answers.toMap());
+        notifyApiDataChanged();
+        return AdoptionApplication.fromJson(json as Map<String, dynamic>);
+      },
+      () => _applyFirestore(listing: listing, answers: answers, applicant: applicant),
+    );
+  }
+
+  Future<AdoptionApplication> _applyFirestore({
+    required AdoptionListing listing,
+    required ApplicationAnswers answers,
+    required UserProfile applicant,
+  }) async {
     final doc = _applications.doc(AdoptionApplication.idFor(listing.id, applicant.uid));
     final result = computeCompatibility(listing, answers);
 
@@ -192,24 +311,47 @@ class AdoptionRepository {
     return AdoptionApplication.fromFirestore(await doc.get());
   }
 
-  Stream<List<AdoptionApplication>> watchMyApplications(String uid) => _applications
+  Stream<List<AdoptionApplication>> watchMyApplications(String uid) => poll(() => _read(
+        () async => _applicationsFrom(await _api.get('/api/applications/mine')),
+        () => _myApplicationsFirestore(uid).first,
+      ));
+
+  Stream<List<AdoptionApplication>> _myApplicationsFirestore(String uid) => _applications
       .where('applicantId', isEqualTo: uid)
       .snapshots()
       .map((snap) => snap.docs.map(AdoptionApplication.fromFirestore).toList()
         ..sort((a, b) => _newestFirst(a.createdAt, b.createdAt)));
 
   /// Candidatures reçues par l'annonceur, éventuellement pour une seule annonce.
-  Stream<List<AdoptionApplication>> watchReceivedApplications(String publisherId, {String? listingId}) {
+  Stream<List<AdoptionApplication>> watchReceivedApplications(String publisherId, {String? listingId}) =>
+      poll(() => _read(
+            () async => _applicationsFrom(await _api.get(
+              listingId == null ? '/api/applications/received' : '/api/applications/received?listingId=$listingId',
+            )),
+            () => _receivedApplicationsFirestore(publisherId, listingId: listingId).first,
+          ));
+
+  Stream<List<AdoptionApplication>> _receivedApplicationsFirestore(String publisherId, {String? listingId}) {
     Query<Map<String, dynamic>> query = _applications.where('publisherId', isEqualTo: publisherId);
     if (listingId != null) query = query.where('listingId', isEqualTo: listingId);
     return query.snapshots().map((snap) => snap.docs.map(AdoptionApplication.fromFirestore).toList()
       ..sort((a, b) => b.score.compareTo(a.score)));
   }
 
-  Stream<AdoptionApplication?> watchApplication(String id) => _applications
-      .doc(id)
-      .snapshots()
-      .map((doc) => doc.exists ? AdoptionApplication.fromFirestore(doc) : null);
+  Stream<AdoptionApplication?> watchApplication(String id) => poll(() => _read<AdoptionApplication?>(
+        () async {
+          try {
+            return AdoptionApplication.fromJson(await _api.get('/api/applications/$id') as Map<String, dynamic>);
+          } on ApiException catch (e) {
+            if (e.statusCode == 404) return null;
+            rethrow;
+          }
+        },
+        () async {
+          final doc = await _applications.doc(id).get();
+          return doc.exists ? AdoptionApplication.fromFirestore(doc) : null;
+        },
+      ));
 
   /// L'annonceur ouvre un nouveau dossier : il passe « En cours d'étude ».
   Future<void> markReviewing(AdoptionApplication app) async {
@@ -217,7 +359,7 @@ class AdoptionRepository {
     await _applications.doc(app.id).update({
       'status': ApplicationStatus.reviewing.firestoreValue,
       'updatedAt': FieldValue.serverTimestamp(),
-    });
+    });    notifyApiDataChanged();
   }
 
   /// Accepte une candidature : l'annonce devient réservée. La transaction garantit
@@ -356,21 +498,46 @@ class AdoptionRepository {
 
   // ---------------------------------------------------------------- Favoris
 
-  Stream<Set<String>> watchFavoriteIds(String uid) =>
-      _favorites(uid).snapshots().map((snap) => {for (final d in snap.docs) d.id});
+  Stream<Set<String>> watchFavoriteIds(String uid) => poll(() => _read(
+        () async {
+          final json = await _api.get('/api/adoptions/favorites') as Map<String, dynamic>;
+          return {for (final id in json['ids'] as List<dynamic>) id as String};
+        },
+        () async => {for (final d in (await _favorites(uid).get()).docs) d.id},
+      ));
 
-  Future<void> setFavorite(String uid, String listingId, bool favorite) => favorite
-      ? _favorites(uid).doc(listingId).set({'createdAt': FieldValue.serverTimestamp()})
-      : _favorites(uid).doc(listingId).delete();
+  Future<void> setFavorite(String uid, String listingId, bool favorite) async {
+    await _write(
+      () async {
+        if (favorite) {
+          await _api.put('/api/adoptions/$listingId/favorite', const {});
+        } else {
+          await _api.delete('/api/adoptions/$listingId/favorite');
+        }
+      },
+      () => favorite
+          ? _favorites(uid).doc(listingId).set({'createdAt': FieldValue.serverTimestamp()})
+          : _favorites(uid).doc(listingId).delete(),
+    );
+    notifyApiDataChanged();
+  }
 
   Future<List<AdoptionListing>> fetchListings(Iterable<String> ids) async {
     final listings = <AdoptionListing>[];
     for (final id in ids) {
       try {
-        final doc = await _listings.doc(id).get();
-        if (doc.exists) listings.add(AdoptionListing.fromFirestore(doc));
+        final listing = await _read<AdoptionListing?>(
+          () async => AdoptionListing.fromJson(await _api.get('/api/adoptions/$id') as Map<String, dynamic>),
+          () async {
+            final doc = await _listings.doc(id).get();
+            return doc.exists ? AdoptionListing.fromFirestore(doc) : null;
+          },
+        );
+        if (listing != null) listings.add(listing);
       } on FirebaseException {
         // Annonce archivée par son auteur : elle n'est plus lisible, on l'ignore.
+      } on ApiException {
+        // Idem côté API : 403 (archivée) ou 404.
       }
     }
     return listings;
@@ -394,6 +561,8 @@ class AdoptionRepository {
       });
 
   Future<void> _notify(String uid, String title, String body) async {
+    // Appelée après chaque décision réussie : les écrans qui interrogent l'API se rafraîchissent.
+    notifyApiDataChanged();
     try {
       await _notifications.send(
         toUserId: uid,
