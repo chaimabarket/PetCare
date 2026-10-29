@@ -79,12 +79,8 @@ class _ShareHappyTailScreenState extends State<ShareHappyTailScreen> {
   }
 
   Future<void> _pickAfter() async {
-    try {
-      final photo = await PhotoPicker().pickOne();
-      if (photo != null && mounted) setState(() => _after = photo);
-    } on PhotoTooLargeException catch (e) {
-      if (mounted) showAdoptionMessage(context, e.message);
-    }
+    final photo = await PhotoPicker().pickOne();
+    if (photo != null && mounted) setState(() => _after = photo);
   }
 
   void _addIdea(String idea) {
@@ -128,7 +124,7 @@ class _ShareHappyTailScreenState extends State<ShareHappyTailScreen> {
       Navigator.of(context).pushReplacementNamed(AppRoutes.happyTails);
     } catch (e) {
       debugPrint('ShareHappyTailScreen: $e');
-      if (mounted) setState(() => _error = 'La publication a échoué. Vérifiez votre connexion et la taille de la photo.');
+      if (mounted) setState(() => _error = 'La publication a échoué. Vérifiez votre connexion et réessayez.');
     } finally {
       if (mounted) setState(() => _saving = false);
     }

@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
@@ -85,12 +86,8 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
   }
 
   Future<void> _addPhotos() async {
-    try {
-      final photos = await _picker.pickMany(limit: AdoptionRepository.maxPhotos - _draft.photos.length);
-      if (photos.isNotEmpty && mounted) setState(() => _draft.photos = [..._draft.photos, ...photos]);
-    } on PhotoTooLargeException catch (e) {
-      if (mounted) showAdoptionMessage(context, e.message);
-    }
+    final photos = await _picker.pickMany(limit: AdoptionRepository.maxPhotos - _draft.photos.length);
+    if (photos.isNotEmpty && mounted) setState(() => _draft.photos = [..._draft.photos, ...photos]);
   }
 
   void _makeCover(int index) {
@@ -149,9 +146,13 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
       Navigator.of(context).pop();
     } on AdoptionException catch (e) {
       setState(() => _error = e.message);
-    } catch (e) {
+    } catch (e, stackTrace) {
       debugPrint('ListingFormScreen: $e');
-      setState(() => _error = "L'enregistrement a échoué. Vérifiez votre connexion et la taille des photos.");
+      debugPrintStack(stackTrace: stackTrace);
+      if (!mounted) return;
+      setState(() => _error = kDebugMode
+          ? "L'enregistrement a échoué.\nDétail : $e"
+          : "Impossible d'enregistrer l'annonce. Réessayez.");
     } finally {
       if (mounted) setState(() => _saving = false);
     }

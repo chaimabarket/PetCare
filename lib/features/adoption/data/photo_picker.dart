@@ -5,7 +5,7 @@ import 'package:image_picker/image_picker.dart';
 /// Photos réduites et compressées avant l'envoi.
 ///
 /// Les photos sont enregistrées dans Firestore (pas de Firebase Storage sur le plan gratuit) :
-/// chaque photo doit rester petite, d'où la taille maximale et la compression JPEG.
+/// elles sont réduites et compressées en JPEG pour tenir dans un document.
 class PhotoPicker {
   PhotoPicker({ImagePicker? picker}) : _picker = picker ?? ImagePicker();
 
@@ -14,11 +14,7 @@ class PhotoPicker {
   static const maxWidth = 900.0;
   static const quality = 60;
 
-  /// Taille maximale d'une photo après compression (un document Firestore est limité à 1 Mo).
-  static const maxBytes = 350 * 1024;
-
-  /// Renvoie les photos choisies (au plus [limit]) ; lève [PhotoTooLargeException] si une photo
-  /// reste trop lourde.
+  /// Renvoie les photos choisies (au plus [limit]).
   Future<List<Uint8List>> pickMany({required int limit}) async {
     if (limit <= 0) return const [];
     final files = await _picker.pickMultiImage(
@@ -38,15 +34,5 @@ class PhotoPicker {
     return file == null ? null : _read(file);
   }
 
-  Future<Uint8List> _read(XFile file) async {
-    final bytes = await file.readAsBytes();
-    if (bytes.length > maxBytes) throw const PhotoTooLargeException();
-    return bytes;
-  }
-}
-
-class PhotoTooLargeException implements Exception {
-  const PhotoTooLargeException();
-
-  String get message => 'Cette photo est trop lourde. Choisissez une image plus petite (JPG ou PNG).';
+  Future<Uint8List> _read(XFile file) => file.readAsBytes();
 }

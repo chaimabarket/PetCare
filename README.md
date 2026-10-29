@@ -4,6 +4,20 @@ Application mobile Flutter de **PetCare Community** : gérer ses animaux, trouve
 
 ## Lancer l'application
 
+### Vue téléphone dans VS Code, sans installation Android
+
+1. Ouvrir ce dossier (`PetCare`) dans VS Code et installer les extensions recommandées.
+2. Dans **Exécuter et déboguer**, choisir **PetCare - Phone Preview**, puis appuyer sur **F5**.
+3. Attendre que Flutter affiche l'adresse `http://localhost:7357`.
+4. Ouvrir la palette (**Ctrl+Maj+P**) et lancer **Mobile Viewer: Open Preview**.
+5. Saisir `http://localhost:7357` dans Mobile Viewer, puis choisir **Pixel 7** ou un autre téléphone.
+
+Cette vue affiche la version web de Flutter dans un cadre de téléphone ; elle ne simule pas Android.
+Utiliser le bouton de rechargement de Mobile Viewer pour actualiser la vue. **Maj+F5** arrête le serveur
+lancé avec F5. Les points d'arrêt Dart ne sont pas activés dans cette configuration de prévisualisation.
+
+### Sur un appareil Android
+
 Prérequis : Flutter (canal stable), un émulateur Android ou un téléphone en mode développeur.
 
 ```bash
