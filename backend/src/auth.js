@@ -45,4 +45,14 @@ async function requireAuth(req, _res, next) {
   }
 }
 
-module.exports = { requireAuth };
+/** Middleware : comme [requireAuth], mais laisse passer les visiteurs sans jeton. */
+async function optionalAuth(req, res, next) {
+  if (!req.headers.authorization) {
+    req.token = null;
+    req.user = null;
+    return next();
+  }
+  return requireAuth(req, res, next);
+}
+
+module.exports = { requireAuth, optionalAuth };

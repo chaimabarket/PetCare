@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/api/api_client.dart';
 import '../../../../core/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../data/adoption_enums.dart';
@@ -638,7 +639,8 @@ class EmptyState extends StatelessWidget {
 
   /// Erreur de chargement : distingue un accès refusé (règles Firestore) d'un problème de réseau.
   factory EmptyState.loadError({Key? key, required String title, required Object? error}) {
-    final denied = error is FirebaseException && error.code == 'permission-denied';
+    final denied = (error is FirebaseException && error.code == 'permission-denied') ||
+        (error is ApiException && error.statusCode == 403);
     return EmptyState(
       key: key,
       icon: denied ? Icons.lock_outline : Icons.cloud_off,
