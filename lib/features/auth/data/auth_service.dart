@@ -1,16 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../core/api/api_client.dart';
 import 'user_role.dart';
 
 /// Accès à Firebase Authentication pour le module Utilisateurs.
 class AuthService {
-  AuthService({FirebaseAuth? auth, FirebaseFirestore? firestore})
+  AuthService({FirebaseAuth? auth, FirebaseFirestore? firestore, ApiClient? api})
       : _auth = auth ?? FirebaseAuth.instance,
-        _firestore = firestore ?? FirebaseFirestore.instance;
+        _firestore = firestore ?? FirebaseFirestore.instance,
+        _api = api ?? ApiClient();
 
   final FirebaseAuth _auth;
   final FirebaseFirestore _firestore;
+  final ApiClient _api;
 
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
@@ -24,7 +27,8 @@ class AuthService {
     }
   }
 
-  /// Crée le compte Firebase puis le profil `users/{uid}` dans Firestore.
+  /// Crée le compte Firebase puis le profil `users/{uid}` par l'API REST
+  /// (directement dans Firestore si le serveur est injoignable).
   Future<void> register({
     required String fullName,
     required String email,
@@ -45,19 +49,43 @@ class AuthService {
     final user = credential.user!;
     try {
       await user.updateDisplayName(fullName.trim());
-      await _firestore.collection('users').doc(user.uid).set({
+      await _createProfile(user.uid, fullName: fullName, email: email, city: city, role: role);
+    } on FirebaseException {
+      await _cancelAccount(user);
+      throw const AuthException("Impossible d'enregistrer votre profil. Réessayez.");
+    } on ApiException catch (e) {
+      await _cancelAccount(user);
+      throw AuthException(e.message);
+    }
+  }
+
+  Future<void> _createProfile(
+    String uid, {
+    required String fullName,
+    required String email,
+    required String city,
+    required UserRole role,
+  }) async {
+    try {
+      await _api.post('/api/users/me', {
+        'fullName': fullName.trim(),
+        'city': city.trim(),
+        'role': role.firestoreValue,
+      });
+    } on ApiException catch (e) {
+      if (!e.isUnreachable) rethrow;
+      await _firestore.collection('users').doc(uid).set({
         'fullName': fullName.trim(),
         'email': email.trim(),
         'city': city.trim(),
         'role': role.firestoreValue,
         'createdAt': FieldValue.serverTimestamp(),
       });
-    } on FirebaseException {
-      // Sans profil, le compte serait inutilisable : on l'annule pour permettre de réessayer.
-      await user.delete();
-      throw const AuthException("Impossible d'enregistrer votre profil. Réessayez.");
     }
   }
+
+  /// Sans profil, le compte serait inutilisable : on l'annule pour permettre de réessayer.
+  Future<void> _cancelAccount(User user) => user.delete();
 
   /// Envoie l'e-mail de réinitialisation (en français).
   /// Firebase ne signale pas les adresses inconnues, pour ne pas révéler quels comptes existent.
