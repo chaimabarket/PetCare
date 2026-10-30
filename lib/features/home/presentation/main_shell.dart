@@ -47,6 +47,16 @@ class _MainShellState extends State<MainShell> {
           const ComingSoonScreen(title: 'Services', embedded: true),
         ],
       ),
+      // Assistant IA, sur l'Accueil (maquette Stitch M1).
+      floatingActionButton: _index == 0
+          ? FloatingActionButton(
+              tooltip: 'Assistant PetCare',
+              onPressed: () => Navigator.of(context).pushNamed(AppRoutes.assistant),
+              backgroundColor: AppColors.teal,
+              foregroundColor: Colors.white,
+              child: const Icon(Icons.chat_bubble_outline),
+            )
+          : null,
       bottomNavigationBar: NavigationBar(
         selectedIndex: _index,
         onDestinationSelected: _selectTab,

@@ -45,6 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             _Greeting(profile: profile),
             const SizedBox(height: 24),
+            const _AssistantCard(),
+            const SizedBox(height: 24),
             if (!signedIn) ...[
               const _VisitorCard(),
               const SizedBox(height: 24),
@@ -138,6 +140,62 @@ class _Greeting extends StatelessWidget {
         ),
         if (profile != null) UserAvatar(initials: profile!.initials, radius: 30),
       ],
+    );
+  }
+}
+
+/// Accès à l'assistant IA (maquette Stitch M1).
+class _AssistantCard extends StatelessWidget {
+  const _AssistantCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.teal,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.assistant),
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              const CircleAvatar(
+                radius: 24,
+                backgroundColor: Colors.white,
+                child: Icon(Icons.pets, color: AppColors.teal),
+              ),
+              const SizedBox(width: 12),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Assistant PetCare',
+                      style: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: Colors.white),
+                    ),
+                    SizedBox(height: 2),
+                    Text(
+                      'Une question sur votre animal ? Demandez-moi !',
+                      style: TextStyle(fontSize: 13, height: 1.3, color: Color(0xFFD5F0EC)),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              FilledButton(
+                onPressed: () => Navigator.of(context).pushNamed(AppRoutes.assistant),
+                style: FilledButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.teal,
+                  padding: const EdgeInsets.symmetric(horizontal: 14),
+                ),
+                child: const Text('Discuter'),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

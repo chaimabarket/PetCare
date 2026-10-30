@@ -142,6 +142,8 @@ class _AdoptionFeedScreenState extends State<AdoptionFeedScreen> {
                     const SizedBox(height: 12),
                     _SpeciesChips(selected: _filters.species, onSelected: _toggleSpecies),
                     const SizedBox(height: 16),
+                    const _AssistantBanner(),
+                    const SizedBox(height: 16),
                     if (visible.isEmpty)
                       EmptyState(
                         icon: Icons.search_off,
@@ -302,6 +304,50 @@ class _SpeciesChips extends StatelessWidget {
             ),
           ],
         ],
+      ),
+    );
+  }
+}
+
+/// Ouvre l'assistant IA avec la question « Trouver mon compagnon » (maquette Stitch W3).
+class _AssistantBanner extends StatelessWidget {
+  const _AssistantBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Material(
+      color: AppColors.tealLight,
+      borderRadius: BorderRadius.circular(16),
+      child: InkWell(
+        onTap: () => Navigator.of(context).pushNamed(AppRoutes.assistant, arguments: true),
+        borderRadius: BorderRadius.circular(16),
+        child: const Padding(
+          padding: EdgeInsets.all(14),
+          child: Row(
+            children: [
+              CircleAvatar(
+                radius: 20,
+                backgroundColor: AppColors.surface,
+                child: Icon(Icons.pets, size: 20, color: AppColors.teal),
+              ),
+              SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text('Pas sûr de quel animal adopter ?', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
+                    SizedBox(height: 2),
+                    Text(
+                      "Décrivez votre mode de vie, l'assistant vous propose des animaux compatibles.",
+                      style: TextStyle(fontSize: 13, height: 1.3, color: AppColors.textSecondary),
+                    ),
+                  ],
+                ),
+              ),
+              Icon(Icons.chevron_right, color: AppColors.teal),
+            ],
+          ),
+        ),
       ),
     );
   }

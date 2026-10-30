@@ -142,3 +142,20 @@ Le choix de l'animal lit la collection `pets` (`ownerId`, `name`, `breed`, `phot
 l'aura créée ; en attendant, « Autre compagnon » permet de saisir le nom.
 
 Après un changement de `firestore.rules` : `firebase deploy --only firestore:rules`.
+
+## Assistant IA (branche `chatbot`)
+
+Code dans `lib/features/assistant/`. Gemini via **Firebase AI Logic** (Gemini Developer API, plan gratuit Spark) : aucune clé dans l'application.
+
+- Visiteur : questions générales et suggestions d'animaux à adopter (cartes vers les annonces).
+- Connecté : choix d'un de ses animaux (fiche `pets` et carnet de santé joints), 5 questions recommandées selon l'animal, « Créer un rappel » depuis une réponse (module Rendez-vous et rappels), historique des 10 dernières conversations, 👍 / 👎, copier. 30 messages par jour.
+- Formulaire d'annonce d'adoption : bouton « Rédiger avec l'IA ».
+
+Mise en route (une fois, sur la console Firebase) : **AI Logic → Get started → Gemini Developer API** (pas Vertex AI), puis vérifier le nom du modèle gratuit dans `assistant_prompt.dart` (`kAssistantModel`).
+
+Pour le module 2 : `AssistantPetRepository.fetchHealthSummary` renvoie quelques lignes du carnet de santé ; elles sont ajoutées automatiquement aux réponses sur l'animal.
+
+| Collection | Contenu |
+|---|---|
+| `users/{uid}/assistantUsage/{AAAA-MM-JJ}` | compteur de messages du jour |
+| `users/{uid}/assistantChats/{id}` et `/messages` | historique privé, avis 👍 / 👎 |

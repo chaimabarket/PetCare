@@ -14,6 +14,7 @@ import '../features/adoption/presentation/received_applications_screen.dart';
 import '../features/adoption/presentation/share_happy_tail_screen.dart';
 
 import '../features/appointments/presentation/agenda_screen.dart';
+import '../features/assistant/presentation/assistant_screen.dart';
 import '../features/appointments/presentation/appointment_detail_screen.dart';
 import '../features/appointments/presentation/appointment_form_screen.dart';
 import '../features/appointments/presentation/reminders_screen.dart';
@@ -48,6 +49,9 @@ abstract final class AppRoutes {
   static const applicationReview = '/adoption/application'; // String : id de la candidature
   static const happyTails = '/happy-tails';
   static const shareHappyTail = '/happy-tails/share'; // AdoptionListing adoptée
+
+  // Assistant IA. Argument : bool? (true = « Trouver mon compagnon » envoyé directement).
+  static const assistant = '/assistant';
 
   static Object? _args(BuildContext context) => ModalRoute.of(context)?.settings.arguments;
 
@@ -89,5 +93,7 @@ abstract final class AppRoutes {
               args: ModalRoute.of(context)?.settings.arguments as AppointmentFormArgs? ?? const AppointmentFormArgs(),
             ),
         reminders: (_) => const RemindersScreen(),
+
+        assistant: (context) => AssistantScreen(startWithAdoption: _args(context) as bool? ?? false),
       };
 }
