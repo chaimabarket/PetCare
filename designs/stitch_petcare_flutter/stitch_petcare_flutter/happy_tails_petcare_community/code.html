@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_tab" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{width:100vw;margin:0;padding:0;}body{overscroll-behavior:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "surface-tint": "#006a63", "on-error": "#ffffff", "secondary-container": "#feae92", "secondary-fixed-dim": "#ffb59c", "on-tertiary-container": "#ffe5db", "primary": "#005c55", "on-surface-variant": "#3e4947", "tertiary-fixed-dim": "#ffb598", "on-secondary-container": "#793f2a", "secondary": "#8c4e38", "inverse-surface": "#27313f", "outline-variant": "#bdc9c6", "on-tertiary": "#ffffff", "surface-container-lowest": "#ffffff", "surface": "#f8f9ff", "primary-fixed": "#9cf2e8", "background": "#f8f9ff", "surface-container": "#e6eeff", "surface-container-highest": "#d9e3f6", "tertiary-fixed": "#ffdbce", "surface-container-low": "#eff4ff", "on-primary-fixed": "#00201d", "surface-container-high": "#dee9fc", "on-primary": "#ffffff", "surface-variant": "#d9e3f6", "secondary-fixed": "#ffdbcf", "error-container": "#ffdad6", "on-secondary-fixed": "#380d01", "outline": "#6e7977", "inverse-primary": "#80d5cb", "on-primary-container": "#a3faef", "on-primary-fixed-variant": "#00504a", "on-tertiary-fixed-variant": "#72361b", "primary-container": "#0f766e", "on-secondary-fixed-variant": "#6f3723", "on-error-container": "#93000a", "on-background": "#121c2a", "error": "#ba1a1a", "surface-bright": "#f8f9ff", "primary-fixed-dim": "#80d5cb", "on-secondary": "#ffffff", "tertiary": "#7f4025", "tertiary-container": "#9c573a", "inverse-on-surface": "#eaf1ff", "on-surface": "#121c2a", "on-tertiary-fixed": "#370e00", "surface-dim": "#d0dbed" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "margin": "1.5rem", "margin-mobile": "1rem", "space-xs": "0.25rem", "gutter-mobile": "0.75rem", "space-md": "1rem", "space-sm": "0.5rem", "space-lg": "1.5rem", "space-xl": "2rem" }, fontFamily: { "headline-sm": ["Inter"], "label-lg": ["Inter"], "headline-lg": ["Inter"], "label-sm": ["Inter"], "body-md": ["Inter"], "body-sm": ["Inter"], "headline-lg-mobile": ["Inter"], "headline-md": ["Inter"], "body-lg": ["Inter"], "label-md": ["Inter"] }, fontSize: { "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "fontWeight": "700" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }] } } } };</script><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm"><div class="w-10 h-10 rounded-xl bg-primary-container flex items-center justify-center text-on-primary shadow-sm"><span class="material-symbols-outlined text-[22px]">pets</span></div><div class="flex flex-col"><span class="font-label-md text-label-md text-primary font-bold tracking-tight">PetCare</span><span class="font-headline-sm text-headline-sm text-on-surface leading-tight">Community</span></div></div><div class="flex items-center gap-space-xs"><button aria-label="Notifications" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container transition-colors relative"><span class="material-symbols-outlined text-[24px]">notifications</span><span class="absolute top-2.5 right-2.5 w-2 h-2 rounded-full bg-secondary ring-2 ring-surface"></span></button><div class="flex items-center gap-space-xs pl-space-xs"><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen px-margin-mobile"><div class="flex flex-col w-full">
+<!-- Top Impact Header -->
+<section class="flex flex-col gap-space-sm pt-space-xs pb-space-md">
+<!-- Community Impact Counter Chip -->
+<div class="inline-flex items-center gap-space-xs self-start px-space-md py-space-xs rounded-full bg-surface-container-high text-primary shadow-sm">
+<span class="material-symbols-outlined text-[18px] text-tertiary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<span class="font-label-md text-label-md font-semibold text-primary">128 animaux adoptés grâce à la communauté</span>
+</div>
+<!-- Page Title & Emotion Framing -->
+<div class="flex flex-col gap-space-xs mt-space-xs">
+<h1 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface font-bold tracking-tight">
+        Les belles histoires d'adoption
+      </h1>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Chaque rencontre est une seconde chance. Découvrez les métamorphoses et le bonheur partagé de nos petits protégés dans leur nouveau foyer.
+      </p>
+</div>
+<!-- Action Prompt Card -->
+<div class="flex items-center justify-between p-space-md rounded-2xl bg-surface-container-low shadow-sm mt-space-xs">
+<div class="flex items-center gap-space-md">
+<div class="w-10 h-10 rounded-full bg-secondary-container flex items-center justify-center text-on-secondary-container flex-shrink-0">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">volunteer_activism</span>
+</div>
+<div class="flex flex-col">
+<span class="font-label-lg text-label-lg text-on-surface">Vous avez adopté ?</span>
+<span class="font-body-sm text-body-sm text-on-surface-variant">Inspirez la communauté</span>
+</div>
+</div>
+<button class="inline-flex items-center gap-space-xs px-space-md py-space-xs rounded-xl bg-secondary-container text-on-secondary-container font-label-md text-label-md font-semibold shadow-sm active:scale-95 transition-transform" onclick="triggerStoryModal()" type="button">
+<span>Raconter</span>
+<span class="material-symbols-outlined text-[16px]">chevron_left</span>
+</button>
+</div>
+</section>
+<!-- Stories Feed -->
+<div class="flex flex-col gap-space-lg">
+<!-- Card 1: Nala -->
+<article class="flex flex-col bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
+<!-- Story Author & Pet Header -->
+<div class="flex items-center justify-between p-space-md pb-space-sm">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-11 h-11 rounded-full bg-surface-container flex items-center justify-center overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Warm natural portrait of Lina smiling gently, soft indoor daylight, contemporary French documentary lifestyle photography, warm earth tones, serene aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAKUC-Opg-oKAjhJSiYhnXJ1h0LyxrfWYlfSvMq4aWC-gCzLLrx8LaHxVPtLNruDA_eNqLO9CfI1aOqCjFl5fg2S7_iBGzLB7HgdYvvAKfjDxgg5WEFX0eCeBDzzK2wwEpFstkeDt2UDlXxTpM6lc-5p2fqTOahf0hMrDoBb2rZGYa1XW1UYrIVyHTpW9kG16zn0KEz5TjIo6jttSz8IIZmBYnOr4io4kaRdRguvnXgT5MQwsgFrp_-ug"/>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">Nala</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant">· Chatte Européenne</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">
+              Adoptée par Lina · Refuge de l'Espoir <span class="text-outline">· il y a 3 sem.</span>
+</span>
+</div>
+</div>
+<button aria-label="Signaler" class="p-space-xs text-outline hover:text-on-surface-variant transition-colors" onclick="reportStory('Nala')" type="button">
+<span class="material-symbols-outlined text-[18px]">flag</span>
+</button>
+</div>
+<!-- Before / After Visual Split Mosaic -->
+<div class="grid grid-cols-2 gap-space-xs px-space-md pt-space-xs">
+<!-- Before -->
+<div class="relative aspect-square rounded-xl overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Close-up of a timid domestic short hair tabby cat with shy green eyes tucked inside an animal shelter blanket box, gentle diffused lighting, caring animal rescue mood." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAGSmtYlKbW5VrKT4Dta_QHf2B8eqceUapNxSRB0IId8srrzCzwbzLSbfJuoRhog9YA7VCTqYNFTzslXDgg0pc4FXUspPcfnTwmr16YTYACOdRDPI4vxPS3qasEbefwyyGRgKgZI4PsW8yt9CubFr7Xk1mMx22SCUoEeoeVKTP2TMZ-i_4xZ6rjcWqrG5hTs7NmHzi4MIXFzSN81Ox6RJkxvpaDlMa_7tT7__3IH_mGc4tiLnx77ZKbiQ"/>
+<span class="absolute top-space-xs left-space-xs px-space-xs py-0.5 rounded-full bg-inverse-surface/80 text-inverse-on-surface font-label-sm text-label-sm backdrop-blur-sm">
+            Au refuge
+          </span>
+</div>
+<!-- After -->
+<div class="relative aspect-square rounded-xl overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Playful tabby cat peacefully purring on a sunny modern living room throw blanket near a window, radiant golden hour lighting, feeling safe, cozy French apartment aesthetic." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCCtDQr_CJgwQSxGxipqruELyNHNVIhnPfyGslQY8vUqbquVdRqGX6UvWtEF3-TrTDyXYAqlQ_eiSuZmZ6jXd5idPFiOAmMU5Rs5fhiB-Ru0qSVo6-_WvjYDSp9jR6TKKMw2D8AyHjWxwWmGB_fiPXTIlJNtdMdBaVlvXhRgFDMJPTpkitbKLKbAAlqIRhv4-PltI1mslLIlUVr8BS4igYKJ8WGx-ib0CLK0NZLPRyrlIi8ZB77S_HX3A"/>
+<span class="absolute top-space-xs left-space-xs px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold backdrop-blur-sm">
+            Dans son foyer ❤️
+          </span>
+</div>
+</div>
+<!-- Story Narrative -->
+<div class="p-space-md pt-space-sm flex flex-col gap-space-xs">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed story-excerpt" id="story-text-1">
+          « Les premiers jours, Nala restait cachée sous le lit. Aujourd'hui, elle ne quitte plus mes genoux pendant le télétravail et adore regarder les oiseaux à la fenêtre. Une vraie métamorphose ! »
+        </p>
+<button class="self-start font-label-md text-label-md text-primary font-semibold hover:underline" onclick="toggleReadMore(1)" type="button">
+          Lire plus
+        </button>
+</div>
+<!-- Interaction Bar -->
+<div class="flex items-center justify-between px-space-md py-space-sm bg-surface-container-low/60">
+<div class="flex items-center gap-space-sm">
+<button class="like-button group flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest shadow-sm active:scale-95 transition-transform" data-count="84" onclick="toggleLike(this)" type="button">
+<span class="heart-icon material-symbols-outlined text-[20px] text-tertiary transition-transform group-hover:scale-110">favorite</span>
+<span class="like-count font-label-md text-label-md text-on-surface font-semibold">84 coups de cœur</span>
+</button>
+<button aria-label="Partager" class="w-9 h-9 rounded-full bg-surface-container-lowest flex items-center justify-center text-on-surface-variant hover:text-on-surface shadow-sm active:scale-95 transition-transform" onclick="shareStory('Nala')" type="button">
+<span class="material-symbols-outlined text-[18px]">share</span>
+</button>
+</div>
+<div class="flex items-center gap-space-xs text-outline font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span>Adoption vérifiée</span>
+</div>
+</div>
+</article>
+<!-- Card 2: Rocky -->
+<article class="flex flex-col bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
+<!-- Story Author & Pet Header -->
+<div class="flex items-center justify-between p-space-md pb-space-sm">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-11 h-11 rounded-full bg-surface-container flex items-center justify-center overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Portrait of Thomas, a young athletic French man in an olive green jacket smiling warmly outdoors, cinematic natural soft lighting, authentic documentary style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcjBBAw4nIUp6V1I-1Cq3bR8gRPkLPXA6M8bS-O9smLxkpxqGjt3PESbGKtuofoT-yQoSWMe0IVwOTSK8vFZ5rSYUqJBvrVByC0vpJbb21TlDoVnqEQWGDd6d09ktfMjjKNLfU7-6ptelHxCO3s3xJy651eZ3Q8gkCruO19tDfqas8X2KQ4oU2iQTMTOo1rRIa7-S_qXSbWBFsshHYL10MPKg5pz_DjSpee529lTpDgZp_wdCEf1la6A"/>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">Rocky</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant">· Berger croisé</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">
+              Adopté par Thomas · Refuge Les Amis <span class="text-outline">· il y a 2 mois</span>
+</span>
+</div>
+</div>
+<button aria-label="Signaler" class="p-space-xs text-outline hover:text-on-surface-variant transition-colors" onclick="reportStory('Rocky')" type="button">
+<span class="material-symbols-outlined text-[18px]">flag</span>
+</button>
+</div>
+<!-- Before / After Visual Split Mosaic -->
+<div class="grid grid-cols-2 gap-space-xs px-space-md pt-space-xs">
+<!-- Before -->
+<div class="relative aspect-square rounded-xl overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Shepherd mix dog sitting patiently in a clean outdoor shelter enclosure with hopeful attentive eyes, realistic shelter environment, emotional adoption photography." src="https://lh3.googleusercontent.com/aida-public/AB6AXuClfTF655uRiykbb2vcyVZVkK2HDARCh9i-sZiTrHKSPH6I80u99BetgAaKRoXZVu_mnjQ-34FPmUpI7LZ20BXRd-PTkPuXRJsDd_kxEbv8KLTDhmTV6cE50uCvKouZ5BPkp6eJjQWo3H6RJ8kZWaFhN_Jb9XIWy4VfuhK0apGMyy8kUNKL49LE3fMtxIAbuEULWrSI6SYu_0udaMWcsOyF17XUCM0H9mNr10I4c596HwJr5z-lM-tjng"/>
+<span class="absolute top-space-xs left-space-xs px-space-xs py-0.5 rounded-full bg-inverse-surface/80 text-inverse-on-surface font-label-sm text-label-sm backdrop-blur-sm">
+            Au refuge
+          </span>
+</div>
+<!-- After -->
+<div class="relative aspect-square rounded-xl overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Energetic happy shepherd dog running freely on a sandy Brittany beach alongside his owner, wet sand splashes, wide open coastal horizon, joyful motion, bright daylight." src="https://lh3.googleusercontent.com/aida-public/AB6AXuCSaTgyhkshM_J9mE3QrEUk6CJDx3xivF2BhXxT1WPSkDChJAxuLoVJgmGFUAAt2A3MjDIxilOuhqFjJSEQ951l1JiV4bks_UDTFtPLZBNoVuzVgM2204RwZyA6w1gTJsPZQBOkgF8U-ta_MxqAW5-Fpnxhxl-aFixe9OQjV6yxeuI2aHS4uFbd49ACuv9yqu7sj5hjxEVObg_0Pwe50XKVq0xlvsXdptgW0Uwdhq9K54C5O7XR_jAYKg"/>
+<span class="absolute top-space-xs left-space-xs px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold backdrop-blur-sm">
+            Nouvelle vie 🐾
+          </span>
+</div>
+</div>
+<!-- Story Narrative -->
+<div class="p-space-md pt-space-sm flex flex-col gap-space-xs">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed story-excerpt" id="story-text-2">
+          « Rocky avait besoin d'espace et de patience. Après quelques semaines d'éducation bienveillante, c'est le chien le plus loyal et joyeux du monde. Merci à toute l'équipe du refuge ! »
+        </p>
+<button class="self-start font-label-md text-label-md text-primary font-semibold hover:underline" onclick="toggleReadMore(2)" type="button">
+          Lire plus
+        </button>
+</div>
+<!-- Interaction Bar -->
+<div class="flex items-center justify-between px-space-md py-space-sm bg-surface-container-low/60">
+<div class="flex items-center gap-space-sm">
+<button class="like-button group flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest shadow-sm active:scale-95 transition-transform" data-count="142" onclick="toggleLike(this)" type="button">
+<span class="heart-icon material-symbols-outlined text-[20px] text-tertiary transition-transform group-hover:scale-110">favorite</span>
+<span class="like-count font-label-md text-label-md text-on-surface font-semibold">142 coups de cœur</span>
+</button>
+<button aria-label="Partager" class="w-9 h-9 rounded-full bg-surface-container-lowest flex items-center justify-center text-on-surface-variant hover:text-on-surface shadow-sm active:scale-95 transition-transform" onclick="shareStory('Rocky')" type="button">
+<span class="material-symbols-outlined text-[18px]">share</span>
+</button>
+</div>
+<div class="flex items-center gap-space-xs text-outline font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span>Adoption vérifiée</span>
+</div>
+</div>
+</article>
+<!-- Card 3: Milo & Otis -->
+<article class="flex flex-col bg-surface-container-lowest rounded-2xl shadow-sm overflow-hidden">
+<!-- Story Author & Pet Header -->
+<div class="flex items-center justify-between p-space-md pb-space-sm">
+<div class="flex items-center gap-space-md min-w-0">
+<div class="w-11 h-11 rounded-full bg-surface-container flex items-center justify-center overflow-hidden flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="Portrait of a smiling couple Claire and Marc in a cozy warmly lit contemporary apartment, candid smile, subtle teal and warm cream accents." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBGI7voLgwGOorqfVOAVhIlyG8tWZZWHo0w-sIvO5PythQtRs7HIkpid5OFb1VYtH0mRwHyvHBqAPbaHPROzHEAh3KjHRm2QiAW2nQwP73_D6PBUOu1iK1uUok3IpfusYqg8SoYdMldusNc1rcE-mIst_TN4bydwzsaThlmSTYh14cLkkuWpSLI_7oJKQEyaL1fiqPO2B9YXJH0rD8cHSMhkjL0pc809XOtzNUoEXafipCvniuaYOchnQ"/>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-space-xs">
+<h2 class="font-headline-sm text-headline-sm text-on-surface truncate">Milo &amp; Otis</h2>
+<span class="font-label-sm text-label-sm text-on-surface-variant">· Duo inséparable</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">
+              Adoptés par Claire &amp; Marc · Assoc. Féline <span class="text-outline">· il y a 1 mois</span>
+</span>
+</div>
+</div>
+<button aria-label="Signaler" class="p-space-xs text-outline hover:text-on-surface-variant transition-colors" onclick="reportStory('Milo &amp; Otis')" type="button">
+<span class="material-symbols-outlined text-[18px]">flag</span>
+</button>
+</div>
+<!-- Before / After Visual Split Mosaic -->
+<div class="grid grid-cols-2 gap-space-xs px-space-md pt-space-xs">
+<!-- Before -->
+<div class="relative aspect-square rounded-xl overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Two bonded ginger and white shelter kittens snuggled tightly together asleep in an association crate, deeply affectionate sibling bond, soft ambient lighting." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBeNZOJYLKHatJk-6m0YC9FWbkoENzraSIWNaDyQ3LkQBF-wyjmNdYZqX-jc28Ii7ecSYAm_Jvsnw238isN1FOPIELjrwCSGsgAKmF2lpvN_JN9nId1ENkNbxEqz_Rpx4qt1oEK6y41bfV6CqfVE27v9znGLvoqksZZp47FMGxMTzUX_wrk_NhGw7BuBLY2x4mw5awzDP9VmNhXsMdxCARJC91ZlWN-MGFdLnABhDoJ0oZApBlVO34SRQ"/>
+<span class="absolute top-space-xs left-space-xs px-space-xs py-0.5 rounded-full bg-inverse-surface/80 text-inverse-on-surface font-label-sm text-label-sm backdrop-blur-sm">
+            Au refuge
+          </span>
+</div>
+<!-- After -->
+<div class="relative aspect-square rounded-xl overflow-hidden bg-surface-container">
+<img class="w-full h-full object-cover" data-alt="Two thriving sleek domestic cats perched high on a designer Scandinavian cat tree in a stylish living room with lush houseplants, sunbeams streaming in, curious and content." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBidsJ4pNI3oydfDEDFdiPltL8RQF-5RKBWVlZ2Yg8u9GskFc6RakXTKBvCWCseWDfdVXATmLofGnGKJYIPYLTqhrcu8Xlyj99lq88LWVpQ83vS2ZZyG7dzgHVarPTjP6d_Qsgw-YrR7_eY4_ZLR-k6LLucf1WZb3_cVzIUZjw3I-96MlRaeY2ARUPpXpj93gvbulsJ7LrImTC2J6M71Z-nl7Uv0x4rh_7yPcOF2i1NKCzwQFnwtZyudw"/>
+<span class="absolute top-space-xs left-space-xs px-space-xs py-0.5 rounded-full bg-secondary-container text-on-secondary-container font-label-sm text-label-sm font-semibold backdrop-blur-sm">
+            Duo comblé ✨
+          </span>
+</div>
+</div>
+<!-- Story Narrative -->
+<div class="p-space-md pt-space-sm flex flex-col gap-space-xs">
+<p class="font-body-md text-body-md text-on-surface leading-relaxed story-excerpt" id="story-text-3">
+          « L'association nous avait prévenus : ils étaient inséparables depuis leur sauvetage. Adopter à deux a été la plus belle décision de notre foyer, ils veillent l'un sur l'autre et illuminent nos journées ! »
+        </p>
+<button class="self-start font-label-md text-label-md text-primary font-semibold hover:underline" onclick="toggleReadMore(3)" type="button">
+          Lire plus
+        </button>
+</div>
+<!-- Interaction Bar -->
+<div class="flex items-center justify-between px-space-md py-space-sm bg-surface-container-low/60">
+<div class="flex items-center gap-space-sm">
+<button class="like-button group flex items-center gap-space-xs px-space-md py-space-xs rounded-full bg-surface-container-lowest shadow-sm active:scale-95 transition-transform" data-count="96" onclick="toggleLike(this)" type="button">
+<span class="heart-icon material-symbols-outlined text-[20px] text-tertiary transition-transform group-hover:scale-110">favorite</span>
+<span class="like-count font-label-md text-label-md text-on-surface font-semibold">96 coups de cœur</span>
+</button>
+<button aria-label="Partager" class="w-9 h-9 rounded-full bg-surface-container-lowest flex items-center justify-center text-on-surface-variant hover:text-on-surface shadow-sm active:scale-95 transition-transform" onclick="shareStory('Milo &amp; Otis')" type="button">
+<span class="material-symbols-outlined text-[18px]">share</span>
+</button>
+</div>
+<div class="flex items-center gap-space-xs text-outline font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[14px]">verified</span>
+<span>Adoption vérifiée</span>
+</div>
+</div>
+</article>
+</div>
+<!-- Bottom Inspiring Invitation Card -->
+<section class="mt-space-lg mb-space-sm p-space-lg rounded-2xl bg-surface-container text-on-surface shadow-sm flex flex-col items-center text-center gap-space-md">
+<div class="w-14 h-14 rounded-2xl bg-secondary-container flex items-center justify-center text-on-secondary-container shadow-sm">
+<span class="material-symbols-outlined text-[30px]" style="font-variation-settings: 'FILL' 1;">pets</span>
+</div>
+<div class="flex flex-col gap-space-xs max-w-xs">
+<h3 class="font-headline-sm text-headline-sm text-on-surface font-bold">
+        Vous aussi, vous avez adopté via PetCare ?
+      </h3>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        Votre témoignage redonne espoir à des centaines d'animaux en attente d'une famille aimante.
+      </p>
+</div>
+<button class="w-full py-space-sm px-space-lg rounded-xl bg-secondary-container text-on-secondary-container font-label-lg text-label-lg font-semibold flex items-center justify-center gap-space-xs shadow-sm hover:opacity-95 active:scale-98 transition-all" onclick="triggerStoryModal()" type="button">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span>Partager votre histoire</span>
+</button>
+</section>
+<!-- Interactive Feedback Toast -->
+<div class="fixed bottom-20 left-1/2 -translate-x-1/2 px-space-md py-space-xs rounded-full bg-inverse-surface text-inverse-on-surface font-label-md text-label-md shadow-lg transition-opacity opacity-0 pointer-events-none z-50 flex items-center gap-space-xs" id="toast-notification">
+<span class="material-symbols-outlined text-[16px] text-primary-fixed">check_circle</span>
+<span id="toast-message">Action enregistrée</span>
+</div>
+</div>
+<script>
+  // Heart like toggle interaction with playful micro-animation
+  function toggleLike(btn) {
+    const heart = btn.querySelector('.heart-icon');
+    const countSpan = btn.querySelector('.like-count');
+    let current = parseInt(btn.getAttribute('data-count'), 10);
+    const isLiked = btn.classList.contains('liked');
+
+    if (!isLiked) {
+      btn.classList.add('liked');
+      btn.classList.add('bg-secondary-fixed');
+      heart.style.fontVariationSettings = "'FILL' 1";
+      heart.classList.add('scale-125');
+      setTimeout(() => heart.classList.remove('scale-125'), 200);
+      current += 1;
+      showToast("Coup de cœur envoyé ! ❤️");
+    } else {
+      btn.classList.remove('liked');
+      btn.classList.remove('bg-secondary-fixed');
+      heart.style.fontVariationSettings = "'FILL' 0";
+      current -= 1;
+    }
+
+    btn.setAttribute('data-count', current);
+    countSpan.textContent = current + " coups de cœur";
+  }
+
+  // Read more narrative expander
+  function toggleReadMore(cardId) {
+    const textEl = document.getElementById('story-text-' + cardId);
+    if (!textEl) return;
+    const btn = event.currentTarget;
+    if (textEl.classList.contains('line-clamp-none')) {
+      textEl.classList.remove('line-clamp-none');
+      btn.textContent = 'Lire plus';
+    } else {
+      textEl.classList.add('line-clamp-none');
+      btn.textContent = 'Réduire';
+    }
+  }
+
+  // Native share or clipboard fallback
+  function shareStory(petName) {
+    if (navigator.share) {
+      navigator.share({
+        title: "L'histoire de " + petName + " sur PetCare",
+        text: "Découvrez l'émouvante adoption de " + petName + " dans PetCare Community !",
+        url: window.location.href,
+      }).catch(() => {});
+    } else {
+      showToast("Lien de l'histoire copié !");
+    }
+  }
+
+  // Report story feedback
+  function reportStory(petName) {
+    showToast("Signalement transmis avec bienveillance");
+  }
+
+  // Story submission trigger
+  function triggerStoryModal() {
+    showToast("Ouverture de l'éditeur d'histoire...");
+  }
+
+  // Micro toast helper
+  function showToast(message) {
+    const toast = document.getElementById('toast-notification');
+    const msg = document.getElementById('toast-message');
+    if (!toast || !msg) return;
+    msg.textContent = message;
+    toast.classList.remove('opacity-0', 'pointer-events-none');
+    toast.classList.add('opacity-100');
+    setTimeout(() => {
+      toast.classList.remove('opacity-100');
+      toast.classList.add('opacity-0', 'pointer-events-none');
+    }, 2400);
+  }
+
+  // Set active bottom nav highlight for community tab
+  (function setActiveNav() {
+    const communityTab = document.querySelector('nav a[data-path="communaute"]');
+    if (communityTab) {
+      communityTab.classList.remove('text-on-surface-variant');
+      communityTab.classList.add('text-primary-container', 'font-semibold');
+      const icon = communityTab.querySelector('.material-symbols-outlined');
+      if (icon) {
+        icon.style.fontVariationSettings = "'FILL' 1";
+      }
+    }
+  })();
+</script></main><nav class="fixed bottom-0 w-full z-50 pb-safe bg-surface/85 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.04)]" data-active-classes="text-primary-container font-semibold"><div class="h-16 px-gutter flex items-center justify-around"><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="accueil" href="#"><span class="material-symbols-outlined text-[24px]">home</span><span class="font-label-sm text-label-sm mt-space-xs">Accueil</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="mes-animaux" href="#"><span class="material-symbols-outlined text-[24px]">pets</span><span class="font-label-sm text-label-sm mt-space-xs">Mes animaux</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="communaute" href="#"><span class="material-symbols-outlined text-[24px]">forum</span><span class="font-label-sm text-label-sm mt-space-xs">Communauté</span></a><a class="flex flex-col items-center justify-center min-w-[56px] min-h-[44px] text-on-surface-variant hover:text-on-surface transition-colors" data-path="services" href="#"><span class="material-symbols-outlined text-[24px]">medical_services</span><span class="font-label-sm text-label-sm mt-space-xs">Services</span></a></div></nav></body></html>

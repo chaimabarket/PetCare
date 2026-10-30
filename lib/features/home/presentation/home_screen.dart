@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/coming_soon_screen.dart';
+import '../../appointments/presentation/widgets/upcoming_appointments_card.dart';
 import '../../profile/data/profile_repository.dart';
 import '../../profile/data/user_profile.dart';
 import '../../profile/presentation/widgets/user_avatar.dart';
@@ -26,9 +26,11 @@ class _HomeScreenState extends State<HomeScreen> {
   final _user = FirebaseAuth.instance.currentUser;
   late final _profileStream = _user == null ? null : ProfileRepository().watch(_user.uid);
 
-  void _openComingSoon(String title) => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => ComingSoonScreen(title: title)),
-      );
+  /// Ouvre un écran du module Rendez-vous ; s'il renvoie un onglet, on l'affiche.
+  Future<void> _openRoute(String route) async {
+    final tab = await Navigator.of(context).pushNamed<Object?>(route);
+    if (tab is int) widget.onOpenTab(tab);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,19 +58,16 @@ class _HomeScreenState extends State<HomeScreen> {
               // Module 1 (Profils des animaux) : afficher ici les animaux de l'utilisateur.
               _AddPetButton(onTap: () => widget.onOpenTab(1)),
               const SizedBox(height: 24),
-              // Module 3 (Rendez-vous) : afficher ici les 2 prochains rendez-vous.
-              _SectionCard(
-                icon: Icons.calendar_month_outlined,
-                title: 'Prochains rendez-vous',
-                actionLabel: "Voir l'agenda",
-                onAction: () => _openComingSoon('Agenda'),
-                emptyText: 'Aucun rendez-vous à venir.',
-              ),
+              // Module 3 (Rendez-vous) : les 2 prochains rendez-vous et l'agenda.
+              UpcomingAppointmentsCard(onOpenTab: widget.onOpenTab),
               const SizedBox(height: 24),
               // Module 2 (Santé) : afficher ici les vaccins et traitements à venir.
-              const _SectionCard(
+              _SectionCard(
                 icon: Icons.notifications_active_outlined,
                 title: 'Rappels de soins',
+                // Module 3 : la liste complète des rappels (soins et rendez-vous).
+                actionLabel: 'Voir tout',
+                onAction: () => _openRoute(AppRoutes.reminders),
                 emptyText: 'Aucun rappel actif. Les prochains vaccins et traitements apparaîtront ici.',
               ),
               const SizedBox(height: 24),

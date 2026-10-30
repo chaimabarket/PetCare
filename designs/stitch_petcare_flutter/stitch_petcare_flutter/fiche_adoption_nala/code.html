@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "inverse-surface": "#27313f", "primary-fixed-dim": "#80d5cb", "secondary": "#8c4e38", "on-surface-variant": "#3e4947", "surface-container-high": "#dee9fc", "on-primary-fixed": "#00201d", "secondary-container": "#feae92", "on-error-container": "#93000a", "on-primary-fixed-variant": "#00504a", "surface-variant": "#d9e3f6", "tertiary-container": "#9c573a", "surface-bright": "#f8f9ff", "surface-container-low": "#eff4ff", "inverse-on-surface": "#eaf1ff", "on-secondary": "#ffffff", "on-tertiary": "#ffffff", "on-secondary-fixed": "#380d01", "error-container": "#ffdad6", "error": "#ba1a1a", "outline-variant": "#bdc9c6", "on-secondary-container": "#793f2a", "secondary-fixed": "#ffdbcf", "surface-dim": "#d0dbed", "background": "#f8f9ff", "surface": "#f8f9ff", "tertiary-fixed-dim": "#ffb598", "on-error": "#ffffff", "on-secondary-fixed-variant": "#6f3723", "tertiary": "#7f4025", "surface-tint": "#006a63", "on-background": "#121c2a", "on-tertiary-fixed-variant": "#72361b", "inverse-primary": "#80d5cb", "primary-container": "#0f766e", "on-primary-container": "#a3faef", "primary-fixed": "#9cf2e8", "on-tertiary-container": "#ffe5db", "primary": "#005c55", "on-surface": "#121c2a", "surface-container-lowest": "#ffffff", "on-tertiary-fixed": "#370e00", "surface-container": "#e6eeff", "surface-container-highest": "#d9e3f6", "outline": "#6e7977", "tertiary-fixed": "#ffdbce", "secondary-fixed-dim": "#ffb59c", "on-primary": "#ffffff" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "margin-mobile": "1rem", "gutter-mobile": "0.75rem", "space-lg": "1.5rem", "space-xl": "2rem", "margin": "1.5rem", "space-xs": "0.25rem", "space-md": "1rem", "space-sm": "0.5rem" }, fontFamily: { "headline-md": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "label-lg": ["Inter"], "body-sm": ["Inter"], "headline-lg-mobile": ["Inter"], "label-md": ["Inter"], "headline-sm": ["Inter"], "body-lg": ["Inter"], "headline-lg": ["Inter"] }, fontSize: { "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100%;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen antialiased"><header class="fixed top-0 inset-x-0 z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin-mobile flex items-center justify-between gap-space-sm"><div class="flex items-center gap-space-sm min-w-0"><button aria-label="Retour" class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[20px]">arrow_back</span></button><h1 class="font-headline-sm text-headline-sm text-on-surface truncate">Pet Detail View</h1></div><div class="flex items-center gap-space-xs"><button aria-label="Partager" class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-on-surface hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">share</span></button><button aria-label="Ajouter aux favoris" class="w-11 h-11 flex items-center justify-center rounded-full bg-surface-container-lowest text-secondary hover:bg-secondary-container/20 transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">favorite</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-xs flex-shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex flex-col relative w-full pt-16 pb-24 bg-surface min-h-screen"><div class="flex flex-col w-full pb-6">
+<!-- Immersive Gallery Section -->
+<div class="relative w-full overflow-hidden bg-surface-container rounded-b-[2rem] shadow-sm">
+<div class="flex w-full overflow-x-auto snap-x snap-mandatory scrollbar-none transition-all duration-300" id="carousel-track">
+<!-- Slide 1 -->
+<div class="min-w-full snap-start relative h-[360px]">
+<img alt="Nala en portrait" class="w-full h-full object-cover" data-alt="A luminous close-up portrait of Nala, a sweet European shorthair female cat with mesmerizing warm golden-amber eyes, sitting peacefully in gentle morning sunlight. Clean organic aesthetic, warm undertones, soft teal and neutral blurred background." src="https://lh3.googleusercontent.com/aida-public/AB6AXuD94JiJSkG34GkBjw-tX3axE1tc-CcuFJQBkVG1aYxM7A9nGjgoQ6oqZVDppyXPUK3gB9HtsVlc0I_c6dsba3TJPqz5wUNcYmvsbdXNIJk79rNcMV4McYot-77bdGJqIU3aiMj4Isrf056JctDuzL_2XVo2GgJ1CiPiqoDK02Y3KRJv49WNvxEvsreKhBbrVJUfB64o-KoTATNZXR6wJ4lZobkQbOG_t9FWjLH_HAZphf5rp8-zLjW5"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
+</div>
+<!-- Slide 2 -->
+<div class="min-w-full snap-start relative h-[360px]">
+<img alt="Nala au repos" class="w-full h-full object-cover" data-alt="Nala, a beautiful 2-year-old domestic cat curled comfortably on a soft cream linen cushion in a bright minimalist apartment. Gentle peaceful mood, natural warm daylight, cozy atmosphere." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDEVRvw6JxXhll8IA_xqOgZ5zdQHrrAV7NTCG7vALclKAJTWEzcRoGuuTQaCLqmG7JY0mHA1PHOxkqWgnu3Jwug87OylLTaQr3ZA8tpGzuPSjzzNlWA9QfHLrysuz8Y_EH2dljGIFcw-6qTL51kcPq46ZIw7EvPzWzWrVuT8BtCMNGk5qhR5x2uuNJ-4CA8ckTuPvz6KSSPBaxYibi9q6IPvs7wLMeXOv36R_ElRBXsvAv6RLtEE1O0"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
+</div>
+<!-- Slide 3 -->
+<div class="min-w-full snap-start relative h-[360px]">
+<img alt="Nala qui joue" class="w-full h-full object-cover" data-alt="Playful cat Nala gently tapping a soft wool toy ball with her paw, dynamic playful expression, cozy modern living room interior with soft wooden textures and warm light." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx8aTHn4WCAAdyonSREmWa7zuHnnU771bhZ91O7HcjIT-KA6QJl7f5dtjB6wyywS9CUnTIGBcc030o8ebr_-I-soN4mOneWgfbwRsBnqqRcvScLdGxTlsBZyIg0tzJ_pqBxCZ0g5djEeP_Qw1nfAl8UmhVBF8ryZYcF6mmo-SBJceBZfNnMqmOzWHWcYcYuEemlJyYWjuqy2C79alN70LJce9mAo8qQLh0g5IZHWDikqpO2uTq03f2"/>
+<div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 pointer-events-none"></div>
+</div>
+</div>
+<!-- Floating Top Overlay Pills & Counters -->
+<div class="absolute bottom-4 right-4 z-10">
+<div class="flex items-center gap-space-xs px-3 py-1 rounded-full bg-inverse-surface/80 backdrop-blur-md text-surface-container-lowest font-label-sm text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-[14px]">photo_camera</span>
+<span id="photo-counter">1 / 3</span>
+</div>
+</div>
+<!-- Pagination Dots -->
+<div class="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+<span class="carousel-dot w-6 h-1.5 rounded-full bg-surface-container-lowest transition-all duration-300"></span>
+<span class="carousel-dot w-1.5 h-1.5 rounded-full bg-surface-container-lowest/50 transition-all duration-300"></span>
+<span class="carousel-dot w-1.5 h-1.5 rounded-full bg-surface-container-lowest/50 transition-all duration-300"></span>
+</div>
+</div>
+<!-- Content Container -->
+<div class="px-margin-mobile flex flex-col gap-space-lg -mt-3 relative z-20">
+<!-- Primary Title & Status Block -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center justify-between gap-space-xs">
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-secondary-container/40 text-secondary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+          Coup de cœur
+        </span>
+<span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary-fixed text-primary font-label-sm text-label-sm">
+<span class="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
+          Disponible à l'adoption
+        </span>
+</div>
+<div class="flex items-baseline justify-between mt-1">
+<div class="flex items-center gap-2">
+<h2 class="font-headline-lg-mobile text-headline-lg-mobile text-on-surface">Nala</h2>
+<span class="inline-flex items-center justify-center w-7 h-7 rounded-full bg-secondary-container/30 text-secondary font-label-md text-label-md" title="Femelle">
+            ♀
+          </span>
+</div>
+<div class="flex items-center gap-1 text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">location_on</span>
+<span>Tunis, La Marsa</span>
+</div>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant">
+        Chat Européen · Femelle · 2 ans · 4.2 kg
+      </p>
+<!-- Key Highlight Metric Badges -->
+<div class="grid grid-cols-2 gap-space-xs pt-space-xs">
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">cake</span>
+</div>
+<div class="min-w-0">
+<p class="text-[11px] leading-tight text-outline">Âge</p>
+<p class="font-label-md text-label-md text-on-surface truncate">2 ans (Adulte)</p>
+</div>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">scale</span>
+</div>
+<div class="min-w-0">
+<p class="text-[11px] leading-tight text-outline">Poids</p>
+<p class="font-label-md text-label-md text-on-surface truncate">4.2 kg (Moyen)</p>
+</div>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">verified</span>
+</div>
+<div class="min-w-0">
+<p class="text-[11px] leading-tight text-outline">Santé</p>
+<p class="font-label-md text-label-md text-primary truncate">Stérilisée</p>
+</div>
+</div>
+<div class="p-2.5 rounded-xl bg-surface-container-low flex items-center gap-2.5">
+<div class="w-8 h-8 rounded-lg bg-surface-container-lowest flex items-center justify-center text-primary shadow-sm flex-shrink-0">
+<span class="material-symbols-outlined text-[18px]">vaccines</span>
+</div>
+<div class="min-w-0">
+<p class="text-[11px] leading-tight text-outline">Carnet</p>
+<p class="font-label-md text-label-md text-primary truncate">À jour &amp; Pucée</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Badges de Personnalité -->
+<div class="flex flex-col gap-space-sm">
+<h3 class="font-label-lg text-label-lg text-on-surface flex items-center gap-1.5">
+<span class="material-symbols-outlined text-secondary text-[20px]">psychology_alt</span>
+        Caractère &amp; Tempérament
+      </h3>
+<div class="flex flex-wrap gap-2">
+<span class="px-3 py-1.5 rounded-xl bg-surface-container-lowest shadow-sm text-on-surface font-body-sm text-body-sm flex items-center gap-1.5">
+<span>🤗</span> Câline &amp; affectueuse
+        </span>
+<span class="px-3 py-1.5 rounded-xl bg-surface-container-lowest shadow-sm text-on-surface font-body-sm text-body-sm flex items-center gap-1.5">
+<span>🛋️</span> Calme en intérieur
+        </span>
+<span class="px-3 py-1.5 rounded-xl bg-surface-container-lowest shadow-sm text-on-surface font-body-sm text-body-sm flex items-center gap-1.5">
+<span>👶</span> OK enfants doux
+        </span>
+<span class="px-3 py-1.5 rounded-xl bg-surface-container-lowest shadow-sm text-on-surface font-body-sm text-body-sm flex items-center gap-1.5">
+<span>🐱</span> Sociable chats
+        </span>
+<span class="px-3 py-1.5 rounded-xl bg-surface-container-lowest shadow-sm text-on-surface font-body-sm text-body-sm flex items-center gap-1.5">
+<span>🧶</span> Joueuse curieuse
+        </span>
+</div>
+</div>
+<!-- Section: Son Histoire -->
+<div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">auto_stories</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Son histoire</h3>
+</div>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Nala a été secourue délicatement lors d'une intervention bénévole en début d'année. Prise en charge par une famille d’accueil attentionnée, elle s’est métamorphosée en une compagne d’une infinie tendresse.
+      </p>
+<p class="font-body-md text-body-md text-on-surface-variant leading-relaxed">
+        Toujours discrète mais présente, elle adore se lover à côté de vous pendant les moments de lecture et exprimer sa joie par des ronronnements rassurants. Elle est fin prête à combler un nouveau foyer de douceur.
+      </p>
+</div>
+<!-- Section: Ses Besoins & Habitudes -->
+<div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">pets</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Besoins au quotidien</h3>
+</div>
+<div class="flex flex-col gap-space-sm mt-1">
+<div class="flex items-start gap-3">
+<div class="w-7 h-7 rounded-full bg-surface-container-low flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">apartment</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Logement sécurisé</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Appartement ou maison avec fenêtres et balcon sécurisés (filet protecteur).</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-7 h-7 rounded-full bg-surface-container-low flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">volunteer_activism</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Présence bienveillante</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Moments d'attention réguliers en soirée pour caresses et sessions de jeu calmes.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="w-7 h-7 rounded-full bg-surface-container-low flex items-center justify-center text-primary flex-shrink-0 mt-0.5">
+<span class="material-symbols-outlined text-[16px]">set_meal</span>
+</div>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Alimentation soignée</p>
+<p class="font-body-sm text-body-sm text-on-surface-variant">Croquettes vétérinaires équilibrées et petite portion d'humide hydratante.</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Conditions d'Adoption -->
+<div class="bg-surface-container-lowest rounded-2xl p-5 shadow-sm flex flex-col gap-space-sm">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-surface-container-high flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-[20px]">checklist_rtl</span>
+</div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Démarche d'adoption</h3>
+</div>
+<div class="flex flex-col gap-2.5 mt-1">
+<div class="flex items-center gap-2.5 p-2 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Participation vétérinaire solidaire aux frais réels</span>
+</div>
+<div class="flex items-center gap-2.5 p-2 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Échange convivial préalable ou visio avec le refuge</span>
+</div>
+<div class="flex items-center gap-2.5 p-2 rounded-xl bg-surface-container-low">
+<span class="material-symbols-outlined text-primary text-[18px]">check_circle</span>
+<span class="font-body-sm text-body-sm text-on-surface">Signature du certificat d’engagement et contrat associatif</span>
+</div>
+</div>
+</div>
+<!-- Section: Fiche Refuge Partenaire -->
+<div class="bg-surface-container-lowest rounded-2xl p-4 shadow-sm flex items-center justify-between gap-space-sm">
+<div class="flex items-center gap-3 min-w-0">
+<div class="w-12 h-12 rounded-xl bg-primary-fixed flex items-center justify-center text-primary flex-shrink-0 font-headline-sm text-headline-sm">
+          🐾
+        </div>
+<div class="min-w-0">
+<div class="flex items-center gap-1">
+<h4 class="font-label-lg text-label-lg text-on-surface truncate">Refuge Les Amis</h4>
+<span class="material-symbols-outlined text-[16px] text-primary" style="font-variation-settings: 'FILL' 1;" title="Vérifié">verified_user</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant truncate">Refuge partenaire éthique · Tunis</p>
+</div>
+</div>
+<button class="px-3 py-1.5 rounded-xl bg-surface-container text-primary font-label-md text-label-md flex-shrink-0 hover:bg-surface-container-high transition-colors" type="button">
+        Profil
+      </button>
+</div>
+<!-- Signalement éthique & modération -->
+<div class="flex justify-center pb-2">
+<button class="inline-flex items-center gap-1.5 text-outline hover:text-error transition-colors font-label-sm text-label-sm py-1 px-3" type="button">
+<span class="material-symbols-outlined text-[14px]">flag</span>
+<span>Signaler une anomalie sur cette fiche</span>
+</button>
+</div>
+</div>
+</div>
+<script>
+  (function() {
+    const track = document.getElementById('carousel-track');
+    const counter = document.getElementById('photo-counter');
+    const dots = document.querySelectorAll('.carousel-dot');
+
+    if (track && counter && dots.length) {
+      track.addEventListener('scroll', () => {
+        const index = Math.round(track.scrollLeft / track.clientWidth);
+        counter.textContent = `${index + 1} / ${dots.length}`;
+        dots.forEach((dot, i) => {
+          if (i === index) {
+            dot.classList.remove('w-1.5', 'bg-surface-container-lowest/50');
+            dot.classList.add('w-6', 'bg-surface-container-lowest');
+          } else {
+            dot.classList.remove('w-6', 'bg-surface-container-lowest');
+            dot.classList.add('w-1.5', 'bg-surface-container-lowest/50');
+          }
+        });
+      }, { passive: true });
+    }
+  })();
+</script></main><aside class="fixed bottom-0 inset-x-0 z-50 pb-safe bg-surface/90 backdrop-blur-xl shadow-[0_-2px_12px_rgba(0,0,0,0.05)]"><div class="h-20 px-margin-mobile flex items-center gap-space-md"><button aria-label="Contacter le refuge" class="w-12 h-12 flex items-center justify-center rounded-xl bg-surface-container-high text-primary hover:bg-surface-container-highest transition-colors flex-shrink-0" type="button"><span class="material-symbols-outlined text-[22px]">chat_bubble</span></button><button class="flex-1 h-12 flex items-center justify-center gap-space-xs rounded-xl bg-primary text-on-primary font-label-lg text-label-lg shadow-sm hover:bg-primary-container transition-colors" type="button"><span class="material-symbols-outlined text-[20px]">pets</span><span>Je veux l'adopter</span></button></div></aside></body></html>

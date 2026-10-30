@@ -6,6 +6,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/coming_soon_screen.dart';
 import '../../../core/widgets/language_button.dart';
 import '../../../l10n/app_localizations.dart';
+import '../../community/presentation/community_screen.dart';
 import '../../notifications/data/notification_service.dart';
 import '../../pets/presentation/my_pets_screen.dart';
 import '../../profile/data/profile_repository.dart';
@@ -43,8 +44,8 @@ class _MainShellState extends State<MainShell> {
         children: [
           HomeScreen(onOpenTab: _selectTab),
           const MyPetsScreen(),
-          // Modules 4 et 5 (Perdus & trouvés, Adoption) : remplacer par l'écran « Communauté ».
-          const ComingSoonScreen(title: 'Communauté', embedded: true),
+          // Modules 4 et 5 : écran « Communauté » (Adoption, Perdus & trouvés, Happy Tails).
+          const CommunityScreen(),
           // Module 6 (Services) : remplacer par l'annuaire des prestataires.
           const ComingSoonScreen(title: 'Services', embedded: true),
         ],

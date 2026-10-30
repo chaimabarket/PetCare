@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { "colors": { "secondary-container": "#feae92", "surface-tint": "#006a63", "on-secondary": "#ffffff", "on-secondary-fixed": "#380d01", "surface": "#f8f9ff", "tertiary-container": "#9c573a", "on-secondary-container": "#793f2a", "background": "#f8f9ff", "primary-fixed": "#9cf2e8", "on-primary": "#ffffff", "on-background": "#121c2a", "surface-container": "#e6eeff", "on-primary-container": "#a3faef", "outline": "#6e7977", "on-error-container": "#93000a", "on-primary-fixed-variant": "#00504a", "on-tertiary-container": "#ffe5db", "error": "#ba1a1a", "outline-variant": "#bdc9c6", "secondary-fixed": "#ffdbcf", "on-secondary-fixed-variant": "#6f3723", "primary": "#005c55", "surface-dim": "#d0dbed", "surface-container-low": "#eff4ff", "on-tertiary-fixed-variant": "#72361b", "inverse-surface": "#27313f", "on-surface": "#121c2a", "error-container": "#ffdad6", "primary-fixed-dim": "#80d5cb", "surface-bright": "#f8f9ff", "tertiary-fixed-dim": "#ffb598", "surface-variant": "#d9e3f6", "primary-container": "#0f766e", "surface-container-high": "#dee9fc", "inverse-primary": "#80d5cb", "tertiary-fixed": "#ffdbce", "secondary-fixed-dim": "#ffb59c", "on-tertiary": "#ffffff", "on-error": "#ffffff", "secondary": "#8c4e38", "surface-container-lowest": "#ffffff", "on-primary-fixed": "#00201d", "inverse-on-surface": "#eaf1ff", "on-tertiary-fixed": "#370e00", "tertiary": "#7f4025", "surface-container-highest": "#d9e3f6", "on-surface-variant": "#3e4947" }, "borderRadius": { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, "spacing": { "gutter-mobile": "0.75rem", "margin": "1.5rem", "margin-mobile": "1rem", "space-md": "1rem", "space-xs": "0.25rem", "space-lg": "1.5rem", "gutter": "1rem", "space-sm": "0.5rem", "space-xl": "2rem" }, "fontFamily": { "label-md": ["Inter"], "body-md": ["Inter"], "headline-sm": ["Inter"], "body-sm": ["Inter"], "headline-md": ["Inter"], "label-sm": ["Inter"], "headline-lg": ["Inter"], "headline-lg-mobile": ["Inter"], "label-lg": ["Inter"], "body-lg": ["Inter"] }, "fontSize": { "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }], "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "fontWeight": "700" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }] } } } };</script><style>@layer base{html,body{width:100%;margin:0;padding:0;}body{overscroll-behavior-y:none;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head><body class="bg-surface font-body-md text-body-md text-on-surface flex flex-col min-h-screen"><header class="fixed top-0 w-full z-50 bg-surface/80 backdrop-blur-xl pt-safe shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-margin-mobile flex items-center justify-between"><button aria-label="Retour" class="w-11 h-11 -ml-space-xs flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back</span></button><h1 class="font-headline-sm text-headline-sm text-on-surface font-semibold truncate px-space-xs text-center flex-1">Publier Une Annonce</h1><div class="flex items-center gap-space-xs"><button aria-label="Enregistrer en brouillon" class="w-11 h-11 flex items-center justify-center rounded-full text-primary hover:bg-surface-container transition-colors" type="button"><span class="material-symbols-outlined text-[24px]">bookmark</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-xs"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 pb-safe bg-surface"><div class="flex flex-col w-full pb-36">
+<!-- Stepper & Encouraging Banner -->
+<section class="px-margin-mobile pt-space-md">
+<div class="bg-surface-container-low rounded-2xl p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-space-xs">
+<div class="flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]" style="font-variation-settings: 'FILL' 1;">favorite</span>
+<span class="font-label-md text-label-md text-primary uppercase tracking-wider">Étape 2 sur 3 · Nouvelle Vie</span>
+</div>
+<span class="font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed-variant px-space-sm py-0.5 rounded-full">Complété à 70%</span>
+</div>
+<p class="font-body-md text-body-md text-on-surface mb-space-sm">
+        Prenez un instant pour décrire votre protégé. Plus les détails sont affectueux et précis, plus vite l'adoption coup de cœur se réalisera !
+      </p>
+<div class="w-full bg-surface-container-highest rounded-full h-1.5 overflow-hidden">
+<div class="bg-primary h-full rounded-full transition-all duration-500" style="width: 70%;"></div>
+</div>
+</div>
+</section>
+<!-- Section 1: Choisir un animal -->
+<section class="mt-space-lg px-margin-mobile">
+<div class="flex items-center justify-between mb-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Choisir un animal</h2>
+<span class="font-label-sm text-label-sm text-primary font-medium">3 enregistrés</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+      Sélectionnez l'un de vos compagnons enregistrés ou créez une nouvelle fiche
+    </p>
+<!-- Avatars Horizontal Scroll -->
+<div class="flex items-start gap-space-md overflow-x-auto pb-space-sm -mx-margin-mobile px-margin-mobile no-scrollbar" id="animal-picker">
+<!-- Item 1 (Selected): Nala -->
+<button class="animal-avatar-btn flex flex-col items-center flex-shrink-0 group focus:outline-none" data-animal="nala" type="button">
+<div class="relative w-16 h-16 rounded-full p-0.5 bg-primary shadow-sm transition-transform active:scale-95">
+<img class="w-full h-full object-cover rounded-full" data-alt="A portrait of a warm-toned European domestic cat named Nala sitting serenely with striking green eyes, soft amber lighting, indoors on a comfortable linen surface, modern pet photography style" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDnrU4z9yi6_Bv1glo87w_ElBlEQyR2969_t3imOVxlvLxnGGDo5NxFFHeeJW5ePjF_GKvEe9OT-5kSq6OC-YvvpAQtCf1qTgb0ROW2f2_zIGqAwcZ7gRQSeLd9pIGkXLpxraek4EHNeVk91oATzXYST2sowEIpWpK-J9INf3OoRkLIMAz5jgXUW0Bnxk_Fp9KYq06apXiI5a_PpIamP0uMyYf8EmksmKSchT2ZEhd0NHqKa5AiPK7F"/>
+<span class="absolute bottom-0 right-0 w-5 h-5 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-sm">
+<span class="material-symbols-outlined text-[14px]">check</span>
+</span>
+</div>
+<span class="mt-space-xs font-label-md text-label-md text-on-surface font-semibold">Nala</span>
+<span class="font-label-sm text-label-sm text-primary">Sélectionnée</span>
+</button>
+<!-- Item 2: Rocky -->
+<button class="animal-avatar-btn flex flex-col items-center flex-shrink-0 group focus:outline-none opacity-70 hover:opacity-100 transition-opacity" data-animal="rocky" type="button">
+<div class="relative w-16 h-16 rounded-full p-0.5 bg-surface-container-highest shadow-sm transition-transform active:scale-95">
+<img class="w-full h-full object-cover rounded-full" data-alt="Portrait of Rocky a gentle friendly golden Labrador cross dog sitting obediently with ears perked, warm natural daylight in a cozy living room, high-end caring editorial photo" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDzpHYMyRmqEhoiYk7lnKjTKaC_v5icu4Iv-oEj6Y1xC_XohHFOa5Y0ERdMXxrdm6XVxngdKA3n5SHyE2WRtuzwZpr3V7GF_2rE47aboyFx7FzJGTmCbSIoiKS64u6-G03_KMC9cXeetp5U9TONJB97yGd5M6FWCvfktgUVFxE5DvJVI2kU_oU_x8dkQwOQqC_Uhm-bgxpffIUd4xCpwEk8TmhbP0xcN8fifUTmV1ZUJ2D9eG-3Fj46"/>
+</div>
+<span class="mt-space-xs font-label-md text-label-md text-on-surface">Rocky</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Chien · 3 ans</span>
+</button>
+<!-- Item 3: Plume -->
+<button class="animal-avatar-btn flex flex-col items-center flex-shrink-0 group focus:outline-none opacity-70 hover:opacity-100 transition-opacity" data-animal="plume" type="button">
+<div class="relative w-16 h-16 rounded-full p-0.5 bg-surface-container-highest shadow-sm transition-transform active:scale-95">
+<img class="w-full h-full object-cover rounded-full" data-alt="Close-up of Plume, an adorable fluffy white and fawn lop-eared rabbit resting quietly on a clean pastel blanket, soft bright natural light" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCBbhTrh_K21IihQ1hJjeITcaZEHsyco2SHHSffS1YX7ug-wo3hD9VYZ5RDQO-pWqVGFJHcaB-FpesihGp4pqTsL6_UqGrMSxDd4qBCXq6LJOVv1XdGz80MEEfj7Ke93v8EXd_1nzK-OVNAFFx-kRjj4XUXG1IxT0dqZhAChLVXFic5ZdRRfRBzLHaFKoANwmjwAoESgBWXVuaq1KXgfzjcc7qZVTKA5swgWufs4YYx2wiCwCT_TnNl"/>
+</div>
+<span class="mt-space-xs font-label-md text-label-md text-on-surface">Plume</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Lapin · 1 an</span>
+</button>
+<!-- Item 4: Add new animal -->
+<button class="flex flex-col items-center flex-shrink-0 group focus:outline-none" type="button">
+<div class="w-16 h-16 rounded-full bg-surface-container-low flex items-center justify-center text-primary shadow-sm hover:bg-surface-container transition-colors active:scale-95">
+<span class="material-symbols-outlined text-[26px]">add</span>
+</div>
+<span class="mt-space-xs font-label-md text-label-md text-on-surface font-medium">Ajouter</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Nouveau</span>
+</button>
+</div>
+</section>
+<!-- Section 2: Photos de l'annonce -->
+<section class="mt-space-lg px-margin-mobile">
+<div class="flex items-center justify-between mb-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Photos de l'annonce <span class="font-label-md text-label-md text-on-surface-variant font-normal">(3/5)</span></h2>
+<span class="font-label-sm text-label-sm bg-secondary-fixed text-on-secondary-fixed-variant px-2 py-0.5 rounded-full font-semibold">Conseillé : 3+</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+      Mettez en valeur son regard et ses attitudes. La première photo servira de couverture.
+    </p>
+<!-- Photo upload grid -->
+<div class="grid grid-cols-3 gap-gutter-mobile">
+<!-- Photo 1: Couverture -->
+<div class="relative col-span-2 aspect-[4/3] rounded-2xl overflow-hidden bg-surface-container shadow-sm group">
+<img class="w-full h-full object-cover" data-alt="Nala the cat staring directly into the camera with affectionate expressive eyes, warm natural afternoon sunlight, cozy beige throw pillow background, peaceful and healthy adoption portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDxPrFtm1ygDlqh0TfUi_-z1ZKeoK5UHQOSPXvHpsXnoU60v5TY6nHZEDR0D1kmNCHf8FnWyJGgypVJ9d0-Kgi4rmN8EVF-EK-gedAS65ugu51Eo-zWk9hNSB1kKNQG6V-bNFgDB1q7jU9Fgt9IuKbiJTABicbIPJpDXU9t3Gq4M7N_5sAMqbE2S3Y5wqL5rUERBBP2iXrl0Er1GU1c2vSg50_2okp2Cz8dHCDwNtAd9qIOtx9XvaZI"/>
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/70 via-transparent to-transparent"></div>
+<div class="absolute top-2.5 left-2.5 bg-secondary-fixed text-on-secondary-fixed-variant font-label-sm text-label-sm px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm font-semibold">
+<span class="material-symbols-outlined text-[13px]" style="font-variation-settings: 'FILL' 1;">star</span>
+          Photo de couverture
+        </div>
+<div class="absolute bottom-2.5 right-2.5 flex items-center gap-1.5">
+<button aria-label="Remplacer la photo de couverture" class="w-8 h-8 rounded-full bg-surface/90 text-on-surface flex items-center justify-center backdrop-blur-sm shadow-sm active:scale-95" type="button">
+<span class="material-symbols-outlined text-[16px]">crop_rotate</span>
+</button>
+<button aria-label="Supprimer la photo" class="w-8 h-8 rounded-full bg-error-container text-on-error-container flex items-center justify-center backdrop-blur-sm shadow-sm active:scale-95" type="button">
+<span class="material-symbols-outlined text-[16px]">delete</span>
+</button>
+</div>
+</div>
+<!-- Photo 2: Sieste au soleil -->
+<div class="relative col-span-1 aspect-[4/3] rounded-2xl overflow-hidden bg-surface-container shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Nala the cat curled up peacefully sleeping on a sunlit olive-green sofa, relaxed and serene posture, warm golden tones" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfqVoLM_HIsr2002crfXbxfxL1E_W4bs_cUFCzphLJlWx1qEUTwQkGuCHSO3T_aZfv5XaW6j1RoPQhanYrUqtuHnDN1ItSHNyBO5z_zrwkuKLkVBLBjMzshVnfCH_potORalPN5lou8aJr-6agL_DeR1ureT-iDTiAQbj1qzHJRH83Q-ydNTl9G_4_pMqPcFa8xKs-NHickUwyjC7rbZOLHuF2D3GaBvY70ObMfUwu3NMdoidIG_xu"/>
+<button aria-label="Supprimer" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-on-background/60 text-surface flex items-center justify-center backdrop-blur-sm shadow-sm active:scale-95" type="button">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+<!-- Photo 3: Nala jouant -->
+<div class="relative col-span-1 aspect-[4/3] rounded-2xl overflow-hidden bg-surface-container shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Playful cat Nala swatting at an organic natural wool feather wand toy, vibrant playful eyes, dynamic capture with soft depth of field" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDZxmONcrJkEyajBF9lsdMDWbLzXKc7Mucisv-AqFnqrrVZiN0Ym2LboIxWVoRg87AKwY_Q_DjaL9eco18yXFsosBtD9brxiE7GyeFLVDw_srLlng-JhTymBusmLE3fxrPjta4e6VGgwo8bZwZ11GJcg-hLamJbN2zcEb8WtskLFcCyXURePHBtdD8YuAr3gzqhuFXtDzzNSxpXwLVEFk7CvleGLHcc_sINd98YF8lDbKussuzJ9Twv"/>
+<button aria-label="Supprimer" class="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-on-background/60 text-surface flex items-center justify-center backdrop-blur-sm shadow-sm active:scale-95" type="button">
+<span class="material-symbols-outlined text-[14px]">close</span>
+</button>
+</div>
+<!-- Slot 4: Empty upload slot -->
+<button class="col-span-1 aspect-[4/3] rounded-2xl bg-surface-container-low flex flex-col items-center justify-center gap-1 text-primary hover:bg-surface-container transition-colors shadow-sm active:scale-95 p-2 text-center" type="button">
+<span class="material-symbols-outlined text-[24px]">add_a_photo</span>
+<span class="font-label-sm text-label-sm leading-tight text-on-surface">Ajouter photo</span>
+</button>
+<!-- Slot 5: Empty slot placeholder -->
+<div class="col-span-1 aspect-[4/3] rounded-2xl bg-surface-container-lowest flex items-center justify-center text-outline-variant shadow-sm">
+<span class="material-symbols-outlined text-[24px]">image</span>
+</div>
+</div>
+<div class="flex items-center gap-1.5 mt-space-sm text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[16px] text-primary">info</span>
+<span>Format JPG ou PNG, max 10 Mo par photo.</span>
+</div>
+</section>
+<!-- Section 3: Informations principales -->
+<section class="mt-space-lg px-margin-mobile">
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm space-y-space-md">
+<div class="flex items-center gap-space-xs text-primary">
+<span class="material-symbols-outlined text-[20px]">edit_note</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Informations principales</h2>
+</div>
+<!-- Champ Titre -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-space-xs" for="ad-title">
+          Titre de l'annonce <span class="text-secondary">*</span>
+</label>
+<div class="relative bg-surface-container-low rounded-xl px-space-md py-space-sm shadow-sm focus-within:bg-surface-container">
+<input class="w-full bg-transparent font-body-md text-body-md text-on-surface outline-none placeholder:text-on-surface-variant" id="ad-title" type="text" value="Douce Nala recherche une famille chaleureuse et attentionnée"/>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-1">Un titre accrocheur attire jusqu'à 3x plus d'adoptions.</p>
+</div>
+<!-- Champ Histoire & Tempérament -->
+<div>
+<div class="flex justify-between items-center mb-space-xs">
+<label class="font-label-md text-label-md text-on-surface" for="ad-story">
+            Son histoire &amp; Tempérament <span class="text-secondary">*</span>
+</label>
+<span class="font-label-sm text-label-sm text-on-surface-variant" id="char-counter">312 / 1000</span>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-sm focus-within:bg-surface-container">
+<textarea class="w-full bg-transparent font-body-md text-body-md text-on-surface outline-none resize-none leading-relaxed placeholder:text-on-surface-variant" id="ad-story" rows="4">Trouvée très jeune dans un jardin partagé, Nala a été soignée avec beaucoup d'amour. Elle adore les siestes au soleil et ronronne dès qu'on lui parle doucement. Elle est vaccinée, identifiée et stérilisée. Très calme, elle recherche un foyer doux prêt à lui offrir des caresses sans fin.</textarea>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 4: Traits de personnalité -->
+<section class="mt-space-lg px-margin-mobile">
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+<div class="flex items-center justify-between mb-1">
+<h2 class="font-headline-sm text-headline-sm text-on-surface flex items-center gap-space-xs">
+<span class="material-symbols-outlined text-primary text-[20px]">psychology</span>
+          Traits de personnalité
+        </h2>
+<span class="font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed-variant px-2.5 py-0.5 rounded-full font-semibold" id="traits-count">5/5 sélectionnés</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+        Sélectionnez jusqu'à 5 badges qui décrivent le mieux son caractère
+      </p>
+<!-- Chips Grid -->
+<div class="flex flex-wrap gap-2" id="traits-container">
+<!-- 1: Câlin(e) - Selected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-primary text-on-primary" data-active="true" type="button">
+<span>🌸</span>
+<span>Câlin(e)</span>
+<span class="material-symbols-outlined text-[14px]">check</span>
+</button>
+<!-- 2: Calme & posé(e) - Selected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-primary text-on-primary" data-active="true" type="button">
+<span>☀️</span>
+<span>Calme &amp; posé(e)</span>
+<span class="material-symbols-outlined text-[14px]">check</span>
+</button>
+<!-- 3: Joueur(se) - Selected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-primary text-on-primary" data-active="true" type="button">
+<span>🧶</span>
+<span>Joueur(se)</span>
+<span class="material-symbols-outlined text-[14px]">check</span>
+</button>
+<!-- 4: Casanier(ère) - Selected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-primary text-on-primary" data-active="true" type="button">
+<span>🏡</span>
+<span>Casanier(ère)</span>
+<span class="material-symbols-outlined text-[14px]">check</span>
+</button>
+<!-- 5: Curieux(se) - Unselected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-surface-container-low text-on-surface hover:bg-surface-container" data-active="false" type="button">
+<span>🦋</span>
+<span>Curieux(se)</span>
+</button>
+<!-- 6: Timide au début - Unselected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-surface-container-low text-on-surface hover:bg-surface-container" data-active="false" type="button">
+<span>🕊️</span>
+<span>Timide au début</span>
+</button>
+<!-- 7: Sociable - Unselected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-surface-container-low text-on-surface hover:bg-surface-container" data-active="false" type="button">
+<span>🐾</span>
+<span>Sociable</span>
+</button>
+<!-- 8: Propre - Selected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-primary text-on-primary" data-active="true" type="button">
+<span>✨</span>
+<span>Propre</span>
+<span class="material-symbols-outlined text-[14px]">check</span>
+</button>
+<!-- 9: Gourmand(e) - Unselected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-surface-container-low text-on-surface hover:bg-surface-container" data-active="false" type="button">
+<span>🧸</span>
+<span>Gourmand(e)</span>
+</button>
+<!-- 10: Aime l'extérieur - Unselected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-surface-container-low text-on-surface hover:bg-surface-container" data-active="false" type="button">
+<span>🌿</span>
+<span>Aime l'extérieur</span>
+</button>
+<!-- 11: Éduqué(e) - Unselected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-surface-container-low text-on-surface hover:bg-surface-container" data-active="false" type="button">
+<span>🎓</span>
+<span>Éduqué(e)</span>
+</button>
+<!-- 12: Protecteur(trice) - Unselected -->
+<button class="trait-chip flex items-center gap-1.5 px-3 py-2 rounded-full font-label-md text-label-md transition-all shadow-sm active:scale-95 bg-surface-container-low text-on-surface hover:bg-surface-container" data-active="false" type="button">
+<span>🛡️</span>
+<span>Protecteur(trice)</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Section 5: Compatibilités du foyer -->
+<section class="mt-space-lg px-margin-mobile">
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm">
+<div class="flex items-center gap-space-xs text-primary mb-1">
+<span class="material-symbols-outlined text-[20px]">family_home</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Compatibilités du foyer</h2>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-space-md">
+        Précisez l'environnement idéal pour garantir une adoption sereine
+      </p>
+<div class="space-y-space-md">
+<!-- Toggle 1: OK Enfants (ON) -->
+<div class="flex items-center justify-between gap-space-md p-space-sm rounded-xl bg-surface-container-low shadow-sm">
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[18px]">child_care</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">OK Enfants</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Habitué(e) aux enfants calmes et respectueux</p>
+</div>
+<button aria-label="Basculer compatibilité enfants" class="toggle-btn relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full bg-primary transition-colors focus:outline-none" data-state="true" type="button">
+<span class="translate-x-5 pointer-events-none inline-block h-6 w-6 transform rounded-full bg-surface shadow-md ring-0 transition duration-200 ease-in-out mt-0.5 ml-0.5"></span>
+</button>
+</div>
+<!-- Toggle 2: OK Chats (ON) -->
+<div class="flex items-center justify-between gap-space-md p-space-sm rounded-xl bg-surface-container-low shadow-sm">
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-primary text-[18px]">pets</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">OK Chats</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Cohabitation harmonieuse testée et approuvée</p>
+</div>
+<button aria-label="Basculer compatibilité chats" class="toggle-btn relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full bg-primary transition-colors focus:outline-none" data-state="true" type="button">
+<span class="translate-x-5 pointer-events-none inline-block h-6 w-6 transform rounded-full bg-surface shadow-md ring-0 transition duration-200 ease-in-out mt-0.5 ml-0.5"></span>
+</button>
+</div>
+<!-- Toggle 3: OK Chiens (OFF) -->
+<div class="flex items-center justify-between gap-space-md p-space-sm rounded-xl bg-surface-container-low shadow-sm">
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">sound_detection_dog_barking</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">OK Chiens</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Tolère les chiens calmes après présentation douce</p>
+</div>
+<button aria-label="Basculer compatibilité chiens" class="toggle-btn relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full bg-surface-container-highest transition-colors focus:outline-none" data-state="false" type="button">
+<span class="translate-x-0 pointer-events-none inline-block h-6 w-6 transform rounded-full bg-surface shadow-md ring-0 transition duration-200 ease-in-out mt-0.5 ml-0.5"></span>
+</button>
+</div>
+<!-- Toggle 4: Besoin d'un jardin (OFF) -->
+<div class="flex items-center justify-between gap-space-md p-space-sm rounded-xl bg-surface-container-low shadow-sm">
+<div class="min-w-0 flex-1">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-on-surface-variant text-[18px]">yard</span>
+<span class="font-label-md text-label-md text-on-surface font-semibold">Besoin d'un jardin / Extérieur</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-0.5 truncate">Peut vivre en appartement avec balcon sécurisé</p>
+</div>
+<button aria-label="Basculer besoin de jardin" class="toggle-btn relative inline-flex h-7 w-12 flex-shrink-0 cursor-pointer rounded-full bg-surface-container-highest transition-colors focus:outline-none" data-state="false" type="button">
+<span class="translate-x-0 pointer-events-none inline-block h-6 w-6 transform rounded-full bg-surface shadow-md ring-0 transition duration-200 ease-in-out mt-0.5 ml-0.5"></span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 6: Rythme de vie & Autonomie -->
+<section class="mt-space-lg px-margin-mobile">
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm space-y-space-lg">
+<div class="flex items-center gap-space-xs text-primary">
+<span class="material-symbols-outlined text-[20px]">bolt</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Rythme de vie &amp; Autonomie</h2>
+</div>
+<!-- Segmented: Niveau d'énergie -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-space-xs">Niveau d'énergie</label>
+<div class="grid grid-cols-3 gap-2" id="energy-selector">
+<!-- Option 1: Faible (Selected) -->
+<button class="energy-btn flex flex-col items-center p-3 rounded-xl bg-primary text-on-primary shadow-sm text-center transition-all" data-value="faible" type="button">
+<span class="material-symbols-outlined text-[20px] mb-1">bed</span>
+<span class="font-label-md text-label-md font-semibold">Faible</span>
+<span class="font-label-sm text-label-sm opacity-90 leading-tight mt-0.5">Tranquille &amp; siestes</span>
+</button>
+<!-- Option 2: Moyen -->
+<button class="energy-btn flex flex-col items-center p-3 rounded-xl bg-surface-container-low text-on-surface shadow-sm text-center transition-all hover:bg-surface-container" data-value="moyen" type="button">
+<span class="material-symbols-outlined text-[20px] mb-1">directions_walk</span>
+<span class="font-label-md text-label-md font-semibold">Moyen</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-tight mt-0.5">Jeux modérés</span>
+</button>
+<!-- Option 3: Élevé -->
+<button class="energy-btn flex flex-col items-center p-3 rounded-xl bg-surface-container-low text-on-surface shadow-sm text-center transition-all hover:bg-surface-container" data-value="eleve" type="button">
+<span class="material-symbols-outlined text-[20px] mb-1">sprint</span>
+<span class="font-label-md text-label-md font-semibold">Élevé</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant leading-tight mt-0.5">Grandes sorties</span>
+</button>
+</div>
+</div>
+<!-- Slider: Peut rester seul(e) -->
+<div>
+<div class="flex items-center justify-between mb-space-xs">
+<label class="font-label-md text-label-md text-on-surface">Peut rester seul(e)</label>
+<span class="font-label-sm text-label-sm bg-primary-fixed text-on-primary-fixed-variant px-2.5 py-0.5 rounded-full font-semibold" id="alone-time-badge">4 à 6 heures / jour</span>
+</div>
+<div class="relative py-2">
+<input class="w-full accent-primary h-2 bg-surface-container rounded-lg cursor-pointer" id="alone-slider" max="10" min="0" step="1" type="range" value="5"/>
+<div class="flex justify-between font-label-sm text-label-sm text-on-surface-variant mt-1.5 px-0.5">
+<span>0h (présence)</span>
+<span>4h</span>
+<span>6h</span>
+<span>10h+</span>
+</div>
+</div>
+<div class="mt-2 p-2.5 rounded-xl bg-surface-container-low flex items-start gap-2 shadow-sm">
+<span class="material-symbols-outlined text-secondary text-[18px] mt-0.5">thumb_up</span>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+            Idéal pour une personne en télétravail partiel ou avec des horaires classiques de bureau.
+          </p>
+</div>
+</div>
+</div>
+</section>
+<!-- Section 7: Besoins spécifiques & Conditions -->
+<section class="mt-space-lg px-margin-mobile">
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm space-y-space-md">
+<div class="flex items-center gap-space-xs text-primary">
+<span class="material-symbols-outlined text-[20px]">assignment</span>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Besoins spécifiques &amp; Conditions</h2>
+</div>
+<!-- Besoins particuliers -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-space-xs" for="special-needs">
+          Ses besoins particuliers (facultatif)
+        </label>
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-sm focus-within:bg-surface-container">
+<textarea class="w-full bg-transparent font-body-md text-body-md text-on-surface outline-none resize-none leading-relaxed placeholder:text-on-surface-variant" id="special-needs" rows="2">Alimentation pour chats d'intérieur recommandée, brossage doux 1x par semaine. Aucun traitement médical requis.</textarea>
+</div>
+</div>
+<!-- Conditions d'adoption -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-space-xs" for="adoption-terms">
+          Conditions d'adoption du refuge / propriétaire <span class="text-secondary">*</span>
+</label>
+<div class="bg-surface-container-low rounded-xl p-space-md shadow-sm focus-within:bg-surface-container">
+<textarea class="w-full bg-transparent font-body-md text-body-md text-on-surface outline-none resize-none leading-relaxed placeholder:text-on-surface-variant" id="adoption-terms" rows="3">Frais d'adoption de 120 DT couvrant la vaccination complète, l'identification électronique et la stérilisation. Contrat d'adoption responsable PetCare avec suivi à 3 mois.</textarea>
+</div>
+</div>
+<!-- Ville / Localisation -->
+<div>
+<label class="block font-label-md text-label-md text-on-surface mb-space-xs" for="location-input">
+          Ville &amp; Quartier d'accueil <span class="text-secondary">*</span>
+</label>
+<div class="flex items-center gap-2 bg-surface-container-low rounded-xl px-space-md py-space-sm shadow-sm focus-within:bg-surface-container">
+<span class="material-symbols-outlined text-primary text-[20px]">location_on</span>
+<input class="w-full bg-transparent font-body-md text-body-md text-on-surface outline-none placeholder:text-on-surface-variant" id="location-input" type="text" value="Tunis, La Marsa (2078)"/>
+<button aria-label="Localiser" class="p-1 rounded-full text-primary hover:bg-surface-container" type="button">
+<span class="material-symbols-outlined text-[18px]">my_location</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+<!-- Reassurance card -->
+<section class="mt-space-lg px-margin-mobile">
+<div class="bg-secondary-fixed text-on-secondary-fixed rounded-2xl p-space-md shadow-sm flex items-start gap-space-sm">
+<span class="material-symbols-outlined text-secondary text-[24px] mt-0.5" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<div class="flex-1">
+<h3 class="font-headline-sm text-headline-sm font-semibold mb-0.5">Charte de bienveillance PetCare</h3>
+<p class="font-body-sm text-body-sm leading-relaxed opacity-90">
+          Chaque annonce est vérifiée par notre équipe sous 24h. Nous nous assurons que les profils soient respectueux et véridiques pour garantir le bien-être de nos amis à quatre pattes.
+        </p>
+</div>
+</div>
+</section>
+<!-- Sticky Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-surface/90 backdrop-blur-xl shadow-[0_-4px_16px_rgba(0,0,0,0.06)] px-margin-mobile pt-3 pb-safe">
+<div class="max-w-md mx-auto flex flex-col gap-2">
+<div class="flex items-center gap-space-sm">
+<!-- Bouton Enregistrer Brouillon -->
+<button class="flex-1 h-12 rounded-xl bg-surface-container-low text-primary font-label-lg text-label-lg flex items-center justify-center gap-1.5 shadow-sm hover:bg-surface-container active:scale-[0.98] transition-all" type="button">
+<span class="material-symbols-outlined text-[20px]">save</span>
+<span>Brouillon</span>
+</button>
+<!-- Bouton Publier Primaire -->
+<button class="flex-[2] h-12 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-md hover:bg-primary-container active:scale-[0.98] transition-all" type="button">
+<span class="material-symbols-outlined text-[20px]">pets</span>
+<span>Publier l'annonce</span>
+</button>
+</div>
+<div class="text-center pb-2">
+<p class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-center gap-1">
+<span class="material-symbols-outlined text-[14px] text-primary">schedule</span>
+          Vérification sous 24h ouvrées par nos équipes
+        </p>
+</div>
+</div>
+</div>
+</div>
+<script>
+  // Dynamic counter for story text area
+  const storyInput = document.getElementById('ad-story');
+  const charCounter = document.getElementById('char-counter');
+  if (storyInput && charCounter) {
+    storyInput.addEventListener('input', () => {
+      charCounter.textContent = `${storyInput.value.length} / 1000`;
+    });
+  }
+
+  // Toggle Switches Logic
+  document.querySelectorAll('.toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const isChecked = btn.getAttribute('data-state') === 'true';
+      const newState = !isChecked;
+      btn.setAttribute('data-state', String(newState));
+      const handle = btn.querySelector('span');
+
+      if (newState) {
+        btn.classList.remove('bg-surface-container-highest');
+        btn.classList.add('bg-primary');
+        handle.classList.remove('translate-x-0');
+        handle.classList.add('translate-x-5');
+      } else {
+        btn.classList.remove('bg-primary');
+        btn.classList.add('bg-surface-container-highest');
+        handle.classList.remove('translate-x-5');
+        handle.classList.add('translate-x-0');
+      }
+    });
+  });
+
+  // Personality chips toggle (limit to 5)
+  const chips = document.querySelectorAll('.trait-chip');
+  const traitsCountBadge = document.getElementById('traits-count');
+
+  function updateChipsCount() {
+    const activeCount = document.querySelectorAll('.trait-chip[data-active="true"]').length;
+    if (traitsCountBadge) {
+      traitsCountBadge.textContent = `${activeCount}/5 sélectionnés`;
+    }
+  }
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const isActive = chip.getAttribute('data-active') === 'true';
+      const currentCount = document.querySelectorAll('.trait-chip[data-active="true"]').length;
+
+      if (!isActive && currentCount >= 5) {
+        // Subtle shake animation feedback
+        chip.classList.add('translate-x-1');
+        setTimeout(() => chip.classList.remove('translate-x-1'), 150);
+        return;
+      }
+
+      if (isActive) {
+        chip.setAttribute('data-active', 'false');
+        chip.classList.remove('bg-primary', 'text-on-primary');
+        chip.classList.add('bg-surface-container-low', 'text-on-surface');
+        const checkIcon = chip.querySelector('.material-symbols-outlined');
+        if (checkIcon) checkIcon.remove();
+      } else {
+        chip.setAttribute('data-active', 'true');
+        chip.classList.remove('bg-surface-container-low', 'text-on-surface');
+        chip.classList.add('bg-primary', 'text-on-primary');
+        const iconSpan = document.createElement('span');
+        iconSpan.className = 'material-symbols-outlined text-[14px]';
+        iconSpan.textContent = 'check';
+        chip.appendChild(iconSpan);
+      }
+      updateChipsCount();
+    });
+  });
+
+  // Energy Level Selector
+  const energyButtons = document.querySelectorAll('.energy-btn');
+  energyButtons.forEach(btn => {
+    btn.addEventListener('click', () => {
+      energyButtons.forEach(b => {
+        b.classList.remove('bg-primary', 'text-on-primary');
+        b.classList.add('bg-surface-container-low', 'text-on-surface');
+        const sub = b.querySelectorAll('span')[2];
+        if (sub) {
+          sub.classList.remove('opacity-90');
+          sub.classList.add('text-on-surface-variant');
+        }
+      });
+      btn.classList.remove('bg-surface-container-low', 'text-on-surface');
+      btn.classList.add('bg-primary', 'text-on-primary');
+      const sub = btn.querySelectorAll('span')[2];
+      if (sub) {
+        sub.classList.remove('text-on-surface-variant');
+        sub.classList.add('opacity-90');
+      }
+    });
+  });
+
+  // Autonomy range slider feedback
+  const aloneSlider = document.getElementById('alone-slider');
+  const aloneBadge = document.getElementById('alone-time-badge');
+  if (aloneSlider && aloneBadge) {
+    aloneSlider.addEventListener('input', (e) => {
+      const val = parseInt(e.target.value, 10);
+      if (val <= 2) {
+        aloneBadge.textContent = "Moins de 2 heures / jour";
+      } else if (val <= 4) {
+        aloneBadge.textContent = "2 à 4 heures / jour";
+      } else if (val <= 7) {
+        aloneBadge.textContent = "4 à 6 heures / jour";
+      } else {
+        aloneBadge.textContent = "7 à 10+ heures / jour";
+      }
+    });
+  }
+</script></main></body></html>

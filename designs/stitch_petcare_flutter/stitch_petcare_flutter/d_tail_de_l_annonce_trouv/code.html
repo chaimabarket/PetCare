@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+
+<html lang="fr"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" name="viewport"/><meta content="mobile_stack" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config = { darkMode: "class", theme: { extend: { colors: { "error-container": "#ffdad6", "secondary-container": "#feae92", "surface-dim": "#d0dbed", "inverse-surface": "#27313f", "on-primary-container": "#a3faef", "on-surface-variant": "#3e4947", "primary-fixed-dim": "#80d5cb", "tertiary": "#7f4025", "on-tertiary-container": "#ffe5db", "outline-variant": "#bdc9c6", "on-tertiary-fixed": "#370e00", "on-primary-fixed-variant": "#00504a", "on-background": "#121c2a", "on-surface": "#121c2a", "error": "#ba1a1a", "background": "#f8f9ff", "inverse-on-surface": "#eaf1ff", "surface-variant": "#d9e3f6", "tertiary-container": "#9c573a", "on-tertiary-fixed-variant": "#72361b", "tertiary-fixed-dim": "#ffb598", "secondary-fixed": "#ffdbcf", "tertiary-fixed": "#ffdbce", "surface": "#f8f9ff", "outline": "#6e7977", "surface-bright": "#f8f9ff", "surface-container-high": "#dee9fc", "on-secondary-fixed": "#380d01", "on-primary": "#ffffff", "on-error": "#ffffff", "primary-fixed": "#9cf2e8", "surface-container-low": "#eff4ff", "inverse-primary": "#80d5cb", "on-error-container": "#93000a", "on-tertiary": "#ffffff", "on-secondary-container": "#793f2a", "surface-container-lowest": "#ffffff", "secondary-fixed-dim": "#ffb59c", "primary-container": "#0f766e", "primary": "#005c55", "on-secondary": "#ffffff", "surface-container": "#e6eeff", "surface-container-highest": "#d9e3f6", "on-primary-fixed": "#00201d", "secondary": "#8c4e38", "on-secondary-fixed-variant": "#6f3723", "surface-tint": "#006a63" }, borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" }, spacing: { "gutter": "1rem", "space-xs": "0.25rem", "space-sm": "0.5rem", "margin": "1.5rem", "space-lg": "1.5rem", "gutter-mobile": "0.75rem", "space-xl": "2rem", "space-md": "1rem", "margin-mobile": "1rem" }, fontFamily: { "headline-lg": ["Inter"], "label-md": ["Inter"], "body-lg": ["Inter"], "headline-sm": ["Inter"], "body-md": ["Inter"], "label-sm": ["Inter"], "headline-lg-mobile": ["Inter"], "label-lg": ["Inter"], "body-sm": ["Inter"], "headline-md": ["Inter"] }, fontSize: { "headline-lg": ["32px", { "lineHeight": "40px", "fontWeight": "700" }], "label-md": ["12px", { "lineHeight": "16px", "fontWeight": "600" }], "body-lg": ["16px", { "lineHeight": "24px", "fontWeight": "400" }], "headline-sm": ["18px", { "lineHeight": "24px", "fontWeight": "600" }], "body-md": ["14px", { "lineHeight": "20px", "fontWeight": "400" }], "label-sm": ["11px", { "lineHeight": "14px", "fontWeight": "500" }], "headline-lg-mobile": ["26px", { "lineHeight": "34px", "fontWeight": "700" }], "label-lg": ["14px", { "lineHeight": "20px", "fontWeight": "600" }], "body-sm": ["12px", { "lineHeight": "16px", "fontWeight": "400" }], "headline-md": ["22px", { "lineHeight": "28px", "fontWeight": "600" }] } } } }</script><style>@layer base{html,body{width:100%;margin:0;padding:0;min-height:100vh;}body{overscroll-behavior-y:none;-webkit-tap-highlight-color:transparent;}.pb-safe{padding-bottom:env(safe-area-inset-bottom,0px);}.pt-safe{padding-top:env(safe-area-inset-top,0px);}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style></head><body class="bg-surface font-body-md text-on-surface flex flex-col min-h-screen antialiased selection:bg-primary-fixed selection:text-on-primary-fixed"><header class="fixed top-0 w-full z-50 pt-safe bg-surface/80 backdrop-blur-xl shadow-[0_1px_8px_rgba(0,0,0,0.04)]"><div class="h-16 px-gutter-mobile flex items-center justify-between gap-space-xs"><button aria-label="Retour" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface hover:bg-surface-container-high transition-colors" onclick="history.back()" type="button"><span class="material-symbols-outlined text-[24px]">arrow_back_ios_new</span></button><h1 class="flex-1 text-center font-headline-sm text-headline-sm text-on-surface truncate px-space-xs">Detail De Lannonce</h1><div class="flex items-center gap-space-xs"><button aria-label="Partager" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[22px]">share</span></button><button aria-label="Plus d'options" class="w-11 h-11 flex items-center justify-center rounded-full text-on-surface-variant hover:text-on-surface hover:bg-surface-container-high transition-colors" type="button"><span class="material-symbols-outlined text-[24px]">more_vert</span></button><div class="w-8 h-8 rounded-full bg-primary flex items-center justify-center ml-space-xs shrink-0"><span class="material-symbols-outlined text-on-primary text-[18px]">person</span></div></div></div></header><main class="flex-1 flex flex-col relative w-full pt-16 bg-surface"><div class="flex flex-col w-full pb-24">
+<!-- Section 1: Hero Image Carousel with Floating Status Badges -->
+<div class="relative w-full aspect-[4/3] bg-surface-container-high overflow-hidden select-none">
+<div class="flex w-full h-full transition-transform duration-300 ease-out" id="carouselTrack">
+<div class="w-full h-full shrink-0 relative">
+<img alt="Chat tigré trouvé" class="w-full h-full object-cover" data-alt="A close-up portrait of a sweet young European tabby cat with expressive amber eyes, grey striped fur, and a pristine white chest and white paws. The cat wears a thin red fabric collar without a tag and is sitting cautiously on a dry park wooden bench in Paris during a soft autumn drizzle. Warm natural daylight, cinematic soft bokeh, reassuring and compassionate documentary style." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBmERqrfIj3uK2FfTAmmoox6ND7JFoUDEkJwDwkD9kRhGrBMWzsI8RLJ8v51SxLS42JNV4bYOfx7MWLPvX2vPAjYECPnHlM59ZZGe_2rTa0-sSeOsJXPWDlIqYBuodozvpGaw8kasCST2elIaFEBXlKXlMSiXsHQmvas4GXnyzJS1F1XASvi89J1yL_fupY0llEfhFhspppCHK6virhUXjzP_jUKBtaCj1OhiCepc6g66kMIaEE4sGM"/>
+</div>
+<div class="w-full h-full shrink-0 relative">
+<img alt="Détail du collier rouge sans médaille" class="w-full h-full object-cover" data-alt="Detailed close-up of a small grey tabby cat's red collar around its soft neck, showing the lack of metallic ID tag. White chest fur cleanly visible under soft ambient natural outdoor light, crisp focus and gentle composition." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAnf1bQd1edZk2UJpSRMqbOyj8H8ZN2RhcWpeVFMRiIqm6hQeX6xoReLD-Nv0sw4Rmxxw-q2TdGxho3WjVhoHL3evwf4PSE78_zs7PvjN_AWbnOxG368iFYD44uv0LcuW6DrzQtFhAgVl5K0dDyWdIWXeOUDhCc1rRwki2AE9THAtkWkJsVAYUn4DnIClQiJ1xgl9yNt694iRfMyDXDXrFbpD4tu39OL6faWz-afxQxPkyvrTVllaUr"/>
+</div>
+<div class="w-full h-full shrink-0 relative">
+<img alt="Chat mis à l'abri au chaud" class="w-full h-full object-cover" data-alt="Full body shot of a friendly young grey and white tabby cat resting quietly inside a safe cardboard box lined with a warm fleece blanket in a Parisian hallway, drinking from a small water bowl, feeling safe." src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeAbXTlYMFKVbGG1MvR-2Jr_w16Jf0hSP_FFt8n_nLP_y86nxN71m1uLceF9fR7EGTwxSLtIYful7ecL5z0QZzQuoOCtM0AFsRiUpGd3qHqlymD3j4aP9bK9SBEjP7UTJHPYjh9igyN_vGLlBiSh6Kopm7B6HtFnkLSmj2oa0scuJt9NUEFSreQECGM0P_J2w3BjZsWW7O8u090E-I2DXiQOpqJ0VrU-F5ZytxMQt2iP5sUiAvIxsA"/>
+</div>
+</div>
+<!-- Soft Vignette Gradient -->
+<div class="absolute inset-0 bg-gradient-to-t from-on-background/70 via-transparent to-on-background/30 pointer-events-none"></div>
+<!-- Top floating pills & favorite action -->
+<div class="absolute top-space-md left-space-md right-space-md flex items-center justify-between pointer-events-auto">
+<div class="flex items-center gap-space-xs">
+<span class="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-primary-fixed text-on-primary-fixed font-label-md text-label-md shadow-sm">
+<span class="material-symbols-outlined text-[16px]" style="font-variation-settings: 'FILL' 1;">pets</span>
+          TROUVÉ
+        </span>
+<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-surface/90 backdrop-blur-md text-on-surface font-label-sm text-label-sm shadow-sm">
+<span class="material-symbols-outlined text-[14px] text-primary">schedule</span>
+          Il y a 2h
+        </span>
+</div>
+<!-- Favorite emotional button -->
+<button aria-label="Ajouter aux favoris" class="w-10 h-10 rounded-full bg-surface/90 backdrop-blur-md flex items-center justify-center text-secondary shadow-sm active:scale-95 transition-transform" id="favBtn" onclick="toggleFavorite(this)" type="button">
+<span class="material-symbols-outlined text-[22px] transition-colors" id="favIcon">favorite_border</span>
+</button>
+</div>
+<!-- Bottom Carousel Controls & Indicator -->
+<div class="absolute bottom-space-md left-space-md right-space-md flex items-end justify-between pointer-events-auto">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-inverse-surface/70 backdrop-blur-md text-inverse-on-surface font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]">photo_camera</span>
+<span id="carouselCounter">1 / 3</span>
+</div>
+<!-- Dot Indicators -->
+<div class="flex items-center gap-1.5 bg-inverse-surface/50 backdrop-blur-md px-2.5 py-1.5 rounded-full">
+<button aria-label="Photo 1" class="carousel-dot w-2 h-2 rounded-full bg-surface transition-all" onclick="goToSlide(0)"></button>
+<button aria-label="Photo 2" class="carousel-dot w-1.5 h-1.5 rounded-full bg-surface/50 transition-all" onclick="goToSlide(1)"></button>
+<button aria-label="Photo 3" class="carousel-dot w-1.5 h-1.5 rounded-full bg-surface/50 transition-all" onclick="goToSlide(2)"></button>
+</div>
+</div>
+</div>
+<!-- Content Body Container -->
+<div class="px-gutter-mobile flex flex-col gap-space-lg pt-space-lg">
+<!-- Section 2: Header & Key Identity Information Card -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm flex flex-col gap-space-md">
+<!-- Title & species badge -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-center justify-between gap-space-sm">
+<div class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-surface-container text-primary font-label-md text-label-md">
+<span class="material-symbols-outlined text-[15px]">cruelty_free</span>
+            Chat • Européen
+          </div>
+<div class="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-primary-fixed/60 text-primary font-label-sm text-label-sm">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">verified</span>
+            Annonce vérifiée
+          </div>
+</div>
+<h1 class="font-headline-md text-headline-md text-on-surface leading-tight mt-1">
+          Chat tigré gris &amp; blanc — collier rouge sans médaille
+        </h1>
+</div>
+<!-- Quick Metrics Grid -->
+<div class="grid grid-cols-2 gap-space-sm pt-space-xs">
+<div class="bg-surface-container-low rounded-xl p-space-sm flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">cake</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Âge estimé</span>
+<span class="font-label-lg text-label-lg text-on-surface truncate">1 - 2 ans</span>
+</div>
+</div>
+<div class="bg-surface-container-low rounded-xl p-space-sm flex items-center gap-space-sm">
+<div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0">
+<span class="material-symbols-outlined text-[18px]">male</span>
+</div>
+<div class="flex flex-col min-w-0">
+<span class="font-label-sm text-label-sm text-on-surface-variant truncate">Sexe / État</span>
+<span class="font-label-lg text-label-lg text-on-surface truncate">Mâle non castré</span>
+</div>
+</div>
+</div>
+<!-- Signalement metadata footer -->
+<div class="flex items-center gap-space-xs text-on-surface-variant font-body-sm text-body-sm pt-space-xs">
+<span class="material-symbols-outlined text-[16px] text-outline">event_available</span>
+<span>Signalé le Mardi 12 novembre 2024 à 10h15</span>
+</div>
+</div>
+<!-- Section 3: Location & Area Card ("Zone de découverte") -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-full bg-primary/10 text-primary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">share_location</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Zone de découverte</h2>
+</div>
+<span class="font-label-sm text-label-sm text-primary px-2 py-0.5 rounded-full bg-primary/10">Rayon 300m</span>
+</div>
+<!-- Map Snapshot with Radius Visual cue -->
+<div class="relative w-full h-44 rounded-xl overflow-hidden shadow-sm">
+<div class="w-full h-full bg-cover bg-center" data-location="Square Sarah Bernhardt, Rue de Buzenval, 75020 Paris, France" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB0Mygps-tTalXRanh3rZAqN1QRpiC0xLLYk1fQ4PR5ZeSXp6_A2SsUx9pOPmE6xAZEzkWseax37O-XS1vLzDwjm-0axs2lYuQb1twCMDE7vGUk0vmnBvdRdccWLB2ayuNSrqiozgXCrm0yQWqvX16nfTT5OQUIiP6Chs4CbIJc8BjRA75K0w6A8Kms_H5um-wS6KVhH2x-_PNZhQ_hbc169oIO8tkHeZZ3fKEWslvlwNQPTpFROvs9')"></div>
+<!-- Pulse Pin Marker -->
+<div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+<div class="relative flex items-center justify-center">
+<span class="absolute w-24 h-24 rounded-full bg-primary/20 animate-ping"></span>
+<span class="absolute w-16 h-16 rounded-full bg-primary/30"></span>
+<div class="relative w-9 h-9 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-lg">
+<span class="material-symbols-outlined text-[20px]" style="font-variation-settings: 'FILL' 1;">location_on</span>
+</div>
+</div>
+</div>
+<!-- Inset label overlay -->
+<div class="absolute bottom-2 left-2 right-2 bg-surface/90 backdrop-blur-md px-2.5 py-1.5 rounded-lg flex items-center justify-between text-on-surface shadow-sm">
+<span class="font-label-sm text-label-sm truncate">Square Sarah Bernhardt / Rue de Buzenval</span>
+<span class="font-label-sm text-label-sm text-primary shrink-0 ml-1">Paris 20e</span>
+</div>
+</div>
+<!-- Location details & human note -->
+<div class="flex flex-col gap-space-xs">
+<div class="flex items-start gap-space-xs text-on-surface">
+<span class="material-symbols-outlined text-[18px] text-primary mt-0.5 shrink-0">directions_subway</span>
+<p class="font-body-md text-body-md">
+<strong>Paris 20e (75020)</strong> • Métro Maraîchers / Avron
+          </p>
+</div>
+<div class="mt-1 bg-surface-container-low p-space-sm rounded-xl flex items-start gap-space-sm text-on-surface-variant font-body-sm text-body-sm">
+<span class="material-symbols-outlined text-[18px] text-secondary shrink-0 mt-0.5">info</span>
+<p class="leading-relaxed">
+            Trouvé réfugié sous un banc près de l'aire de jeux pour enfants. Semble apeuré mais très doux, s'approche prudemment si on lui tend la main.
+          </p>
+</div>
+</div>
+</div>
+<!-- Section 4: Physical Description & Distinctive Traits -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center gap-space-sm">
+<div class="w-7 h-7 rounded-full bg-secondary-container/40 text-secondary flex items-center justify-center">
+<span class="material-symbols-outlined text-[18px]">stylus_note</span>
+</div>
+<h2 class="font-headline-sm text-headline-sm text-on-surface">Signes distinctifs</h2>
+</div>
+<!-- Chips Cluster -->
+<div class="flex flex-wrap gap-2">
+<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary-container/30 text-on-secondary-container font-label-md text-label-md">
+<span class="w-2 h-2 rounded-full bg-secondary"></span>
+          Collier rouge sans médaille
+        </div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container text-on-surface font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] text-primary">palette</span>
+          Pelage tigré gris
+        </div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container text-on-surface font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] text-primary">file_download</span>
+          Bout des 4 pattes blanches
+        </div>
+<div class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant font-label-md text-label-md">
+<span class="material-symbols-outlined text-[16px] text-outline">contactless</span>
+          Puce non vérifiée (rdv véto cet apm)
+        </div>
+</div>
+<!-- Detailed text paragraph -->
+<div class="space-y-2 pt-1 font-body-md text-body-md text-on-surface leading-relaxed">
+<p>
+          Nous avons recueilli ce jeune chat ce matin alors qu'il pleuvait abondamment sur le square. Il n'a pas l'air blessé mais avait très faim et a bu avidement.
+        </p>
+<p>
+          Il est très propre, habitué aux caresses et ronronne facilement. Si c'est votre compagnon ou si vous reconnaissez le chat d'un voisin du quartier, contactez-nous sans attendre.
+        </p>
+</div>
+</div>
+<!-- Section 5: Author Card with Privacy Protection ("Auteur du signalement") -->
+<div class="bg-surface-container-lowest rounded-2xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Auteur du signalement</span>
+<span class="inline-flex items-center gap-1 font-label-sm text-label-sm text-primary">
+<span class="material-symbols-outlined text-[14px]">shield</span>
+          Identité vérifiée
+        </span>
+</div>
+<div class="flex items-center gap-space-md">
+<div class="relative shrink-0">
+<img alt="Sophie M." class="w-14 h-14 rounded-full object-cover shadow-sm" data-alt="Warm friendly smiling portrait photo of Sophie M., a Parisian pet lover with kind hazel eyes, wearing a dark green cardigan, soft natural outdoor bokeh." src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPtWzWApxGTZrTqwg78LHeBP_ly2CXBMtY1pBlYyiyEByGbovfeQvj7bS469SD5ZsxH1D6rTGshEHTFFRiFOEP4BW9FxxWg3WRJmxXocliemcBjWRpH3W93NQ1914WOAIoOVW6yrZn2ztAOwxJutJZRbtW2OmAgK_vsFZ4f2sGkEnO16dn8KCyc3FMAvAXclaf5f68XAMJolOH5ib2NfPxnF0I7lYKv32e1O28axjB30Sgv6nguyHQ"/>
+<span class="absolute bottom-0 right-0 w-4 h-4 rounded-full bg-primary-fixed-dim flex items-center justify-center text-on-primary-fixed">
+<span class="material-symbols-outlined text-[10px]" style="font-variation-settings: 'FILL' 1;">check</span>
+</span>
+</div>
+<div class="flex flex-col min-w-0">
+<div class="flex items-center gap-1.5">
+<h3 class="font-headline-sm text-headline-sm text-on-surface truncate">Sophie M.</h3>
+<span class="text-label-sm font-label-sm px-1.5 py-0.5 rounded bg-surface-container text-on-surface-variant shrink-0">Paris 20e</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant truncate">
+            Membre bienveillante depuis 2023 • 4 animaux aidés
+          </span>
+</div>
+</div>
+<!-- Safe relay notice -->
+<div class="bg-surface-container-low rounded-xl p-space-sm flex items-start gap-space-sm text-on-surface-variant">
+<span class="material-symbols-outlined text-[18px] text-primary shrink-0 mt-0.5">lock</span>
+<div class="flex flex-col gap-0.5">
+<span class="font-label-sm text-label-sm font-semibold text-on-surface">Coordonnées masquées pour préserver la vie privée</span>
+<p class="font-body-sm text-body-sm leading-normal">
+            Vos messages et numéros transitent en toute sécurité via la messagerie chiffrée PetCare Community.
+          </p>
+</div>
+</div>
+<!-- Private message button -->
+<button class="w-full h-12 rounded-xl bg-surface-container-high hover:bg-surface-container-highest text-primary font-label-lg text-label-lg flex items-center justify-center gap-2 active:scale-[0.99] transition-all" onclick="openContactModal()" type="button">
+<span class="material-symbols-outlined text-[20px]">chat_bubble</span>
+        Envoyer un message privé à Sophie
+      </button>
+</div>
+<!-- Section 6: Owner / Manager View Variant Card -->
+<div class="bg-surface-container-low rounded-2xl p-space-md shadow-sm flex flex-col gap-space-md">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px] text-secondary">admin_panel_settings</span>
+<span class="font-label-lg text-label-lg text-on-surface">Mode gestion de l'annonce</span>
+</div>
+<span class="px-2 py-0.5 rounded-full bg-secondary-container/50 text-on-secondary-container font-label-sm text-label-sm">
+          Auteur
+        </span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+        Vous êtes l'auteur de cette fiche. Maintenez les informations à jour pour aider les propriétaires à retrouver leur compagnon.
+      </p>
+<div class="grid grid-cols-2 gap-space-sm">
+<button class="h-11 rounded-xl bg-surface-container-lowest hover:bg-surface text-on-surface font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all" onclick="alert('Ouverture de l\'éditeur d\'annonce')" type="button">
+<span class="material-symbols-outlined text-[18px] text-primary">edit</span>
+          Modifier la fiche
+        </button>
+<button class="h-11 rounded-xl bg-secondary-fixed hover:bg-secondary-fixed-dim text-on-secondary-fixed font-label-md text-label-md flex items-center justify-center gap-1.5 shadow-sm active:scale-95 transition-all" onclick="confirmClosure()" type="button">
+<span class="material-symbols-outlined text-[18px]">task_alt</span>
+          Animal restitué
+        </button>
+</div>
+</div>
+<!-- Section 7: Safety Notice & Community Vigilance -->
+<div class="flex flex-col gap-space-sm px-space-xs">
+<!-- Tip box -->
+<div class="bg-primary/5 rounded-xl p-space-sm flex items-start gap-space-sm text-on-surface">
+<span class="material-symbols-outlined text-[20px] text-primary shrink-0 mt-0.5" style="font-variation-settings: 'FILL' 1;">lightbulb</span>
+<p class="font-body-sm text-body-sm leading-relaxed">
+<strong class="font-semibold text-primary">Conseil bienveillant :</strong> Demandez systématiquement une photo d'archive ou le carnet de santé avant toute remise définitive de l'animal.
+        </p>
+</div>
+<!-- Abuse link -->
+<div class="flex items-center justify-center pt-space-xs">
+<button class="inline-flex items-center gap-1 text-on-surface-variant hover:text-error font-label-sm text-label-sm transition-colors py-1" onclick="reportAbuse()" type="button">
+<span class="material-symbols-outlined text-[16px] text-error">flag</span>
+          Signaler un abus ou une fausse annonce
+        </button>
+</div>
+</div>
+</div>
+<!-- Section 8: Sticky Bottom Action Bar -->
+<div class="fixed bottom-0 left-0 right-0 z-40 bg-surface-container-lowest/95 backdrop-blur-lg px-gutter-mobile py-3 shadow-[0_-4px_16px_rgba(0,0,0,0.06)] pb-safe">
+<div class="max-w-md mx-auto flex items-center gap-space-sm">
+<!-- Secondary quick share/alert button -->
+<button aria-label="Diffuser l'alerte" class="w-12 h-12 rounded-xl bg-surface-container hover:bg-surface-container-high text-on-surface flex items-center justify-center shrink-0 active:scale-95 transition-transform" onclick="shareAlert()" type="button">
+<span class="material-symbols-outlined text-[22px]">send</span>
+</button>
+<!-- Primary main action: Envoyer une information -->
+<button class="flex-1 h-12 rounded-xl bg-primary-container hover:bg-primary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 shadow-sm active:scale-[0.98] transition-all" onclick="openProvideInfoModal()" type="button">
+<span class="material-symbols-outlined text-[22px]">pets</span>
+<span>J'ai une information</span>
+</button>
+</div>
+</div>
+<!-- Interactive Slide-over Sheet / Modal (J'ai une information) -->
+<div class="fixed inset-0 z-50 bg-inverse-surface/60 backdrop-blur-sm hidden items-end justify-center transition-opacity" id="infoSheet">
+<div class="bg-surface-container-lowest rounded-t-3xl w-full max-w-lg p-space-lg flex flex-col gap-space-md shadow-2xl animate-in slide-in-from-bottom duration-200">
+<div class="w-12 h-1.5 rounded-full bg-surface-container-highest self-center"></div>
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[24px]">contact_support</span>
+<h3 class="font-headline-sm text-headline-sm text-on-surface">Transmettre une information</h3>
+</div>
+<button class="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center text-on-surface-variant hover:text-on-surface" onclick="closeProvideInfoModal()" type="button">
+<span class="material-symbols-outlined text-[18px]">close</span>
+</button>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">
+        Vous pensez reconnaître ce chat ou vous avez croisé son propriétaire dans le 20e arrondissement ? Sophie recevra immédiatement votre message.
+      </p>
+<div class="flex flex-col gap-space-sm">
+<label class="font-label-sm text-label-sm text-on-surface font-semibold" for="userMessage">Votre message ou indice</label>
+<textarea class="w-full rounded-xl bg-surface-container-lowest p-3 text-on-surface font-body-md text-body-md shadow-inner focus:outline-none focus:ring-2 focus:ring-primary placeholder:text-outline" id="userMessage" placeholder="Ex: J'habite rue de Buzenval, ce chat ressemble à celui de mon voisin du 3e..." rows="3"></textarea>
+</div>
+<div class="flex flex-col gap-2 pt-1">
+<button class="w-full h-12 rounded-xl bg-primary text-on-primary font-label-lg text-label-lg flex items-center justify-center gap-2 active:scale-95 transition-transform" onclick="submitInfo()" type="button">
+<span class="material-symbols-outlined text-[20px]">send</span>
+          Envoyer à Sophie
+        </button>
+<button class="w-full h-10 rounded-xl text-on-surface-variant font-label-md text-label-md hover:bg-surface-container" onclick="closeProvideInfoModal()" type="button">
+          Annuler
+        </button>
+</div>
+</div>
+</div>
+<!-- Toast Notification -->
+<div class="fixed top-20 left-1/2 -translate-x-1/2 z-50 bg-inverse-surface text-inverse-on-surface px-4 py-2.5 rounded-full shadow-lg font-label-sm text-label-sm flex items-center gap-2 opacity-0 pointer-events-none transition-all duration-300" id="toast">
+<span class="material-symbols-outlined text-[18px] text-primary-fixed" id="toastIcon">check_circle</span>
+<span id="toastMsg">Action enregistrée</span>
+</div>
+</div>
+<script>
+  let currentSlide = 0;
+  const totalSlides = 3;
+
+  function goToSlide(index) {
+    currentSlide = index;
+    const track = document.getElementById('carouselTrack');
+    const counter = document.getElementById('carouselCounter');
+    const dots = document.querySelectorAll('.carousel-dot');
+
+    if (track) {
+      track.style.transform = `translateX(-${currentSlide * 100}%)`;
+    }
+    if (counter) {
+      counter.textContent = `${currentSlide + 1} / ${totalSlides}`;
+    }
+    dots.forEach((dot, idx) => {
+      if (idx === currentSlide) {
+        dot.className = 'carousel-dot w-2 h-2 rounded-full bg-surface transition-all';
+      } else {
+        dot.className = 'carousel-dot w-1.5 h-1.5 rounded-full bg-surface/50 transition-all';
+      }
+    });
+  }
+
+  function toggleFavorite(btn) {
+    const icon = document.getElementById('favIcon');
+    const isFav = icon.getAttribute('style')?.includes('FILL');
+    if (isFav) {
+      icon.style.fontVariationSettings = "'FILL' 0";
+      icon.textContent = 'favorite_border';
+      showToast('Retiré des favoris', 'favorite');
+    } else {
+      icon.style.fontVariationSettings = "'FILL' 1";
+      icon.textContent = 'favorite';
+      showToast('Ajouté à vos favoris', 'favorite');
+    }
+  }
+
+  function openProvideInfoModal() {
+    const modal = document.getElementById('infoSheet');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+  }
+
+  function closeProvideInfoModal() {
+    const modal = document.getElementById('infoSheet');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+  }
+
+  function submitInfo() {
+    const input = document.getElementById('userMessage');
+    if (!input.value.trim()) {
+      showToast('Veuillez écrire un court message', 'error');
+      return;
+    }
+    closeProvideInfoModal();
+    input.value = '';
+    showToast('Information transmise avec succès !', 'check_circle');
+  }
+
+  function openContactModal() {
+    openProvideInfoModal();
+  }
+
+  function confirmClosure() {
+    if (confirm("Confirmez-vous que ce chat a retrouvé son foyer ? L'annonce sera alors archivée.")) {
+      showToast('Félicitations ! Annonce clôturée.', 'verified');
+    }
+  }
+
+  function shareAlert() {
+    if (navigator.share) {
+      navigator.share({
+        title: 'Chat trouvé Paris 20e — PetCare',
+        text: 'Alerte animal trouvé : Chat tigré gris & blanc avec collier rouge, Square Sarah Bernhardt.',
+        url: window.location.href,
+      }).catch(() => {});
+    } else {
+      showToast('Lien de l\'annonce copié dans le presse-papier !', 'link');
+    }
+  }
+
+  function reportAbuse() {
+    showToast('Signalement transmis à l\'équipe de modération', 'flag');
+  }
+
+  function showToast(message, iconName = 'check_circle') {
+    const toast = document.getElementById('toast');
+    const toastMsg = document.getElementById('toastMsg');
+    const toastIcon = document.getElementById('toastIcon');
+
+    toastMsg.textContent = message;
+    toastIcon.textContent = iconName;
+
+    toast.classList.remove('opacity-0', 'pointer-events-none');
+    toast.classList.add('opacity-100');
+
+    setTimeout(() => {
+      toast.classList.remove('opacity-100');
+      toast.classList.add('opacity-0', 'pointer-events-none');
+    }, 2800);
+  }
+
+  // Swipe support for carousel
+  (function initSwipe() {
+    const track = document.getElementById('carouselTrack');
+    if (!track) return;
+    let startX = 0;
+    let endX = 0;
+
+    track.addEventListener('touchstart', (e) => {
+      startX = e.touches[0].clientX;
+    }, { passive: true });
+
+    track.addEventListener('touchend', (e) => {
+      endX = e.changedTouches[0].clientX;
+      const diff = startX - endX;
+      if (Math.abs(diff) > 40) {
+        if (diff > 0 && currentSlide < totalSlides - 1) {
+          goToSlide(currentSlide + 1);
+        } else if (diff < 0 && currentSlide > 0) {
+          goToSlide(currentSlide - 1);
+        }
+      }
+    }, { passive: true });
+  })();
+</script></main></body></html>

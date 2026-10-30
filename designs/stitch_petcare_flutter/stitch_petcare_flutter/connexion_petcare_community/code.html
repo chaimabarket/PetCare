@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="fr" class="h-full">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Connexion - PetCare Community</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              teal: '#0F766E',
+              'teal-dark': '#0b5a54',
+              'teal-light': '#e6f4f2',
+              coral: '#F4A58A',
+              'coral-text': '#E07A5F',
+              bg: '#F8FAF9',
+              dark: '#1F2937',
+              gray: '#6B7280',
+              'gray-light': '#E5E7EB',
+              border: '#E2E8F0'
+            }
+          },
+          boxShadow: {
+            'soft': '0 4px 20px -2px rgba(15, 118, 110, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04)',
+            'card': '0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03)'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#F8FAF9] text-[#1F2937] font-sans min-h-full flex flex-col justify-between antialiased">
+  <!-- Status bar spacer & Container -->
+  <div class="w-full max-w-md mx-auto flex-1 flex flex-col px-5 py-6">
+    
+    <!-- Top Brand Logo -->
+    <header class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2.5">
+        <div class="w-9 h-9 rounded-xl bg-[#0F766E]/10 flex items-center justify-center text-[#0F766E]">
+          <i class="fa-solid fa-paw text-lg"></i>
+        </div>
+        <div class="flex flex-col">
+          <span class="text-base font-bold text-[#1F2937] tracking-tight leading-none">PetCare</span>
+          <span class="text-[11px] font-semibold text-[#0F766E] uppercase tracking-wider">Community</span>
+        </div>
+      </div>
+      <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[#0F766E]/10 text-[#0F766E]">
+        <i class="fa-solid fa-shield-heart text-[11px]"></i> Réseau certifié
+      </span>
+    </header>
+
+    <!-- Hero Illustration Banner -->
+    <div class="relative w-full rounded-2xl overflow-hidden mb-5 bg-gradient-to-b from-[#eff8f6] to-[#F8FAF9] border border-[#0F766E]/10 shadow-sm">
+      <img 
+        src="https://lh3.googleusercontent.com/aida-public/AB6AXuDjLPaUcZPZyJVeAPAecoTsYLc3YssXSKrF6dScRqPk1fECc_Eul6mUXWApa4-lQfe_T7M3fYINUXOFgpiXWPvlKGznbf_EDh5h6kXPOjyID3kf5qM2MEns9Y5FwVIMKxXldDoholkLZRncRhUME4C3RwNczKwnGkLdFPMy9h5OD4YOsKsgzJopdQjgDwG3yC6UxVaW-W2KwNh5WKUEffJCH4IUr4niKrmFsURB8S1lAcDxHCeD8iAI" 
+        alt="Illustration chaleureuse chien et chat" 
+        class="w-full h-44 object-cover object-center"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-[#F8FAF9] via-transparent to-transparent opacity-60"></div>
+    </div>
+
+    <!-- Main Card Content -->
+    <main class="bg-white rounded-2xl p-6 shadow-soft border border-slate-100 flex-1 flex flex-col justify-between">
+      <div>
+        <!-- Welcome Title & Subtitle -->
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-[#1F2937] tracking-tight mb-1.5">
+            Heureux de vous revoir !
+          </h1>
+          <p class="text-sm text-[#6B7280]">
+            Connectez-vous pour retrouver vos coups de cœur et suivre vos demandes d'adoption.
+          </p>
+        </div>
+
+        <!-- Form Section -->
+        <form class="space-y-4" onsubmit="event.preventDefault();">
+          <!-- Email field -->
+          <div>
+            <label for="email" class="block text-xs font-semibold text-[#1F2937] mb-1.5">
+              Adresse e-mail
+            </label>
+            <div class="relative rounded-xl">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#6B7280]">
+                <i class="fa-regular fa-envelope text-sm"></i>
+              </div>
+              <input 
+                type="email" 
+                id="email" 
+                name="email"
+                placeholder="clara.dupont@exemple.fr"
+                value="clara.dupont@exemple.fr"
+                class="w-full pl-10 pr-4 py-3 bg-[#F8FAF9] border border-gray-200 rounded-xl text-sm text-[#1F2937] placeholder-[#6B7280]/60 focus:outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 transition-all"
+              />
+            </div>
+          </div>
+
+          <!-- Password field -->
+          <div>
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="password" class="block text-xs font-semibold text-[#1F2937]">
+                Mot de passe
+              </label>
+              <a href="#" class="text-xs font-semibold text-[#E07A5F] hover:text-[#c45f44] transition-colors">
+                Mot de passe oublié ?
+              </a>
+            </div>
+            <div class="relative rounded-xl">
+              <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-[#6B7280]">
+                <i class="fa-solid fa-lock text-sm"></i>
+              </div>
+              <input 
+                type="password" 
+                id="password" 
+                name="password"
+                placeholder="••••••••••••"
+                value="motdepassesecurise"
+                class="w-full pl-10 pr-10 py-3 bg-[#F8FAF9] border border-gray-200 rounded-xl text-sm text-[#1F2937] placeholder-[#6B7280]/60 focus:outline-none focus:border-[#0F766E] focus:ring-2 focus:ring-[#0F766E]/20 transition-all"
+              />
+              <button type="button" class="absolute inset-y-0 right-0 pr-3.5 flex items-center text-[#6B7280] hover:text-[#1F2937]">
+                <i class="fa-regular fa-eye-slash text-sm"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <div class="pt-2">
+            <button 
+              type="submit"
+              class="w-full py-3.5 px-4 bg-[#0F766E] hover:bg-[#0b5a54] active:scale-[0.99] text-white font-semibold text-sm rounded-xl shadow-md shadow-[#0F766E]/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <i class="fa-solid fa-paw text-xs"></i>
+              <span>Se connecter</span>
+            </button>
+          </div>
+        </form>
+
+        <!-- Divider -->
+        <div class="relative my-6">
+          <div class="absolute inset-0 flex items-center">
+            <div class="w-full border-t border-gray-100"></div>
+          </div>
+          <div class="relative flex justify-center text-xs">
+            <span class="bg-white px-3 text-[#6B7280]">ou</span>
+          </div>
+        </div>
+
+        <!-- Continue as guest link button -->
+        <div class="text-center">
+          <button 
+            type="button"
+            class="w-full py-3 px-4 border border-gray-200 hover:border-[#0F766E]/40 hover:bg-[#F8FAF9] text-[#1F2937] font-medium text-sm rounded-xl transition-all flex items-center justify-center gap-2"
+          >
+            <i class="fa-regular fa-compass text-[#0F766E]"></i>
+            <span>Continuer en visiteur</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Signup footer link -->
+      <div class="pt-6 mt-4 border-t border-gray-100 text-center">
+        <p class="text-sm text-[#6B7280]">
+          Pas de compte ? 
+          <a href="#" class="font-bold text-[#0F766E] hover:underline ml-1">
+            S'inscrire
+          </a>
+        </p>
+      </div>
+    </main>
+
+    <!-- Bottom trust note / footer -->
+    <footer class="mt-4 text-center">
+      <p class="text-[11px] text-[#6B7280] flex items-center justify-center gap-1.5">
+        <i class="fa-solid fa-heart text-[#F4A58A] text-[10px]"></i>
+        <span>Adoptez avec bienveillance & engagement</span>
+      </p>
+    </footer>
+
+  </div>
+</body>
+</html>
