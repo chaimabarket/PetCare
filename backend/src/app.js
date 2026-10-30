@@ -4,6 +4,7 @@ const { requireAuth } = require('./auth');
 const { ApiError, getDocument, writeDocument, updateMany, queryCollection } = require('./firestore');
 const { profileFields, role } = require('./validation');
 const { listingsRouter, applicationsRouter } = require('./adoption/routes');
+const { appointmentsRouter, remindersRouter } = require('./appointments/routes');
 
 function publicProfile(doc) {
   const { id, fullName, email, city, phone, role: userRole, createdAt } = doc;
@@ -15,6 +16,16 @@ const wrap = (handler) => (req, res, next) => Promise.resolve(handler(req, res))
 function createApp() {
   const app = express();
   app.use(express.json({ limit: '4mb' }));
+  // L'application lancée dans Chrome (flutter run -d chrome) est servie depuis une autre adresse
+  // (localhost:5000…) : le navigateur exige ces en-têtes pour la laisser appeler l'API.
+  // Le jeton circule dans l'en-tête Authorization, pas dans un cookie : autoriser toutes les origines est sans risque.
+  app.use((req, res, next) => {
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Access-Control-Allow-Headers', 'Authorization, Content-Type');
+    res.set('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
+    if (req.method === 'OPTIONS') return res.status(204).end();
+    next();
+  });
   app.use((req, res, next) => {
     res.on('finish', () => console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode}`));
     next();
@@ -94,6 +105,8 @@ function createApp() {
   app.use('/api/users/me', me);
   app.use('/api/adoptions', listingsRouter());
   app.use('/api/applications', applicationsRouter());
+  app.use('/api/appointments', appointmentsRouter());
+  app.use('/api/reminders', remindersRouter());
   app.use('/api', (_req, _res, next) => next(new ApiError(404, 'Route inconnue.')));
 
   // eslint-disable-next-line no-unused-vars

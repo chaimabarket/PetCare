@@ -69,6 +69,36 @@ Le fil et les fiches d'annonces sont publics : un visiteur sans jeton peut les l
 Les décisions de l'annonceur (en étude, accepter, refuser, retirer, confirmer l'adoption), les signalements et les
 Happy Tails ne sont pas encore dans l'API (étape 2) : l'application les écrit directement dans Firestore.
 
+### Module Rendez-vous et rappels
+
+Toutes les routes exigent un jeton. Les dates sont des textes ISO 8601 (`2026-11-12T09:30:00.000Z`).
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/api/appointments` | Mon agenda : les rendez-vous de mes animaux et, pour un prestataire, ceux qu'il a reçus, triés par date |
+| GET | `/api/appointments/{id}` | Un rendez-vous |
+| POST | `/api/appointments` | Crée un rendez-vous : `petName`, `title`, `type`, `startsAt`, `durationMinutes`, `place`, `location`, `notes`, `reminderMinutes`. Sans `providerId` il démarre « confirmé » ; avec `providerId`, `providerName` et `serviceId` c'est une réservation « en attente » (module Services). Refusé (409) si l'animal a déjà un rendez-vous actif sur ce créneau |
+| POST | `/api/appointments/{id}/confirm` | Le prestataire confirme une réservation en attente |
+| POST | `/api/appointments/{id}/reschedule` | Reporte avant le début : `startsAt` et `reason` obligatoires ; même durée, l'ancien horaire va dans l'historique |
+| POST | `/api/appointments/{id}/cancel` | Annule avant le début : `reason` facultatif ; définitif |
+| POST | `/api/appointments/{id}/complete` | Termine un rendez-vous confirmé, après son heure de fin |
+| PUT | `/api/appointments/{id}/reminder` | `minutes` avant le début (0 = sans rappel) |
+| PUT | `/api/appointments/{id}/reminder-done` | `done` : bouton « Fait » de la liste des rappels |
+| GET | `/api/reminders` | Mes rappels de soins, par échéance |
+| POST | `/api/reminders` | Crée un rappel : `petName`, `title`, `category`, `dueAt`, `description` et `detail` facultatifs |
+| PATCH | `/api/reminders/{id}` | `{"done": true}` ou `false` |
+| DELETE | `/api/reminders/{id}` | Supprime un rappel (204) |
+
+Chaque action sur un rendez-vous envoie la `version` affichée par l'application. Si le rendez-vous a changé
+entre-temps, l'API répond 409 au lieu d'écraser la modification de l'autre personne (RG-20). Une action
+impossible dans l'état actuel (report après le début, rendez-vous déjà annulé…) répond aussi 409.
+
+`AppointmentRepository` et `ReminderRepository` appellent ces routes, et passent directement par Firestore si le serveur
+est éteint.
+
+L'API accepte les appels venant d'une autre adresse (en-têtes CORS), ce qui permet de l'utiliser depuis
+`flutter run -d chrome`. Dans ce cas, lancez l'application avec `--dart-define=API_URL=http://localhost:3000`.
+
 Erreurs : JSON `{"error": "message en français"}` avec le code HTTP `400` (champ invalide), `401` (jeton manquant
 ou expiré), `403` (refusé par les règles), `404`, `409` (profil déjà créé).
 

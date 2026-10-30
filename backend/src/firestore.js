@@ -65,7 +65,8 @@ async function call(token, url, options = {}) {
     const headers = { 'Content-Type': 'application/json' };
     if (token) headers.Authorization = `Bearer ${token}`;
     response = await fetch(url, { ...options, headers });
-  } catch {
+} catch (error) {
+    console.error('Firestore injoignable :', error.cause || error);
     throw new ApiError(502, 'Firestore est injoignable.');
   }
   if (response.ok) return response.json();
@@ -96,17 +97,35 @@ async function getDocument(token, path) {
 }
 
 /**
+ * Comme [getDocument], avec l'heure de dernière modification du document (`updateTime`).
+ * Passée à [writeOp], elle fait refuser l'écriture (409) si quelqu'un a modifié le document entre-temps.
+ */
+async function getDocumentWithTime(token, path) {
+  try {
+    const raw = await call(token, `${BASE}/${path}`);
+    return { doc: fromDocument(raw), updateTime: raw.updateTime };
+  } catch (error) {
+    if (error.status === 404) return null;
+    throw error;
+  }
+}
+
+/**
  * Prépare l'écriture d'un document.
  * - par défaut : mise à jour partielle des champs de [data] ;
  * - [replace] : remplace tout le document ;
  * - [mustExist] / [mustNotExist] : conditions sur l'état actuel du document ;
+ * - [updateTime] : le document ne doit pas avoir changé depuis cette lecture ;
  * - [serverTimestamps] : champs qui reçoivent l'heure du serveur.
  */
-function writeOp(path, data, { serverTimestamps = [], mustExist = false, mustNotExist = false, replace = false } = {}) {
+function writeOp(path, data, {
+  serverTimestamps = [], mustExist = false, mustNotExist = false, replace = false, updateTime = null,
+} = {}) {
   const write = { update: { name: `${ROOT}/${path}`, fields: toFields(data) } };
   if (!replace) write.updateMask = { fieldPaths: Object.keys(data) };
   if (mustExist) write.currentDocument = { exists: true };
   if (mustNotExist) write.currentDocument = { exists: false };
+  if (updateTime) write.currentDocument = { updateTime };
   if (serverTimestamps.length) {
     write.updateTransforms = serverTimestamps.map((fieldPath) => ({
       fieldPath,
@@ -160,6 +179,7 @@ async function queryCollection(token, parentPath, collection, { where, filters =
 module.exports = {
   ApiError,
   getDocument,
+  getDocumentWithTime,
   writeDocument,
   writeOp,
   deleteOp,

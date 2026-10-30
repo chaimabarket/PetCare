@@ -1,5 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Une date lue dans Firestore (Timestamp) ou renvoyée par l'API REST (texte ISO en UTC).
+DateTime? readDate(Object? value) {
+  if (value is Timestamp) return value.toDate();
+  if (value is String) return DateTime.tryParse(value)?.toLocal();
+  if (value is DateTime) return value;
+  return null;
+}
+
 /// Statuts d'un rendez-vous (cahier des charges, section 6).
 ///
 /// PLANNED et CONFIRMED sont actifs ; COMPLETED et CANCELLED sont terminaux (RG-20).
@@ -90,11 +98,11 @@ class AppointmentChange {
 
   factory AppointmentChange.fromMap(Map<String, dynamic> map) => AppointmentChange(
         action: AppointmentAction.fromFirestore(map['action'] as String?),
-        at: (map['at'] as Timestamp?)?.toDate() ?? DateTime.now(),
+        at: readDate(map['at']) ?? DateTime.now(),
         byUserId: map['by'] as String? ?? '',
         reason: map['reason'] as String?,
-        oldStart: (map['oldStart'] as Timestamp?)?.toDate(),
-        newStart: (map['newStart'] as Timestamp?)?.toDate(),
+        oldStart: readDate(map['oldStart']),
+        newStart: readDate(map['newStart']),
       );
 
   final AppointmentAction action;
@@ -149,11 +157,16 @@ class Appointment {
     this.changes = const [],
   });
 
-  factory Appointment.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? const {};
-    final startsAt = (data['startsAt'] as Timestamp?)?.toDate() ?? DateTime.now();
+  factory Appointment.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      Appointment.fromData(doc.id, doc.data() ?? const {});
+
+  /// Rendez-vous renvoyé par l'API REST (`GET /api/appointments`).
+  factory Appointment.fromJson(Map<String, dynamic> json) => Appointment.fromData(json['id'] as String? ?? '', json);
+
+  factory Appointment.fromData(String id, Map<String, dynamic> data) {
+    final startsAt = readDate(data['startsAt']) ?? DateTime.now();
     return Appointment(
-      id: doc.id,
+      id: id,
       ownerId: data['ownerId'] as String? ?? '',
       petId: data['petId'] as String?,
       petName: data['petName'] as String? ?? '',
@@ -163,7 +176,7 @@ class Appointment {
       description: data['description'] as String?,
       type: AppointmentType.fromFirestore(data['type'] as String?),
       startsAt: startsAt,
-      endsAt: (data['endsAt'] as Timestamp?)?.toDate() ?? startsAt.add(const Duration(minutes: 30)),
+      endsAt: readDate(data['endsAt']) ?? startsAt.add(const Duration(minutes: 30)),
       status: AppointmentStatus.fromFirestore(data['status'] as String?),
       providerId: data['providerId'] as String?,
       providerName: data['providerName'] as String?,
@@ -177,11 +190,11 @@ class Appointment {
       reminderMinutes: (data['reminderMinutes'] as num?)?.toInt() ?? 0,
       pushReminder: data['pushReminder'] as bool? ?? false,
       cancelReason: data['cancelReason'] as String?,
-      reminderDoneAt: (data['reminderDoneAt'] as Timestamp?)?.toDate(),
+      reminderDoneAt: readDate(data['reminderDoneAt']),
       version: (data['version'] as num?)?.toInt() ?? 1,
       changes: [
         for (final c in (data['changes'] as List<dynamic>? ?? const []))
-          if (c is Map<String, dynamic>) AppointmentChange.fromMap(c),
+          if (c is Map) AppointmentChange.fromMap(Map<String, dynamic>.from(c)),
       ],
     );
   }
