@@ -33,11 +33,16 @@ function petFields(body = {}) {
   const chipNumber = optionalText(body.chipNumber, 'Le numéro de puce', 15);
   if (chipNumber && !CHIP.test(chipNumber)) throw new ApiError(400, 'Le numéro de puce doit contenir 15 chiffres.');
 
+  const species = oneOf(body.species, E.SPECIES, "L'espèce");
+  // Avec « other », `breed` contient l'animal saisi librement (ours, tigre, tortue…).
+  const breed = optionalText(body.breed, 'La race', 80);
+  if (species === 'other' && !breed) throw new ApiError(400, "Indiquez de quel animal il s'agit.");
+
   return {
     name: text(body.name, 'Le nom', { min: 2, max: 80 }),
-    species: oneOf(body.species, E.SPECIES, "L'espèce"),
+    species,
     sex: oneOf(body.sex, E.SEX, 'Le sexe'),
-    breed: optionalText(body.breed, 'La race', 80),
+    breed,
     birthDate: pastDate(body.birthDate, 'La date de naissance'),
     birthDateEstimated: body.birthDateEstimated === true,
     chipNumber,

@@ -32,6 +32,11 @@ test('fiche : mêmes limites que firestore.rules', () => {
   assert.strictEqual(petFields(body({ chipNumber: '250269812345678' })).chipNumber, '250269812345678');
 });
 
+test('espèce « other » : tout animal est accepté, à condition de le nommer', () => {
+  assert.strictEqual(petFields(body({ species: 'other', breed: 'Ours' })).breed, 'Ours');
+  refused(() => petFields(body({ species: 'other' })));
+});
+
 test('modification partielle : seuls les champs envoyés changent', () => {
   assert.deepStrictEqual(petPatch({ favorite: true }), { favorite: true });
   assert.deepStrictEqual(petPatch({ notes: '  ' }), { notes: null });

@@ -155,6 +155,12 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     await _run(() => _repository.setNotes(pet.id, notes), success: success);
   }
 
+  /// Assistant IA (branche `chatbot`) : une fois fusionné, ouvrir ici `AppRoutes.assistant` avec cet animal.
+  void _openAdvice() {
+    final title = _l.petsAdvice;
+    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ComingSoonScreen(title: title)));
+  }
+
   Future<void> _addWeight() async {
     await showDialog<void>(
       context: context,
@@ -217,8 +223,8 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     final summary = [
       pet.name,
       [
-        speciesLabel(l, pet.species),
-        if (pet.hasBreed) pet.breed!,
+        petKindLabel(l, pet),
+        if (pet.hasBreed && pet.species != PetSpecies.other) pet.breed!,
         sexLabel(l, pet.sex),
         formatAge(l, pet.birthDate),
       ].join(' • '),
@@ -604,7 +610,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
           const SizedBox(height: 20),
           Row(
             children: [
-              Expanded(child: _SpecTile(icon: Icons.pets, label: l.petsFormSpecies, value: speciesLabel(l, pet.species))),
+              Expanded(child: _SpecTile(icon: Icons.pets, label: l.petsFormSpecies, value: petKindLabel(l, pet))),
               const SizedBox(width: 12),
               Expanded(
                 child: _SpecTile(
@@ -981,6 +987,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               overflow: TextOverflow.ellipsis,
               style: PetText.labelLg.copyWith(color: Colors.white),
             ),
+          ),
+          const SizedBox(height: 10),
+          _SecondaryAction(
+            icon: Icons.tips_and_updates_outlined,
+            label: l.petsAdvice,
+            color: PetColors.primary,
+            onTap: _openAdvice,
           ),
           const SizedBox(height: 10),
         ],

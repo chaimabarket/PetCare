@@ -854,6 +854,30 @@ abstract class AppLocalizations {
   /// **'Espèce'**
   String get petsFormSpecies;
 
+  /// No description provided for @petsAdvice.
+  ///
+  /// In fr, this message translates to:
+  /// **'Conseils'**
+  String get petsAdvice;
+
+  /// No description provided for @petsFormKind.
+  ///
+  /// In fr, this message translates to:
+  /// **'Quel animal ?'**
+  String get petsFormKind;
+
+  /// No description provided for @petsFormKindHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ex : Tortue, Furet, Ours, Tigre...'**
+  String get petsFormKindHint;
+
+  /// No description provided for @petsFormKindError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Indiquez de quel animal il s\'agit.'**
+  String get petsFormKindError;
+
   /// No description provided for @petsFormBreed.
   ///
   /// In fr, this message translates to:

@@ -119,6 +119,11 @@ class _PetFormScreenState extends State<PetFormScreen> {
     });
   }
 
+  /// Avec « Autre », l'animal est saisi librement dans le champ de la race (ours, tigre, tortue…).
+  bool get _freeSpecies => _species == PetSpecies.other;
+
+  String? _kindError(AppLocalizations l) => _freeSpecies && _breed.text.trim().isEmpty ? l.petsFormKindError : null;
+
   void _makeCover(int index) => setState(() => _photos.insert(0, _photos.removeAt(index)));
 
   void _removePhoto(int index) => setState(() => _photos.removeAt(index));
@@ -127,7 +132,11 @@ class _PetFormScreenState extends State<PetFormScreen> {
     final l = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     setState(() => _submitted = true);
-    if (_nameError(l) != null || _birthError(l) != null || _weightError(l) != null || _chipError(l) != null) {
+    if (_nameError(l) != null ||
+        _kindError(l) != null ||
+        _birthError(l) != null ||
+        _weightError(l) != null ||
+        _chipError(l) != null) {
       messenger.showSnackBar(SnackBar(content: Text(l.petsFormCheckFields)));
       return;
     }
@@ -445,10 +454,12 @@ class _PetFormScreenState extends State<PetFormScreen> {
           ],
         ),
         _Field(
-          label: l.petsFormBreed,
+          label: _freeSpecies ? l.petsFormKind : l.petsFormBreed,
           controller: _breed,
-          hint: l.petsFormBreedHint,
-          help: l.petsFormBreedHelp,
+          hint: _freeSpecies ? l.petsFormKindHint : l.petsFormBreedHint,
+          help: _freeSpecies ? null : l.petsFormBreedHelp,
+          required: _freeSpecies,
+          error: _submitted ? _kindError(l) : null,
           maxLength: 80,
           textCapitalization: TextCapitalization.words,
         ),

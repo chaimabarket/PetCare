@@ -80,6 +80,10 @@ String truncateChip(String chip, {int keep = 5}) => chip.length <= keep ? chip :
 /// « Stérilisé » ou « Stérilisée » selon le sexe.
 String sterilizedLabel(AppLocalizations l, Pet pet) => pet.isFemale ? l.petsSterilizedFemale : l.petsSterilizedMale;
 
-/// « Chien • Golden Retriever » ou « Chien » si la race est inconnue.
+/// Espèce affichée : avec « Autre », c'est l'animal saisi librement (« Ours », « Tigre »…), gardé dans `breed`.
+String petKindLabel(AppLocalizations l, Pet pet) =>
+    pet.species == PetSpecies.other && pet.hasBreed ? pet.breed! : speciesLabel(l, pet.species);
+
+/// « Chien • Golden Retriever », « Chien » si la race est inconnue, « Ours » pour un animal saisi librement.
 String speciesAndBreed(AppLocalizations l, Pet pet) =>
-    pet.hasBreed ? '${speciesLabel(l, pet.species)} • ${pet.breed}' : speciesLabel(l, pet.species);
+    pet.hasBreed && pet.species != PetSpecies.other ? '${speciesLabel(l, pet.species)} • ${pet.breed}' : petKindLabel(l, pet);

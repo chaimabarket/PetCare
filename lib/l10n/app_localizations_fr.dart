@@ -465,6 +465,18 @@ class AppLocalizationsFr extends AppLocalizations {
   String get petsFormSpecies => 'Espèce';
 
   @override
+  String get petsAdvice => 'Conseils';
+
+  @override
+  String get petsFormKind => 'Quel animal ?';
+
+  @override
+  String get petsFormKindHint => 'Ex : Tortue, Furet, Ours, Tigre...';
+
+  @override
+  String get petsFormKindError => 'Indiquez de quel animal il s\'agit.';
+
+  @override
   String get petsFormBreed => 'Race';
 
   @override

@@ -93,6 +93,8 @@ restaure, mais toute autre modification renvoie `409`.
 | PUT | `/api/pets/{id}/weights/{entryId}` | Corrige `weightKg` et `note` (la date ne change pas) |
 | DELETE | `/api/pets/{id}/weights/{entryId}` | Supprime une pesée |
 
+Pour une espèce `other`, `breed` est obligatoire et contient l'animal saisi librement (ours, tigre, tortue…).
+
 Firestore garde les photos d'animaux en octets (`bytesValue`) ; l'API les échange en base64.
 
 Le blocage des animaux archivés est appliqué par l'API : les écritures directes à Firestore (serveur éteint) ne
