@@ -96,9 +96,6 @@ impossible dans l'état actuel (report après le début, rendez-vous déjà annu
 `AppointmentRepository` et `ReminderRepository` appellent ces routes, et passent directement par Firestore si le serveur
 est éteint.
 
-L'API accepte les appels venant d'une autre adresse (en-têtes CORS), ce qui permet de l'utiliser depuis
-`flutter run -d chrome`. Dans ce cas, lancez l'application avec `--dart-define=API_URL=http://localhost:3000`.
-
 Erreurs : JSON `{"error": "message en français"}` avec le code HTTP `400` (champ invalide), `401` (jeton manquant
 ou expiré), `403` (refusé par les règles), `404`, `409` (profil déjà créé).
 
