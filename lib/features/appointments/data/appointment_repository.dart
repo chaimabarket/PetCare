@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import '../../../core/api/api_client.dart';
+import '../../../core/api/polling.dart';
 import '../../notifications/data/app_notification.dart';
 import '../../notifications/data/notification_service.dart';
 import 'appointment.dart';
@@ -20,20 +22,26 @@ class AppointmentException implements Exception {
 
 /// Lecture et actions sur les rendez-vous (`appointments/{id}`).
 ///
-/// Chaque action vérifie les règles du cahier des charges (RG-12 à RG-21) ; les règles
-/// Firestore (`firestore.rules`) les vérifient aussi côté serveur.
+/// Tout passe par l'API REST PetCare (`/api/appointments`, dossier `backend/`) ; si le serveur
+/// est injoignable, les mêmes opérations passent directement par Firestore.
+///
+/// Chaque action vérifie les règles du cahier des charges (RG-12 à RG-21) : ici en secours,
+/// sur le serveur sinon, et toujours dans les règles Firestore (`firestore.rules`).
 class AppointmentRepository {
   AppointmentRepository({
     FirebaseFirestore? firestore,
     FirebaseAuth? auth,
     NotificationService? notifications,
+    ApiClient? api,
   })  : _firestore = firestore ?? FirebaseFirestore.instance,
         _auth = auth ?? FirebaseAuth.instance,
-        _notifications = notifications ?? NotificationService(firestore: firestore);
+        _notifications = notifications ?? NotificationService(firestore: firestore),
+        _api = api ?? ApiClient();
 
   final FirebaseFirestore _firestore;
   final FirebaseAuth _auth;
   final NotificationService _notifications;
+  final ApiClient _api;
 
   CollectionReference<Map<String, dynamic>> get _collection => _firestore.collection('appointments');
 
@@ -43,13 +51,45 @@ class AppointmentRepository {
     return uid;
   }
 
+  /// Lit par l'API ; si le serveur est éteint, [viaFirestore] prend le relais.
+  Future<T> _read<T>(Future<T> Function() viaApi, Future<T> Function() viaFirestore) async {
+    try {
+      return await viaApi();
+    } on ApiException catch (e) {
+      if (e.isUnreachable) return viaFirestore();
+      throw AppointmentException(e.message);
+    }
+  }
+
+  /// Écrit par l'API ; un refus du serveur devient une erreur affichable. Les écrans se rafraîchissent aussitôt.
+  Future<T> _write<T>(Future<T> Function() viaApi, Future<T> Function() viaFirestore) async {
+    try {
+      return await viaApi();
+    } on ApiException catch (e) {
+      if (e.isUnreachable) return viaFirestore();
+      throw AppointmentException(e.message);
+    } finally {
+      notifyApiDataChanged();
+    }
+  }
+
+  static String _iso(DateTime d) => d.toUtc().toIso8601String();
+
+  static List<Appointment> _listFrom(dynamic json) =>
+      [for (final item in json as List<dynamic>) Appointment.fromJson(item as Map<String, dynamic>)];
+
   // ---------------------------------------------------------------------------
   // Lecture
   // ---------------------------------------------------------------------------
 
   /// Les rendez-vous de l'utilisateur : ceux de ses animaux et, s'il est prestataire,
   /// les réservations qu'il a reçues. Triés par date de début.
-  Stream<List<Appointment>> watchAgenda(String uid) {
+  Stream<List<Appointment>> watchAgenda(String uid) => poll(() => _read(
+        () async => _listFrom(await _api.get('/api/appointments')),
+        () => _agendaFirestore(uid).first,
+      ));
+
+  Stream<List<Appointment>> _agendaFirestore(String uid) {
     // Deux requêtes simples (sans index composite) fusionnées à la main.
     final mine = _collection.where('ownerId', isEqualTo: uid).snapshots();
     final received = _collection.where('providerId', isEqualTo: uid).snapshots();
@@ -88,11 +128,17 @@ class AppointmentRepository {
     return controller.stream;
   }
 
-  /// Un rendez-vous, mis à jour en direct. Émet null s'il n'existe pas ou n'est pas accessible.
-  Stream<Appointment?> watchOne(String id) => _collection
-      .doc(id)
-      .snapshots()
-      .map((doc) => doc.exists ? Appointment.fromFirestore(doc) : null);
+  /// Un rendez-vous, rafraîchi régulièrement. Émet null s'il n'existe pas ou n'est pas accessible.
+  Stream<Appointment?> watchOne(String id) => poll(() async {
+        try {
+          return Appointment.fromJson(await _api.get('/api/appointments/$id') as Map<String, dynamic>);
+        } on ApiException catch (e) {
+          if (e.statusCode == 404 || e.statusCode == 403) return null;
+          if (!e.isUnreachable) throw AppointmentException(e.message);
+          final doc = await _collection.doc(id).get();
+          return doc.exists ? Appointment.fromFirestore(doc) : null;
+        }
+      });
 
   // ---------------------------------------------------------------------------
   // Création
@@ -115,6 +161,59 @@ class AppointmentRepository {
     String notes = '',
     int reminderMinutes = 1440,
     bool pushReminder = true,
+  }) {
+    _uid; // Connexion requise.
+    return _write(
+      () async {
+        final json = await _api.post('/api/appointments', {
+          'petId': petId,
+          'petName': petName,
+          'petBreed': petBreed,
+          'petPhotoUrl': petPhotoUrl,
+          'title': title,
+          'type': type.firestoreValue,
+          'startsAt': _iso(startsAt),
+          'durationMinutes': duration.inMinutes,
+          'place': place.firestoreValue,
+          'location': location,
+          'notes': notes,
+          'reminderMinutes': reminderMinutes,
+          'pushReminder': pushReminder,
+        }) as Map<String, dynamic>;
+        return json['id'] as String;
+      },
+      () => _createPersonalFirestore(
+        petName: petName,
+        petId: petId,
+        petBreed: petBreed,
+        petPhotoUrl: petPhotoUrl,
+        title: title,
+        type: type,
+        startsAt: startsAt,
+        duration: duration,
+        place: place,
+        location: location,
+        notes: notes,
+        reminderMinutes: reminderMinutes,
+        pushReminder: pushReminder,
+      ),
+    );
+  }
+
+  Future<String> _createPersonalFirestore({
+    required String petName,
+    String? petId,
+    String? petBreed,
+    String? petPhotoUrl,
+    required String title,
+    required AppointmentType type,
+    required DateTime startsAt,
+    required Duration duration,
+    required AppointmentPlace place,
+    required String location,
+    required String notes,
+    required int reminderMinutes,
+    required bool pushReminder,
   }) async {
     final uid = _uid;
     final endsAt = startsAt.add(duration);
@@ -187,6 +286,68 @@ class AppointmentRepository {
     double? price,
     String notes = '',
     int reminderMinutes = 1440,
+  }) {
+    _uid; // Connexion requise.
+    return _write(
+      () async {
+        final json = await _api.post('/api/appointments', {
+          'petId': petId,
+          'petName': petName,
+          'petBreed': petBreed,
+          'petPhotoUrl': petPhotoUrl,
+          'providerId': providerId,
+          'providerName': providerName,
+          'providerAddress': providerAddress,
+          'providerPhone': providerPhone,
+          'serviceId': serviceId,
+          'title': title,
+          'type': type.firestoreValue,
+          'startsAt': _iso(startsAt),
+          'durationMinutes': duration.inMinutes,
+          'price': price,
+          'notes': notes,
+          'reminderMinutes': reminderMinutes,
+        }) as Map<String, dynamic>;
+        return json['id'] as String;
+      },
+      () => _createBookingFirestore(
+        petName: petName,
+        petId: petId,
+        petBreed: petBreed,
+        petPhotoUrl: petPhotoUrl,
+        providerId: providerId,
+        providerName: providerName,
+        providerAddress: providerAddress,
+        providerPhone: providerPhone,
+        serviceId: serviceId,
+        title: title,
+        type: type,
+        startsAt: startsAt,
+        duration: duration,
+        price: price,
+        notes: notes,
+        reminderMinutes: reminderMinutes,
+      ),
+    );
+  }
+
+  Future<String> _createBookingFirestore({
+    required String petName,
+    String? petId,
+    String? petBreed,
+    String? petPhotoUrl,
+    required String providerId,
+    required String providerName,
+    String? providerAddress,
+    String? providerPhone,
+    required String serviceId,
+    required String title,
+    required AppointmentType type,
+    required DateTime startsAt,
+    required Duration duration,
+    double? price,
+    required String notes,
+    required int reminderMinutes,
   }) async {
     final uid = _uid;
     final endsAt = startsAt.add(duration);
@@ -236,9 +397,11 @@ class AppointmentRepository {
     required DateTime end,
     String? ignoreId,
   }) async {
-    final snap = await _collection.where('ownerId', isEqualTo: ownerId).get();
-    for (final doc in snap.docs) {
-      final other = Appointment.fromFirestore(doc);
+    final all = await _read(
+      () async => _listFrom(await _api.get('/api/appointments')).where((a) => a.ownerId == ownerId).toList(),
+      () async => (await _collection.where('ownerId', isEqualTo: ownerId).get()).docs.map(Appointment.fromFirestore).toList(),
+    );
+    for (final other in all) {
       if (other.id == ignoreId || !other.status.isActive) continue;
       if (other.petName.trim().toLowerCase() != petName.trim().toLowerCase()) continue;
       if (other.overlaps(start, end)) return other;
@@ -250,8 +413,22 @@ class AppointmentRepository {
   // Transitions (FR-12, FR-13)
   // ---------------------------------------------------------------------------
 
+  /// Envoie une action à l'API avec la version affichée (RG-20) ; en secours, [viaFirestore].
+  Future<void> _action(Appointment a, String method, String path, Map<String, dynamic> body, Future<void> Function() viaFirestore) =>
+      _write(
+        () async {
+          final payload = {...body, 'version': a.version};
+          final url = '/api/appointments/${a.id}/$path';
+          method == 'PUT' ? await _api.put(url, payload) : await _api.post(url, payload);
+        },
+        viaFirestore,
+      );
+
   /// Le prestataire confirme une réservation en attente.
-  Future<void> confirm(Appointment appointment) => _transition(
+  Future<void> confirm(Appointment appointment) =>
+      _action(appointment, 'POST', 'confirm', const {}, () => _confirmFirestore(appointment));
+
+  Future<void> _confirmFirestore(Appointment appointment) => _transition(
         appointment,
         check: (a) => a.canConfirm() ? null : 'Ce rendez-vous ne peut plus être confirmé.',
         changes: (a) => {'status': AppointmentStatus.confirmed.firestoreValue},
@@ -263,7 +440,18 @@ class AppointmentRepository {
 
   /// Reporte avant le début, avec un motif (RG-18). Même rendez-vous, nouvel horaire, version +1.
   /// Une réservation repasse « En attente » : le prestataire doit la confirmer à nouveau.
-  Future<void> reschedule(Appointment appointment, {required DateTime newStart, required String reason}) async {
+  Future<void> reschedule(Appointment appointment, {required DateTime newStart, required String reason}) {
+    if (reason.trim().isEmpty) throw const AppointmentException('Indiquez le motif du report.');
+    return _action(
+      appointment,
+      'POST',
+      'reschedule',
+      {'startsAt': _iso(newStart), 'reason': reason.trim()},
+      () => _rescheduleFirestore(appointment, newStart: newStart, reason: reason),
+    );
+  }
+
+  Future<void> _rescheduleFirestore(Appointment appointment, {required DateTime newStart, required String reason}) async {
     final newEnd = newStart.add(appointment.duration);
     _checkTimes(newStart, newEnd);
     if (reason.trim().isEmpty) throw const AppointmentException('Indiquez le motif du report.');
@@ -305,7 +493,10 @@ class AppointmentRepository {
   }
 
   /// Annule un rendez-vous pas encore commencé (RG-17). CANCELLED est définitif.
-  Future<void> cancel(Appointment appointment, {String reason = ''}) => _transition(
+  Future<void> cancel(Appointment appointment, {String reason = ''}) =>
+      _action(appointment, 'POST', 'cancel', {'reason': reason.trim()}, () => _cancelFirestore(appointment, reason: reason));
+
+  Future<void> _cancelFirestore(Appointment appointment, {required String reason}) => _transition(
         appointment,
         check: (a) => a.canCancel() ? null : 'Ce rendez-vous ne peut plus être annulé : il a déjà commencé.',
         changes: (a) => {
@@ -320,7 +511,10 @@ class AppointmentRepository {
       );
 
   /// Termine un rendez-vous confirmé après son heure de fin (RG-19).
-  Future<void> complete(Appointment appointment) => _transition(
+  Future<void> complete(Appointment appointment) =>
+      _action(appointment, 'POST', 'complete', const {}, () => _completeFirestore(appointment));
+
+  Future<void> _completeFirestore(Appointment appointment) => _transition(
         appointment,
         check: (a) => a.canComplete() ? null : "Un rendez-vous se termine après son heure de fin, s'il était confirmé.",
         changes: (a) => {'status': AppointmentStatus.completed.firestoreValue},
@@ -328,14 +522,30 @@ class AppointmentRepository {
       );
 
   /// Active ou désactive le rappel (« Me rappeler 1 jour avant »).
-  Future<void> setReminder(Appointment appointment, {required int minutes}) => _transition(
+  Future<void> setReminder(Appointment appointment, {required int minutes}) => _action(
+        appointment,
+        'PUT',
+        'reminder',
+        {'minutes': minutes},
+        () => _setReminderFirestore(appointment, minutes: minutes),
+      );
+
+  Future<void> _setReminderFirestore(Appointment appointment, {required int minutes}) => _transition(
         appointment,
         check: (a) => a.status.isActive ? null : 'Ce rendez-vous est terminé ou annulé.',
         changes: (a) => {'reminderMinutes': minutes, 'reminderDoneAt': null},
       );
 
   /// Bouton « Fait » de la liste des rappels pour un rendez-vous.
-  Future<void> markReminderDone(Appointment appointment, {bool done = true}) => _transition(
+  Future<void> markReminderDone(Appointment appointment, {bool done = true}) => _action(
+        appointment,
+        'PUT',
+        'reminder-done',
+        {'done': done},
+        () => _markReminderDoneFirestore(appointment, done: done),
+      );
+
+  Future<void> _markReminderDoneFirestore(Appointment appointment, {required bool done}) => _transition(
         appointment,
         check: (_) => null,
         changes: (a) => {'reminderDoneAt': done ? Timestamp.now() : null},
@@ -343,7 +553,7 @@ class AppointmentRepository {
 
   // ---------------------------------------------------------------------------
 
-  /// Applique une modification dans une transaction.
+  /// Secours sans serveur : applique une modification dans une transaction Firestore.
   ///
   /// Si le rendez-vous a été modifié depuis son affichage (version différente), la modification
   /// est refusée plutôt que d'écraser celle de l'autre personne (RG-20).

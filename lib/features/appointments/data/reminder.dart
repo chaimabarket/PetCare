@@ -1,5 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'appointment.dart' show readDate;
+
 /// Catégorie d'un rappel : l'étiquette et l'icône de la carte (maquette « Rappels & Soins »).
 enum ReminderCategory {
   medication('medicament', 'Médicament'),
@@ -39,10 +41,15 @@ class Reminder {
     this.doneAt,
   });
 
-  factory Reminder.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? const {};
+  factory Reminder.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      Reminder.fromData(doc.id, doc.data() ?? const {});
+
+  /// Rappel renvoyé par l'API REST (`GET /api/reminders`).
+  factory Reminder.fromJson(Map<String, dynamic> json) => Reminder.fromData(json['id'] as String? ?? '', json);
+
+  factory Reminder.fromData(String id, Map<String, dynamic> data) {
     return Reminder(
-      id: doc.id,
+      id: id,
       ownerId: data['ownerId'] as String? ?? '',
       petName: data['petName'] as String? ?? '',
       petBreed: data['petBreed'] as String?,
@@ -51,10 +58,10 @@ class Reminder {
       description: data['description'] as String?,
       detail: data['detail'] as String?,
       category: ReminderCategory.fromFirestore(data['category'] as String?),
-      dueAt: (data['dueAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      dueAt: readDate(data['dueAt']) ?? DateTime.now(),
       appointmentId: data['appointmentId'] as String?,
       done: data['done'] as bool? ?? false,
-      doneAt: (data['doneAt'] as Timestamp?)?.toDate(),
+      doneAt: readDate(data['doneAt']),
     );
   }
 
