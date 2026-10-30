@@ -5,7 +5,9 @@ const {
   ApiError, getDocument, writeDocument, writeOp, deleteOp, commit, queryCollection, newId,
 } = require('../firestore');
 const E = require('./enums');
-const { petFields, petPatch, photoBytes, gallery, weightEntry, MAX_PHOTOS } = require('./validation');
+const {
+  petFields, petPatch, photoBytes, gallery, weightEntry, weightCorrection, MAX_PHOTOS,
+} = require('./validation');
 
 const wrap = (handler) => (req, res, next) => Promise.resolve(handler(req, res)).catch(next);
 
@@ -238,6 +240,17 @@ function petsRouter() {
       throw error;
     }
     res.status(201).json(await getDocument(req.token, weightPath(pet.id, id)));
+  }));
+
+  /** Corrige le poids ou la note d'une pesée existante. */
+  router.put('/:id/weights/:entryId', wrap(async (req, res) => {
+    const pet = await activePetOrFail(req);
+    const data = weightCorrection(req.body);
+    const path = weightPath(pet.id, req.params.entryId);
+    if (!await getDocument(req.token, path)) throw new ApiError(404, 'Pesée introuvable.');
+
+    await writeDocument(req.token, path, data, { mustExist: true });
+    res.json(await getDocument(req.token, path));
   }));
 
   router.delete('/:id/weights/:entryId', wrap(async (req, res) => {

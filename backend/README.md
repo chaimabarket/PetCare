@@ -90,6 +90,7 @@ restaure, mais toute autre modification renvoie `409`.
 | POST | `/api/pets/{id}/photos/{photoId}/cover` | Choisit la photo principale |
 | GET | `/api/pets/{id}/weights?limit=` | Pesées, la plus récente d'abord |
 | POST | `/api/pets/{id}/weights` | Ajoute une pesée : `date` (AAAA-MM-JJ), `measuredOn` (minuit local en ISO), `weightKg`, `note` (`409` si ce jour a déjà une pesée) |
+| PUT | `/api/pets/{id}/weights/{entryId}` | Corrige `weightKg` et `note` (la date ne change pas) |
 | DELETE | `/api/pets/{id}/weights/{entryId}` | Supprime une pesée |
 
 Firestore garde les photos d'animaux en octets (`bytesValue`) ; l'API les échange en base64.

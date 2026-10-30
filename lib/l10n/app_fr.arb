@@ -236,6 +236,7 @@
   "petsWeightStable": "Stable {period}",
   "@petsWeightStable": {"placeholders": {"period": {"type": "String"}}},
   "petsWeightAdd": "Ajouter une pesée",
+  "petsWeightEdit": "Corriger la pesée",
   "petsWeightCurrent": "(Actuel)",
   "petsHealthSubtitle": "Vaccins, traitements et antécédents",
   "petsHealthAlertTitle": "Rappels vaccins",

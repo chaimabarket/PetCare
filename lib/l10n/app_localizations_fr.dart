@@ -720,6 +720,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get petsWeightAdd => 'Ajouter une pesée';
 
   @override
+  String get petsWeightEdit => 'Corriger la pesée';
+
+  @override
   String get petsWeightCurrent => '(Actuel)';
 
   @override

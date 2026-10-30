@@ -712,6 +712,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get petsWeightAdd => 'Add a weigh-in';
 
   @override
+  String get petsWeightEdit => 'Correct weigh-in';
+
+  @override
   String get petsWeightCurrent => '(Current)';
 
   @override

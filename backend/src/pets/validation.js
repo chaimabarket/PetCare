@@ -122,4 +122,9 @@ function weightEntry(body = {}) {
   };
 }
 
-module.exports = { petFields, petPatch, photoBytes, gallery, weightEntry, MAX_PHOTOS };
+/** Correction d'une pesée : son jour reste son identifiant, seuls le poids et la note changent. */
+function weightCorrection(body = {}) {
+  return { weightKg: weightKg(body.weightKg), note: optionalText(body.note, 'La note', 500) };
+}
+
+module.exports = { petFields, petPatch, photoBytes, gallery, weightEntry, weightCorrection, MAX_PHOTOS };

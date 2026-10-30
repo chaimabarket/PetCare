@@ -324,6 +324,15 @@ class PetRepository {
     );
   }
 
+  /// Corrige le poids ou la note d'une pesée ; son jour ne change pas.
+  Future<void> updateWeight(String petId, String entryId, {required double weightKg, String? note}) => _write(
+        () => _api.put('/api/pets/$petId/weights/$entryId', {'weightKg': weightKg, 'note': note}),
+        () => _weights(petId).doc(entryId).update({
+              'weightKg': weightKg,
+              'note': note == null || note.trim().isEmpty ? null : note.trim(),
+            }),
+      );
+
   Future<void> deleteWeight(String petId, String entryId) => _write(
         () => _api.delete('/api/pets/$petId/weights/$entryId'),
         () => _weights(petId).doc(entryId).delete(),

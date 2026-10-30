@@ -1379,20 +1379,23 @@ class _NotesDialogState extends State<_NotesDialog> {
 }
 
 class _AddWeightDialog extends StatefulWidget {
-  const _AddWeightDialog({required this.petId, required this.repository, this.previous});
+  const _AddWeightDialog({required this.petId, required this.repository, this.previous, this.entry});
 
   final String petId;
   final PetRepository repository;
   final WeightEntry? previous;
+
+  /// Pesée à corriger ; `null` pour en ajouter une.
+  final WeightEntry? entry;
 
   @override
   State<_AddWeightDialog> createState() => _AddWeightDialogState();
 }
 
 class _AddWeightDialogState extends State<_AddWeightDialog> {
-  final _weight = TextEditingController();
-  final _note = TextEditingController();
-  DateTime _date = DateTime.now();
+  late final _weight = TextEditingController(text: widget.entry?.weightKg.toString());
+  late final _note = TextEditingController(text: widget.entry?.note);
+  late DateTime _date = widget.entry?.measuredOn ?? DateTime.now();
   String? _error;
   bool _saving = false;
 
@@ -1452,7 +1455,12 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
       _error = null;
     });
     try {
-      await widget.repository.addWeight(widget.petId, date: _date, weightKg: value, note: _note.text);
+      final entry = widget.entry;
+      if (entry == null) {
+        await widget.repository.addWeight(widget.petId, date: _date, weightKg: value, note: _note.text);
+      } else {
+        await widget.repository.updateWeight(widget.petId, entry.id, weightKg: value, note: _note.text);
+      }
       if (mounted) Navigator.of(context).pop();
     } on DuplicateWeightException {
       setState(() {
@@ -1472,7 +1480,7 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
     final l = AppLocalizations.of(context);
     return AlertDialog(
       backgroundColor: PetColors.surfaceLowest,
-      title: Text(l.petsWeightAdd, style: PetText.headlineSm),
+      title: Text(widget.entry == null ? l.petsWeightAdd : l.petsWeightEdit, style: PetText.headlineSm),
       content: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -1492,12 +1500,13 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
           ),
           const SizedBox(height: 12),
           InkWell(
-            onTap: _pickDate,
+            // Le jour identifie la pesée : une correction ne le change pas.
+            onTap: widget.entry == null ? _pickDate : null,
             borderRadius: BorderRadius.circular(12),
             child: InputDecorator(
               decoration: InputDecoration(
                 labelText: l.petsDate,
-                suffixIcon: const Icon(Icons.calendar_today_outlined, size: 20),
+                suffixIcon: widget.entry == null ? const Icon(Icons.calendar_today_outlined, size: 20) : null,
               ),
               child: Text(formatLongDate(l, _date), style: PetText.bodyLg),
             ),
@@ -1531,6 +1540,12 @@ class _WeightHistorySheet extends StatelessWidget {
 
   /// Animal archivé : l'historique reste consultable, mais plus modifiable.
   final bool readOnly;
+
+  /// [neighbour] est la pesée voisine : elle sert à repérer une correction inhabituelle.
+  Future<void> _edit(BuildContext context, WeightEntry entry, WeightEntry? neighbour) => showDialog<void>(
+        context: context,
+        builder: (_) => _AddWeightDialog(petId: petId, repository: repository, previous: neighbour, entry: entry),
+      );
 
   Future<void> _delete(BuildContext context, WeightEntry entry) async {
     final l = AppLocalizations.of(context);
@@ -1577,7 +1592,7 @@ class _WeightHistorySheet extends StatelessWidget {
             children: [
               Text(l.petsWeightHistory, style: PetText.headlineSm),
               const SizedBox(height: 8),
-              for (final entry in entries)
+              for (final (i, entry) in entries.indexed)
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: const Icon(Icons.scale_outlined, color: PetColors.primary),
@@ -1588,10 +1603,24 @@ class _WeightHistorySheet extends StatelessWidget {
                   ),
                   trailing: readOnly
                       ? null
-                      : IconButton(
-                          tooltip: l.petsWeightDeleteTooltip,
-                          onPressed: () => _delete(context, entry),
-                          icon: const Icon(Icons.delete_outline, color: PetColors.error),
+                      : Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              tooltip: l.petsWeightEdit,
+                              onPressed: () => _edit(
+                                context,
+                                entry,
+                                i + 1 < entries.length ? entries[i + 1] : (i > 0 ? entries[i - 1] : null),
+                              ),
+                              icon: const Icon(Icons.edit_outlined, color: PetColors.primary),
+                            ),
+                            IconButton(
+                              tooltip: l.petsWeightDeleteTooltip,
+                              onPressed: () => _delete(context, entry),
+                              icon: const Icon(Icons.delete_outline, color: PetColors.error),
+                            ),
+                          ],
                         ),
                 ),
             ],

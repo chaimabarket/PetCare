@@ -1286,6 +1286,12 @@ abstract class AppLocalizations {
   /// **'Ajouter une pesée'**
   String get petsWeightAdd;
 
+  /// No description provided for @petsWeightEdit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Corriger la pesée'**
+  String get petsWeightEdit;
+
   /// No description provided for @petsWeightCurrent.
   ///
   /// In fr, this message translates to:

@@ -221,6 +221,25 @@ test('pesées : une par jour, la plus récente d\'abord', async () => {
   });
 });
 
+test('une pesée se corrige sans changer de jour', async () => {
+  await withServer(async (api) => {
+    const { json: pet } = await api('POST', '', body());
+    await api('POST', `/${pet.id}/weights`, weight({ note: 'Avant' }));
+
+    const corrected = await api('PUT', `/${pet.id}/weights/2026-01-10`, { weightKg: 4.2, note: '  ' });
+    assert.strictEqual(corrected.status, 200);
+    assert.strictEqual(corrected.json.weightKg, 4.2);
+    assert.strictEqual(corrected.json.note, null);
+    assert.strictEqual(corrected.json.measuredOn, weight().measuredOn);
+
+    assert.strictEqual((await api('PUT', `/${pet.id}/weights/2026-01-10`, { weightKg: 501 })).status, 400);
+    assert.strictEqual((await api('PUT', `/${pet.id}/weights/2020-01-01`, { weightKg: 4 })).status, 404);
+
+    await api('POST', `/${pet.id}/archive`);
+    assert.strictEqual((await api('PUT', `/${pet.id}/weights/2026-01-10`, { weightKg: 4 })).status, 409);
+  });
+});
+
 test('un animal archivé se lit et se restaure, mais ne se modifie plus', async () => {
   await withServer(async (api) => {
     const { json: pet } = await api('POST', '', body());

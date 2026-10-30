@@ -208,6 +208,7 @@
   "petsWeightSince": "since {month}",
   "petsWeightStable": "Stable {period}",
   "petsWeightAdd": "Add a weigh-in",
+  "petsWeightEdit": "Correct weigh-in",
   "petsWeightCurrent": "(Current)",
   "petsHealthSubtitle": "Vaccines, treatments and history",
   "petsHealthAlertTitle": "Vaccine reminders",
