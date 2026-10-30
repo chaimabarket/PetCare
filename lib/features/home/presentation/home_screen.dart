@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import '../../../core/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../appointments/presentation/widgets/upcoming_appointments_card.dart';
+import '../../health/presentation/widgets/health_home_card.dart';
 import '../../profile/data/profile_repository.dart';
 import '../../profile/data/user_profile.dart';
 import '../../profile/presentation/widgets/user_avatar.dart';
@@ -61,7 +62,9 @@ class _HomeScreenState extends State<HomeScreen> {
               // Module 3 (Rendez-vous) : les 2 prochains rendez-vous et l'agenda.
               UpcomingAppointmentsCard(onOpenTab: widget.onOpenTab),
               const SizedBox(height: 24),
-              // Module 2 (Santé) : afficher ici les vaccins et traitements à venir.
+              // Module 2 (Santé) : vaccins et traitements à venir, carnet de chaque animal.
+              HealthHomeCard(onOpenTab: widget.onOpenTab),
+              const SizedBox(height: 24),
               _SectionCard(
                 icon: Icons.notifications_active_outlined,
                 title: 'Rappels de soins',

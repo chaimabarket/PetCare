@@ -51,6 +51,12 @@ service cloud.firestore {
       match /likedHappyTails/{tailId} {
         allow read, write: if isOwner(userId);
       }
+
+      // Module Santé : fiches santé enregistrées (marque-pages), privées.
+      match /healthBookmarks/{sheetId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && request.resource.data.keys().hasOnly(['createdAt']);
+      }
     }
 
     // ------------------------------------------------------------ Module Adoption
@@ -226,6 +232,95 @@ service cloud.firestore {
           && request.resource.data.weightKg > 0 && request.resource.data.weightKg <= 500
           && request.resource.data.measuredOn <= request.time;
       }
+
+      // Module 2 (Santé) : carnet de santé et traitements, privés au propriétaire de l'animal.
+      // Ces sous-collections ne suivent pas une copie de la fiche vers un adoptant.
+      function optString(d, field, max) {
+        return d.get(field, null) == null || (d[field] is string && d[field].size() <= max);
+      }
+
+      function validHealthEntry(d) {
+        return d.keys().hasOnly(['ownerId', 'type', 'title', 'date', 'description', 'practitioner', 'cost',
+            'vaccineName', 'batchNumber', 'nextReminderAt', 'reminderDone', 'weightKg', 'weightDeltaKg',
+            'attachments', 'createdAt'])
+          && d.ownerId == request.auth.uid
+          && d.type in ['visite', 'vaccin', 'examen', 'allergie', 'note']
+          && d.title is string && d.title.size() > 0 && d.title.size() <= 120
+          // Pas de soin daté dans le futur (une heure de marge pour l'horloge du téléphone).
+          && d.date is timestamp && d.date <= request.time + duration.value(1, 'h')
+          && optString(d, 'description', 1000)
+          && optString(d, 'practitioner', 120)
+          && optString(d, 'vaccineName', 120)
+          && optString(d, 'batchNumber', 60)
+          && (d.get('cost', null) == null || (d.cost is number && d.cost >= 0))
+          && (d.get('nextReminderAt', null) == null || (d.nextReminderAt is timestamp && d.nextReminderAt > d.date))
+          // Un vaccin a toujours un nom et une date de prochain rappel.
+          && (d.type != 'vaccin' || (d.get('vaccineName', null) != null && d.get('nextReminderAt', null) != null))
+          && d.attachments is list && d.attachments.size() <= 3;
+      }
+
+      match /healthEntries/{entryId} {
+        allow read, delete: if petOwner();
+        allow create: if petOwner() && validHealthEntry(request.resource.data);
+        // Seul le bouton « rappel déjà fait » modifie un soin enregistré.
+        allow update: if petOwner()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reminderDone'])
+          && request.resource.data.reminderDone is bool;
+
+        // Pièces jointes (ordonnance, vignette) : octets, 3 au maximum par soin.
+        match /files/{fileId} {
+          allow read, delete: if petOwner();
+          allow create: if petOwner()
+            && fileId in ['0', '1', '2']
+            && request.resource.data.keys().hasOnly(['name', 'mimeType', 'data'])
+            && request.resource.data.name is string && request.resource.data.name.size() <= 200
+            && request.resource.data.mimeType in ['application/pdf', 'image/jpeg', 'image/png', 'image/heic', 'image/webp']
+            && request.resource.data.data is bytes
+            && request.resource.data.data.size() <= 921600;
+        }
+      }
+
+      function validTreatment(d) {
+        return d.keys().hasOnly(['ownerId', 'category', 'name', 'subtitle', 'form', 'practitioner', 'posology',
+            'startDate', 'endDate', 'doseTimes', 'doses', 'stoppedAt', 'stopReason', 'renewalAt',
+            'scheduleNote', 'createdAt'])
+          && d.ownerId == request.auth.uid
+          && d.category is string && d.category.size() > 0 && d.category.size() <= 40
+          && d.name is string && d.name.size() > 0 && d.name.size() <= 120
+          && d.posology is string && d.posology.size() > 0 && d.posology.size() <= 500
+          && d.form in ['comprime', 'gouttes', 'injection', 'pipette', 'autre']
+          && optString(d, 'subtitle', 120)
+          && optString(d, 'practitioner', 120)
+          && optString(d, 'stopReason', 300)
+          && optString(d, 'scheduleNote', 120)
+          && d.startDate is timestamp && d.endDate is timestamp && d.endDate >= d.startDate
+          && d.doseTimes is list && d.doseTimes.size() <= 8
+          && d.doses is list;
+      }
+
+      match /treatments/{treatmentId} {
+        allow read, delete: if petOwner();
+        allow create: if petOwner()
+          && validTreatment(request.resource.data)
+          && request.resource.data.doses.size() == 0
+          && request.resource.data.get('stoppedAt', null) == null;
+        // Noter une prise, ou arrêter un traitement (une seule fois, avec une raison).
+        allow update: if petOwner() && validTreatment(request.resource.data) && (
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['doses'])
+            && request.resource.data.doses.size() == resource.data.doses.size() + 1
+            && resource.data.get('stoppedAt', null) == null)
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stoppedAt', 'stopReason'])
+            && resource.data.get('stoppedAt', null) == null
+            && request.resource.data.stoppedAt == request.time
+            && request.resource.data.get('stopReason', null) != null)
+        );
+      }
+    }
+
+    // Module 2 : fiches santé publiques, publiées par l'administrateur.
+    match /healthSheets/{sheetId} {
+      allow read: if true;
+      allow write: if signedIn() && userRole() == 'admin';
     }
 
     // Module 3 : Rendez-vous et rappels.
