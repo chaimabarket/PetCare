@@ -1,0 +1,22 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "PetCare - Phone Preview",
+      "type": "dart",
+      "request": "launch",
+      "program": "lib/main.dart",
+      "deviceId": "web-server",
+      "flutterMode": "debug",
+      "noDebug": true,
+      "suppressWebServerDeviceBrowserLaunch": true,
+      "toolArgs": [
+        "--web-hostname=localhost",
+        "--web-port=7357"
+      ],
+      "env": {
+        "PATH": "D:\\dev\\flutter\\bin;C:\\Program Files\\Git\\cmd;${env:PATH}"
+      }
+    }
+  ]
+}
