@@ -21,9 +21,9 @@ Pour générer l'APK de démonstration :
 flutter build apk --release
 ```
 
-## API REST (module Utilisateurs)
+## API REST (Utilisateurs, Adoption, Profils des animaux)
 
-Le profil et les notifications passent par une API REST Node.js dans [backend/](backend/README.md) :
+Le profil, les notifications, l'adoption et les animaux passent par une API REST Node.js dans [backend/](backend/README.md) :
 `cd backend && npm install && npm start`, puis lancer l'application. Si le serveur est éteint,
 l'application utilise Firestore directement.
 

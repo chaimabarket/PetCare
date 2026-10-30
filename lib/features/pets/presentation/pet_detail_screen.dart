@@ -1,4 +1,3 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -59,7 +58,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     try {
       await action();
       if (success != null && mounted) _snack(success);
-    } on FirebaseException {
+    } on PetException {
       if (mounted) _snack(error);
     }
   }
@@ -167,14 +166,14 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     );
   }
 
-  void _openWeightHistory() {
+  void _openWeightHistory(Pet pet) {
     if (_weights.isEmpty) return;
     showModalBottomSheet<void>(
       context: context,
       isScrollControlled: true,
       backgroundColor: PetColors.surfaceLowest,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(16))),
-      builder: (_) => _WeightHistorySheet(petId: widget.petId, repository: _repository),
+      builder: (_) => _WeightHistorySheet(petId: widget.petId, repository: _repository, readOnly: pet.isArchived),
     );
   }
 
@@ -287,7 +286,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         if (pet != null) ...[
           IconButton(
             tooltip: pet.favorite ? l.petsFavoriteRemove : l.petsFavoriteAdd,
-            onPressed: () => _run(() => _repository.setFavorite(pet.id, !pet.favorite)),
+            onPressed: pet.isArchived ? null : () => _run(() => _repository.setFavorite(pet.id, !pet.favorite)),
             icon: Icon(pet.favorite ? Icons.favorite : Icons.favorite_border, color: PetColors.secondary),
           ),
           PopupMenuButton<String>(
@@ -306,16 +305,17 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               }
             },
             itemBuilder: (_) => [
-              PopupMenuItem(
-                value: 'edit',
-                child: Row(
-                  children: [
-                    const Icon(Icons.edit_outlined, size: 20, color: PetColors.primary),
-                    const SizedBox(width: 8),
-                    Text(l.petsMenuEdit, style: PetText.labelMd.copyWith(fontSize: 14)),
-                  ],
+              if (!pet.isArchived)
+                PopupMenuItem(
+                  value: 'edit',
+                  child: Row(
+                    children: [
+                      const Icon(Icons.edit_outlined, size: 20, color: PetColors.primary),
+                      const SizedBox(width: 8),
+                      Text(l.petsMenuEdit, style: PetText.labelMd.copyWith(fontSize: 14)),
+                    ],
+                  ),
                 ),
-              ),
               PopupMenuItem(
                 value: pet.isArchived ? 'restore' : 'archive',
                 child: Row(
@@ -649,12 +649,13 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
                         style: PetText.labelMd.copyWith(color: PetColors.secondary, letterSpacing: 0.6),
                       ),
                     ),
-                    IconButton(
-                      tooltip: l.petsNotesEdit,
-                      visualDensity: VisualDensity.compact,
-                      onPressed: () => _editNotes(pet),
-                      icon: const Icon(Icons.edit_outlined, size: 16, color: PetColors.onSurfaceVariant),
-                    ),
+                    if (!pet.isArchived)
+                      IconButton(
+                        tooltip: l.petsNotesEdit,
+                        visualDensity: VisualDensity.compact,
+                        onPressed: () => _editNotes(pet),
+                        icon: const Icon(Icons.edit_outlined, size: 16, color: PetColors.onSurfaceVariant),
+                      ),
                   ],
                 ),
                 Text(
@@ -711,7 +712,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           InkWell(
-            onTap: _openWeightHistory,
+            onTap: () => _openWeightHistory(pet),
             borderRadius: BorderRadius.circular(12),
             child: Row(
               children: [
@@ -942,7 +943,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               const Icon(Icons.contact_phone_outlined, size: 20, color: PetColors.secondary),
               const SizedBox(width: 8),
               Expanded(child: Text(l.petsContactsTitle, style: PetText.headlineSm)),
-              if (pet.contacts.length < 5)
+              if (!pet.isArchived && pet.contacts.length < 5)
                 IconButton(
                   tooltip: l.petsContactAdd,
                   visualDensity: VisualDensity.compact,
@@ -958,7 +959,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
             _ContactTile(
               contact: pet.contacts[i],
               onCall: () => _call(pet.contacts[i].phone),
-              onLongPress: () => _removeContact(pet, i),
+              onLongPress: pet.isArchived ? null : () => _removeContact(pet, i),
             ),
           ],
         ],
@@ -970,17 +971,19 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        FilledButton.icon(
-          onPressed: () => _edit(pet),
-          style: FilledButton.styleFrom(backgroundColor: PetColors.primary, minimumSize: const Size.fromHeight(48)),
-          icon: const Icon(Icons.edit_outlined, size: 20),
-          label: Text(
-            l.petsEditInfo(pet.name),
-            overflow: TextOverflow.ellipsis,
-            style: PetText.labelLg.copyWith(color: Colors.white),
+        if (!pet.isArchived) ...[
+          FilledButton.icon(
+            onPressed: () => _edit(pet),
+            style: FilledButton.styleFrom(backgroundColor: PetColors.primary, minimumSize: const Size.fromHeight(48)),
+            icon: const Icon(Icons.edit_outlined, size: 20),
+            label: Text(
+              l.petsEditInfo(pet.name),
+              overflow: TextOverflow.ellipsis,
+              style: PetText.labelLg.copyWith(color: Colors.white),
+            ),
           ),
-        ),
-        const SizedBox(height: 10),
+          const SizedBox(height: 10),
+        ],
         Row(
           children: [
             Expanded(
@@ -1205,11 +1208,11 @@ class _SpecTile extends StatelessWidget {
 }
 
 class _ContactTile extends StatelessWidget {
-  const _ContactTile({required this.contact, required this.onCall, required this.onLongPress});
+  const _ContactTile({required this.contact, required this.onCall, this.onLongPress});
 
   final PetContact contact;
   final VoidCallback onCall;
-  final VoidCallback onLongPress;
+  final VoidCallback? onLongPress;
 
   String get _initials {
     final parts = contact.name.trim().split(RegExp(r'\s+')).where((p) => p.isNotEmpty).toList();
@@ -1456,7 +1459,7 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
         _saving = false;
         _error = l.petsWeightDuplicate(formatLongDate(l, _date));
       });
-    } on FirebaseException {
+    } on PetException {
       setState(() {
         _saving = false;
         _error = l.petsWeightSaveError;
@@ -1521,13 +1524,17 @@ class _AddWeightDialogState extends State<_AddWeightDialog> {
 }
 
 class _WeightHistorySheet extends StatelessWidget {
-  const _WeightHistorySheet({required this.petId, required this.repository});
+  const _WeightHistorySheet({required this.petId, required this.repository, required this.readOnly});
 
   final String petId;
   final PetRepository repository;
 
+  /// Animal archivé : l'historique reste consultable, mais plus modifiable.
+  final bool readOnly;
+
   Future<void> _delete(BuildContext context, WeightEntry entry) async {
     final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -1545,7 +1552,12 @@ class _WeightHistorySheet extends StatelessWidget {
         ],
       ),
     );
-    if (confirmed == true) await repository.deleteWeight(petId, entry.id);
+    if (confirmed != true) return;
+    try {
+      await repository.deleteWeight(petId, entry.id);
+    } on PetException {
+      messenger.showSnackBar(SnackBar(content: Text(l.petsOpError)));
+    }
   }
 
   @override
@@ -1574,11 +1586,13 @@ class _WeightHistorySheet extends StatelessWidget {
                     [formatLongDate(l, entry.measuredOn), if (entry.note != null) entry.note!].join(' • '),
                     style: PetText.bodySm,
                   ),
-                  trailing: IconButton(
-                    tooltip: l.petsWeightDeleteTooltip,
-                    onPressed: () => _delete(context, entry),
-                    icon: const Icon(Icons.delete_outline, color: PetColors.error),
-                  ),
+                  trailing: readOnly
+                      ? null
+                      : IconButton(
+                          tooltip: l.petsWeightDeleteTooltip,
+                          onPressed: () => _delete(context, entry),
+                          icon: const Icon(Icons.delete_outline, color: PetColors.error),
+                        ),
                 ),
             ],
           );

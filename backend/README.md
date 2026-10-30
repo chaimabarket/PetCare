@@ -69,8 +69,36 @@ Le fil et les fiches d'annonces sont publics : un visiteur sans jeton peut les l
 Les décisions de l'annonceur (en étude, accepter, refuser, retirer, confirmer l'adoption), les signalements et les
 Happy Tails ne sont pas encore dans l'API (étape 2) : l'application les écrit directement dans Firestore.
 
+### Module Profils des animaux
+
+Toutes les routes exigent un jeton ; chaque fiche est privée à son propriétaire. Un animal archivé se lit et se
+restaure, mais toute autre modification renvoie `409`.
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/api/pets` | Mes animaux, récents d'abord ; `?status=active` ou `archived` pour filtrer |
+| POST | `/api/pets` | Crée la fiche : `name`, `species`, `sex`, `birthDate`, `breed`, `birthDateEstimated`, `chipNumber`, `sterilized`, `notes`, `photos` (`[{"data": "<base64>"}]`, 5 images de 750 Ko maximum), `weight` facultatif |
+| GET | `/api/pets/{id}` | Lit une fiche |
+| PUT | `/api/pets/{id}` | Modifie la fiche ; `photos` remplace la galerie dans l'ordre (`{"id": "..."}` garde une photo, `{"data": "..."}` en ajoute une) ; `weight` enregistre la pesée du jour |
+| PATCH | `/api/pets/{id}` | Modifie seulement `notes`, `favorite` ou `contacts` (5 maximum) |
+| POST | `/api/pets/{id}/archive` | Archive l'animal (jamais de suppression, 204) |
+| POST | `/api/pets/{id}/restore` | Restaure l'animal (204) |
+| GET | `/api/pets/{id}/photos` | `[{"id", "data", "sortOrder"}]`, la photo principale d'abord |
+| GET | `/api/pets/{id}/cover` | Photo principale seule, ou `null` |
+| POST | `/api/pets/{id}/photos` | Ajoute `{"data": "<base64>"}` en fin de galerie (`409` au-delà de 5) |
+| DELETE | `/api/pets/{id}/photos/{photoId}` | Supprime une photo et recompacte l'ordre |
+| POST | `/api/pets/{id}/photos/{photoId}/cover` | Choisit la photo principale |
+| GET | `/api/pets/{id}/weights?limit=` | Pesées, la plus récente d'abord |
+| POST | `/api/pets/{id}/weights` | Ajoute une pesée : `date` (AAAA-MM-JJ), `measuredOn` (minuit local en ISO), `weightKg`, `note` (`409` si ce jour a déjà une pesée) |
+| DELETE | `/api/pets/{id}/weights/{entryId}` | Supprime une pesée |
+
+Firestore garde les photos d'animaux en octets (`bytesValue`) ; l'API les échange en base64.
+
+Le blocage des animaux archivés est appliqué par l'API : les écritures directes à Firestore (serveur éteint) ne
+passent pas par ce contrôle, l'application masque alors simplement les actions.
+
 Erreurs : JSON `{"error": "message en français"}` avec le code HTTP `400` (champ invalide), `401` (jeton manquant
-ou expiré), `403` (refusé par les règles), `404`, `409` (profil déjà créé).
+ou expiré), `403` (refusé par les règles), `404`, `409` (état incompatible : profil déjà créé, animal archivé…).
 
 Exemples :
 
@@ -84,9 +112,12 @@ curl -X PUT -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json
 
 ## Côté Flutter
 
-`lib/core/api/api_client.dart` appelle ces routes ; `ProfileRepository`, `NotificationService` et
-`AuthService.register` l'utilisent. Si le serveur est éteint, ils passent directement par Firestore
+`lib/core/api/api_client.dart` appelle ces routes ; `ProfileRepository`, `NotificationService`, `PetRepository`
+et `AuthService.register` l'utilisent. Si le serveur est éteint, ils passent directement par Firestore
 (même résultat, mêmes règles).
+
+Le serveur n'autorise pas les appels d'un navigateur (pas de CORS) : l'API se teste sur l'émulateur ou un téléphone.
+Dans Chrome, l'application passe par Firestore.
 
 L'adresse par défaut est `http://10.0.2.2:3000` : c'est le PC vu depuis l'émulateur Android. Pour un
 téléphone réel sur le même Wi-Fi :

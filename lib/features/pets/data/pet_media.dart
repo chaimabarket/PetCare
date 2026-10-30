@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -17,6 +18,13 @@ class PetPhoto {
       sortOrder: data['sortOrder'] as int? ?? 0,
     );
   }
+
+  /// Photo renvoyée par l'API REST : l'image est en base64.
+  factory PetPhoto.fromJson(Map<String, dynamic> json) => PetPhoto(
+        id: json['id'] as String,
+        bytes: base64Decode(json['data'] as String? ?? ''),
+        sortOrder: json['sortOrder'] as int? ?? 0,
+      );
 
   final String id;
   final Uint8List bytes;
@@ -38,6 +46,14 @@ class WeightEntry {
       note: data['note'] as String?,
     );
   }
+
+  /// Pesée renvoyée par l'API REST : la date est un texte ISO.
+  factory WeightEntry.fromJson(Map<String, dynamic> json) => WeightEntry(
+        id: json['id'] as String,
+        measuredOn: DateTime.parse(json['measuredOn'] as String).toLocal(),
+        weightKg: (json['weightKg'] as num).toDouble(),
+        note: json['note'] as String?,
+      );
 
   final String id;
   final DateTime measuredOn;

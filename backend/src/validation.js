@@ -31,4 +31,4 @@ function role(value) {
   return value;
 }
 
-module.exports = { profileFields, role, ROLES };
+module.exports = { text, profileFields, role, ROLES };

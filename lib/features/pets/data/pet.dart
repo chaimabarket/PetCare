@@ -107,6 +107,28 @@ class Pet {
     );
   }
 
+  /// Fiche renvoyée par l'API REST : mêmes champs, les dates sont des textes ISO.
+  factory Pet.fromJson(Map<String, dynamic> json) => Pet(
+        id: json['id'] as String,
+        ownerId: json['ownerId'] as String? ?? '',
+        name: json['name'] as String? ?? '',
+        species: PetSpecies.fromCode(json['species'] as String?),
+        sex: PetSex.fromCode(json['sex'] as String?),
+        breed: json['breed'] as String?,
+        birthDate: DateTime.tryParse(json['birthDate'] as String? ?? '')?.toLocal(),
+        birthDateEstimated: json['birthDateEstimated'] as bool? ?? false,
+        chipNumber: json['chipNumber'] as String?,
+        sterilized: json['sterilized'] as bool? ?? false,
+        notes: json['notes'] as String?,
+        status: PetStatus.fromCode(json['status'] as String?),
+        favorite: json['favorite'] as bool? ?? false,
+        contacts: [
+          for (final c in (json['contacts'] as List<dynamic>? ?? const []))
+            PetContact.fromMap(Map<String, dynamic>.from(c as Map)),
+        ],
+        createdAt: DateTime.tryParse(json['createdAt'] as String? ?? '')?.toLocal(),
+      );
+
   final String id;
   final String ownerId;
   final String name;
@@ -160,12 +182,17 @@ class PetDraft {
     return trimmed.isEmpty ? null : trimmed;
   }
 
-  Map<String, dynamic> toMap() => {
+  DateTime get _birthDay => DateTime(birthDate.year, birthDate.month, birthDate.day);
+
+  Map<String, dynamic> toMap() => {...toJson(), 'birthDate': Timestamp.fromDate(_birthDay)};
+
+  /// Corps envoyé à l'API REST.
+  Map<String, dynamic> toJson() => {
         'name': name.trim(),
         'species': species.code,
         'sex': sex.code,
         'breed': _clean(breed),
-        'birthDate': Timestamp.fromDate(DateTime(birthDate.year, birthDate.month, birthDate.day)),
+        'birthDate': _birthDay.toUtc().toIso8601String(),
         'birthDateEstimated': birthDateEstimated,
         'chipNumber': _clean(chipNumber),
         'sterilized': sterilized,

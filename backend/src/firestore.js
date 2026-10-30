@@ -24,18 +24,20 @@ function toValue(value) {
     return Number.isInteger(value) ? { integerValue: String(value) } : { doubleValue: value };
   }
   if (value instanceof Date) return { timestampValue: value.toISOString() };
+  if (Buffer.isBuffer(value)) return { bytesValue: value.toString('base64') };
   if (Array.isArray(value)) return { arrayValue: { values: value.map(toValue) } };
   if (typeof value === 'object') return { mapValue: { fields: toFields(value) } };
   throw new Error(`Type non pris en charge : ${typeof value}`);
 }
 
-/** Convertit une valeur Firestore en valeur JavaScript (les dates restent des textes ISO). */
+/** Convertit une valeur Firestore en valeur JavaScript (les dates restent des textes ISO, les octets du base64). */
 function fromValue(value) {
   if ('stringValue' in value) return value.stringValue;
   if ('booleanValue' in value) return value.booleanValue;
   if ('integerValue' in value) return Number(value.integerValue);
   if ('doubleValue' in value) return value.doubleValue;
   if ('timestampValue' in value) return value.timestampValue;
+  if ('bytesValue' in value) return value.bytesValue;
   if ('arrayValue' in value) return (value.arrayValue.values || []).map(fromValue);
   if ('mapValue' in value) return fromFields(value.mapValue.fields || {});
   return null;
@@ -137,7 +139,9 @@ const updateMany = (token, updates) =>
  * Cherche dans la collection [collection]. Avec [parentPath], c'est une sous-collection de ce document ;
  * sans, une collection de premier niveau. Chaque filtre : { field, op: 'EQUAL' | 'IN', value }.
  */
-async function queryCollection(token, parentPath, collection, { where, filters = [], orderBy, limit } = {}) {
+async function queryCollection(
+  token, parentPath, collection, { where, filters = [], orderBy, direction = 'DESCENDING', limit } = {},
+) {
   const all = where ? [{ op: 'EQUAL', ...where }, ...filters] : filters;
   const structuredQuery = { from: [{ collectionId: collection }] };
 
@@ -148,7 +152,7 @@ async function queryCollection(token, parentPath, collection, { where, filters =
   if (wire.length > 1) structuredQuery.where = { compositeFilter: { op: 'AND', filters: wire } };
 
   if (orderBy) {
-    structuredQuery.orderBy = [{ field: { fieldPath: orderBy }, direction: 'DESCENDING' }];
+    structuredQuery.orderBy = [{ field: { fieldPath: orderBy }, direction }];
   }
   if (limit) structuredQuery.limit = limit;
 

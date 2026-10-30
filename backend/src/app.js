@@ -4,6 +4,7 @@ const { requireAuth } = require('./auth');
 const { ApiError, getDocument, writeDocument, updateMany, queryCollection } = require('./firestore');
 const { profileFields, role } = require('./validation');
 const { listingsRouter, applicationsRouter } = require('./adoption/routes');
+const { petsRouter } = require('./pets/routes');
 
 function publicProfile(doc) {
   const { id, fullName, email, city, phone, role: userRole, createdAt } = doc;
@@ -14,7 +15,8 @@ const wrap = (handler) => (req, res, next) => Promise.resolve(handler(req, res))
 
 function createApp() {
   const app = express();
-  app.use(express.json({ limit: '4mb' }));
+  // Une fiche d'animal peut envoyer 5 photos de 750 Ko, soit 5 Mo en base64.
+  app.use(express.json({ limit: '6mb' }));
   app.use((req, res, next) => {
     res.on('finish', () => console.log(`${req.method} ${req.originalUrl} -> ${res.statusCode}`));
     next();
@@ -94,6 +96,7 @@ function createApp() {
   app.use('/api/users/me', me);
   app.use('/api/adoptions', listingsRouter());
   app.use('/api/applications', applicationsRouter());
+  app.use('/api/pets', petsRouter());
   app.use('/api', (_req, _res, next) => next(new ApiError(404, 'Route inconnue.')));
 
   // eslint-disable-next-line no-unused-vars

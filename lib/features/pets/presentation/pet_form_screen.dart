@@ -172,7 +172,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
       if (!mounted) return;
       messenger.showSnackBar(SnackBar(content: Text(l.petsFormSaved(draft.name.trim()))));
       Navigator.of(context).pop();
-    } on FirebaseException {
+    } on PetException {
       if (!mounted) return;
       setState(() => _saving = false);
       messenger.showSnackBar(SnackBar(content: Text(l.petsFormSaveError)));
