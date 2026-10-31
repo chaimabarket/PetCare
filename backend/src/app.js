@@ -10,6 +10,8 @@ const { createAdoptionRepository } = require('./adoption/repository');
 const { createAdoptionService } = require('./adoption/service');
 const { appointmentsRouter, remindersRouter } = require('./appointments/routes');
 const { petsRouter } = require('./pets/routes');
+const { createPetsRepository } = require('./pets/repository');
+const { createPetsService } = require('./pets/service');
 const { providersRouter, bookingsRouter, categoriesRouter } = require('./services/routes');
 const { createServicesRepository } = require('./services/repository');
 const { createServicesService } = require('./services/service');
@@ -32,7 +34,7 @@ function createApp() {
   app.use('/api/applications', applicationsRouter(adoptionService));
   app.use('/api/appointments', appointmentsRouter());
   app.use('/api/reminders', remindersRouter());
-  app.use('/api/pets', petsRouter());
+  app.use('/api/pets', petsRouter(createPetsService(createPetsRepository())));
   const servicesService = createServicesService(createServicesRepository());
   app.use('/api/services/categories', categoriesRouter(servicesService));
   app.use('/api/services/providers', providersRouter(servicesService));
