@@ -19,7 +19,6 @@ class ServicesScreen extends StatefulWidget {
 
 class _ServicesScreenState extends State<ServicesScreen> {
   final _repository = ServiceRepository();
-  late final _categoriesStream = _repository.watchCategories();
   final _searchController = TextEditingController();
   String _category = 'Tous';
   String _city = '';
@@ -115,32 +114,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
           ],
         ),
         const SizedBox(height: 8),
-        StreamBuilder<List<ServiceCategory>>(
-          stream: _categoriesStream,
-          initialData: ServiceCategory.defaults,
-          builder: (context, snapshot) {
-            final categories = snapshot.data ?? ServiceCategory.defaults;
-            return GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              itemCount: categories.length,
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 3,
-                crossAxisSpacing: 9,
-                mainAxisSpacing: 9,
-                childAspectRatio: 1.16,
-              ),
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                return _CategoryTile(
-                  label: category.name,
-                  icon: category.iconData,
-                  selected: _category == category.name,
-                  onTap: () => setState(() => _category = category.name),
-                );
-              },
-            );
-          },
+        _CategoryGrid(
+          repository: _repository,
+          selected: _category,
+          onSelect: (name) => setState(() => _category = name),
         ),
         const SizedBox(height: 14),
         TextField(
@@ -333,6 +310,52 @@ class _ProviderCard extends StatelessWidget {
         ],
       ),
     ),
+  );
+}
+
+/// Grille des catégories. Elle possède son propre flux : dans une liste, le widget peut être retiré puis
+/// recréé quand on fait défiler, et un flux ne s'écoute qu'une fois.
+class _CategoryGrid extends StatefulWidget {
+  const _CategoryGrid({required this.repository, required this.selected, required this.onSelect});
+
+  final ServiceRepository repository;
+  final String selected;
+  final ValueChanged<String> onSelect;
+
+  @override
+  State<_CategoryGrid> createState() => _CategoryGridState();
+}
+
+class _CategoryGridState extends State<_CategoryGrid> {
+  late final _stream = widget.repository.watchCategories();
+
+  @override
+  Widget build(BuildContext context) => StreamBuilder<List<ServiceCategory>>(
+    stream: _stream,
+    initialData: ServiceCategory.defaults,
+    builder: (context, snapshot) {
+      final categories = snapshot.data ?? ServiceCategory.defaults;
+      return GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        itemCount: categories.length,
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 3,
+          crossAxisSpacing: 9,
+          mainAxisSpacing: 9,
+          childAspectRatio: 1.16,
+        ),
+        itemBuilder: (context, index) {
+          final category = categories[index];
+          return _CategoryTile(
+            label: category.name,
+            icon: category.iconData,
+            selected: widget.selected == category.name,
+            onTap: () => widget.onSelect(category.name),
+          );
+        },
+      );
+    },
   );
 }
 
