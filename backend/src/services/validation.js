@@ -47,8 +47,8 @@ function providerFields(body = {}) {
 /** Prestation (`POST` et `PUT /providers/me/services`). */
 function serviceFields(body = {}) {
   const duration = Number(body.durationMinutes);
-  if (!Number.isInteger(duration) || duration < 5 || duration > 480) {
-    throw new ApiError(400, 'La durée doit être comprise entre 5 et 480 minutes.');
+  if (!Number.isInteger(duration) || duration < 5 || duration > 1440) {
+    throw new ApiError(400, 'La durée doit être comprise entre 5 et 1440 minutes (24 h).');
   }
   const price = Number(body.price);
   if (!Number.isFinite(price) || price < 0 || price > 100000) throw new ApiError(400, 'Le prix est invalide.');

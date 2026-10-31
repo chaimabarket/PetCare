@@ -142,7 +142,7 @@ Les annuaires sont publics ; le reste exige un jeton. Un prestataire est identif
 | GET | `/api/services/providers/{id}/services` | Ses prestations publiées (`?all=1` : toutes, pour son propriétaire) |
 | GET | `/api/services/providers/{id}/availability` | `{"1": {"enabled": true, "ranges": [{"start": "09:00", "end": "12:00"}]}}` (1 = lundi … 7 = dimanche) |
 | GET | `/api/services/providers/me/services` | Mes prestations, archivées comprises |
-| POST / PUT | `/api/services/providers/me/services[/{id}]` | Crée ou modifie une prestation : `name`, `category`, `durationMinutes` (5-480), `price`, `status` (`published`, `archived`), `description` |
+| POST / PUT | `/api/services/providers/me/services[/{id}]` | Crée ou modifie une prestation : `name`, `category`, `durationMinutes` (5-1440, une pension se compte à la nuit), `price`, `status` (`published`, `archived`), `description` |
 | PUT | `/api/services/providers/me/availability/{jour}` | `enabled` et `ranges` au format HH:MM |
 | GET | `/api/services/bookings?as=client\|provider` | Mes réservations, ou celles que j'ai reçues |
 | POST | `/api/services/bookings` | Demande de réservation : `providerId`, `serviceId`, `animalName`, `dateTime` (à venir), `notes` |

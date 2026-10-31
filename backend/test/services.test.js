@@ -22,11 +22,11 @@ test('profil prestataire : nom, téléphone et e-mail contrôlés', () => {
   assert.throws(() => V.providerFields(provider({ city: '' })), { status: 400 });
 });
 
-test('prestation : durée entre 5 et 480 min, prix positif, statut connu', () => {
+test('prestation : durée entre 5 et 1440 min, prix positif, statut connu', () => {
   const ok = { name: 'Bain', category: 'Toiletteurs', durationMinutes: 45, price: 35.5, description: '' };
   assert.strictEqual(V.serviceFields(ok).status, 'published');
   assert.throws(() => V.serviceFields({ ...ok, durationMinutes: 2 }), { status: 400 });
-  assert.throws(() => V.serviceFields({ ...ok, durationMinutes: 600 }), { status: 400 });
+  assert.throws(() => V.serviceFields({ ...ok, durationMinutes: 2000 }), { status: 400 });
   assert.throws(() => V.serviceFields({ ...ok, price: -1 }), { status: 400 });
   assert.throws(() => V.serviceFields({ ...ok, status: 'supprime' }), { status: 400 });
 });
