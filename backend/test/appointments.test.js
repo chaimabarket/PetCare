@@ -3,7 +3,7 @@ const assert = require('node:assert');
 
 const R = require('../src/appointments/rules');
 const V = require('../src/appointments/validation');
-const { when } = require('../src/appointments/routes');
+const { when } = require('../src/appointments/service');
 const { createApp } = require('../src/app');
 
 // ---------------------------------------------------------------------------
