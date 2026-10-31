@@ -32,7 +32,6 @@ class _PetFormScreenState extends State<PetFormScreen> {
   late final _weight = TextEditingController(
     text: widget.currentWeight == null ? '' : widget.currentWeight!.weightKg.toString(),
   );
-  late final _chip = TextEditingController(text: widget.pet?.chipNumber);
   late final _notes = TextEditingController(text: widget.pet?.notes);
 
   late PetSpecies _species = widget.pet?.species ?? PetSpecies.dog;
@@ -52,14 +51,14 @@ class _PetFormScreenState extends State<PetFormScreen> {
   @override
   void initState() {
     super.initState();
-    for (final c in [_name, _weight, _chip, _notes]) {
+    for (final c in [_name, _weight, _notes]) {
       c.addListener(() => setState(() {}));
     }
   }
 
   @override
   void dispose() {
-    for (final c in [_name, _breed, _weight, _chip, _notes]) {
+    for (final c in [_name, _breed, _weight, _notes]) {
       c.dispose();
     }
     super.dispose();
@@ -86,12 +85,6 @@ class _PetFormScreenState extends State<PetFormScreen> {
     if (value == null || value <= 0 || value > 500) return l.petsFormWeightError;
     if ((value * 100).roundToDouble() != value * 100) return l.petsFormWeightDecimals;
     return null;
-  }
-
-  String? _chipError(AppLocalizations l) {
-    final chip = _chip.text.trim();
-    if (chip.isEmpty || RegExp(r'^\d{15}$').hasMatch(chip)) return null;
-    return l.petsFormChipError;
   }
 
   Future<void> _pickBirthDate() async {
@@ -135,8 +128,7 @@ class _PetFormScreenState extends State<PetFormScreen> {
     if (_nameError(l) != null ||
         _kindError(l) != null ||
         _birthError(l) != null ||
-        _weightError(l) != null ||
-        _chipError(l) != null) {
+        _weightError(l) != null) {
       messenger.showSnackBar(SnackBar(content: Text(l.petsFormCheckFields)));
       return;
     }
@@ -151,7 +143,8 @@ class _PetFormScreenState extends State<PetFormScreen> {
       birthDate: _birthDate!,
       breed: _breed.text,
       birthDateEstimated: _birthEstimated,
-      chipNumber: _chip.text,
+      // Le formulaire ne saisit plus d'identification : une fiche existante garde la sienne.
+      chipNumber: widget.pet?.chipNumber,
       sterilized: _sterilized,
       notes: _notes.text,
     );
@@ -592,17 +585,6 @@ class _PetFormScreenState extends State<PetFormScreen> {
             child: Text('kg', style: PetText.labelMd.copyWith(color: PetColors.primary)),
           ),
         ),
-        _Field(
-          label: l.petsFormIdentification,
-          optionalLabel: l.petsFormOptional,
-          controller: _chip,
-          hint: l.petsFormChipHint,
-          error: _submitted ? _chipError(l) : null,
-          keyboardType: TextInputType.number,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly, LengthLimitingTextInputFormatter(15)],
-          monospace: true,
-          suffix: const Icon(Icons.qr_code_scanner, size: 22, color: PetColors.onSurfaceVariant),
-        ),
       ],
     );
   }
@@ -797,11 +779,10 @@ class _SectionCard extends StatelessWidget {
 }
 
 class _Label extends StatelessWidget {
-  const _Label({required this.text, this.required = false, this.optionalLabel});
+  const _Label({required this.text, this.required = false});
 
   final String text;
   final bool required;
-  final String? optionalLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -819,7 +800,6 @@ class _Label extends StatelessWidget {
             ),
           ),
         ),
-        if (optionalLabel != null) Text(optionalLabel!, style: PetText.labelSm),
       ],
     );
   }
@@ -845,14 +825,12 @@ class _Field extends StatelessWidget {
     required this.controller,
     required this.hint,
     this.required = false,
-    this.optionalLabel,
     this.help,
     this.error,
     this.suffix,
     this.keyboardType,
     this.inputFormatters,
     this.maxLength,
-    this.monospace = false,
     this.textCapitalization = TextCapitalization.none,
   });
 
@@ -860,14 +838,12 @@ class _Field extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
   final bool required;
-  final String? optionalLabel;
   final String? help;
   final String? error;
   final Widget? suffix;
   final TextInputType? keyboardType;
   final List<TextInputFormatter>? inputFormatters;
   final int? maxLength;
-  final bool monospace;
   final TextCapitalization textCapitalization;
 
   @override
@@ -876,7 +852,7 @@ class _Field extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        _Label(text: label, required: required, optionalLabel: optionalLabel),
+        _Label(text: label, required: required),
         const SizedBox(height: 4),
         TextField(
           controller: controller,
@@ -886,9 +862,8 @@ class _Field extends StatelessWidget {
           textCapitalization: textCapitalization,
           style: PetText.bodyLg.copyWith(
             color: hasError ? PetColors.onErrorContainer : PetColors.onSurface,
-            fontFamily: monospace ? 'monospace' : null,
           ),
-          decoration: _decoration(hint: hint, error: hasError, suffix: suffix, monospace: monospace),
+          decoration: _decoration(hint: hint, error: hasError, suffix: suffix),
         ),
         if (hasError)
           _ErrorText(error!)
