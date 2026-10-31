@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 
 import '../../../core/routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/coming_soon_screen.dart';
 import '../../../core/widgets/language_button.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../community/presentation/community_screen.dart';
@@ -12,6 +11,7 @@ import '../../pets/presentation/my_pets_screen.dart';
 import '../../profile/data/profile_repository.dart';
 import '../../profile/data/user_profile.dart';
 import '../../profile/presentation/widgets/user_avatar.dart';
+import '../../services/presentation/service_directory_screen.dart';
 import 'home_screen.dart';
 
 /// Structure principale après connexion (ou en visiteur) : en-tête + 4 onglets du cahier des charges.
@@ -46,8 +46,8 @@ class _MainShellState extends State<MainShell> {
           const MyPetsScreen(),
           // Modules 4 et 5 : écran « Communauté » (Adoption, Perdus & trouvés, Happy Tails).
           const CommunityScreen(),
-          // Module 6 (Services) : remplacer par l'annuaire des prestataires.
-          const ComingSoonScreen(title: 'Services', embedded: true),
+          // Module 6 : annuaire des prestataires.
+          const ServicesScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(
