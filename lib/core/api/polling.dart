@@ -11,7 +11,7 @@ void notifyApiDataChanged() => _changes.add(null);
 /// Chaque écoute relance sa propre boucle et s'arrête quand l'écouteur se désabonne. Le flux peut donc être
 /// écouté plusieurs fois : une liste détruit puis recrée ses `StreamBuilder` au défilement, avec le même
 /// flux (un flux ordinaire lèverait « Stream has already been listened to »).
-Stream<T> poll<T>(Future<T> Function() fetch, {Duration every = const Duration(seconds: 8)}) {
+Stream<T> poll<T>(Future<T> Function() fetch, {Duration every = const Duration(seconds: 30)}) {
   return Stream<T>.multi((controller) {
     var active = true;
     controller.onCancel = () => active = false;
