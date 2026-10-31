@@ -12,6 +12,11 @@ import '../data/health_repository.dart';
 import 'widgets/health_ui.dart';
 
 /// Suggestions sous « Nom ou Spécialité du vaccin » : libellé de la puce → texte inséré.
+const _visitReasons = ['Contrôle annuel', 'Maladie', 'Blessure', 'Suivi après opération', 'Urgence'];
+const _examTypes = ['Prise de sang', 'Radiographie', 'Échographie', 'Analyse d\'urine', 'Test allergique'];
+const _allergens = ['Poulet', 'Bœuf', 'Pollen', 'Acariens', 'Puces', 'Médicament'];
+const _severities = ['Légère', 'Modérée', 'Sévère'];
+
 const _vaccineSuggestions = [
   ('CHPPiL', 'CHPPiL Rappel Annuel'),
   ('Rage', 'Rabisin (Rage)'),
@@ -46,6 +51,11 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
   var _careDate = dayOf(DateTime.now());
   late DateTime _nextReminder = DateTime(_careDate.year + 1, _careDate.month, _careDate.day);
   var _createAlert = true;
+  final _subject = TextEditingController();
+  var _severity = 'Modérée';
+
+  /// Visite : date du prochain contrôle, ou null s'il n'y en a pas.
+  DateTime? _followUp;
   final _attachments = <PendingAttachment>[];
   var _saving = false;
 
@@ -82,7 +92,7 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
 
   @override
   void dispose() {
-    for (final c in [_vaccineName, _batchNumber, _practitioner, _cost, _description]) {
+    for (final c in [_vaccineName, _batchNumber, _practitioner, _cost, _description, _subject]) {
       c.dispose();
     }
     super.dispose();
@@ -100,6 +110,7 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
     setState(() {
       _careDate = picked;
       if (!_nextReminder.isAfter(picked)) _nextReminder = DateTime(picked.year + 1, picked.month, picked.day);
+      if (_followUp != null && !_followUp!.isAfter(picked)) _followUp = _defaultFollowUp(picked);
     });
   }
 
@@ -112,6 +123,19 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
       helpText: 'Prochain rappel vaccinal',
     );
     if (picked != null) setState(() => _nextReminder = picked);
+  }
+
+  DateTime _defaultFollowUp(DateTime from) => DateTime(from.year, from.month + 1, from.day);
+
+  Future<void> _pickFollowUp() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _followUp ?? _defaultFollowUp(_careDate),
+      firstDate: _careDate.add(const Duration(days: 1)),
+      lastDate: DateTime(_careDate.year + 5, 12, 31),
+      helpText: 'Prochain contrôle',
+    );
+    if (picked != null) setState(() => _followUp = picked);
   }
 
   void _appendNote(String note) {
@@ -190,18 +214,13 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
   (String, String?) _titleAndBody() {
     final text = _description.text.trim();
     if (_type == HealthEntryType.vaccine) return (_vaccineName.text.trim(), text.isEmpty ? null : text);
-    final fallback = switch (_type) {
-      HealthEntryType.visit => 'Visite vétérinaire',
-      HealthEntryType.exam => 'Examen',
-      HealthEntryType.allergy => 'Allergie',
-      _ => 'Note',
-    };
-    if (text.isEmpty) return (fallback, null);
-    final match = RegExp(r'^(.{3,90}?[.!?])(\s|$)|^(.{3,90})\n').firstMatch(text);
-    final first = (match?.group(1) ?? match?.group(3))?.trim();
-    if (first == null) return (text.length <= 90 ? text : fallback, text.length <= 90 ? null : text);
-    final rest = text.substring(match!.end).trim();
-    return (first.replaceFirst(RegExp(r'\.$'), ''), rest.isEmpty ? null : rest);
+    // Les autres types ont leur propre champ : motif, type d'examen, allergène ou titre de la note.
+    final title = _subject.text.trim();
+    if (_type == HealthEntryType.allergy) {
+      final severity = 'Gravité : $_severity';
+      return (title, text.isEmpty ? severity : '$severity\n$text');
+    }
+    return (title, text.isEmpty ? null : text);
   }
 
   Future<void> _save() async {
@@ -223,14 +242,24 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
         cost: cost,
         vaccineName: _vaccineName.text,
         batchNumber: _batchNumber.text,
-        nextReminderAt: _type == HealthEntryType.vaccine ? _nextReminder : null,
+        nextReminderAt: switch (_type) {
+          HealthEntryType.vaccine => _nextReminder,
+          HealthEntryType.visit => _followUp,
+          _ => null,
+        },
         weightKg: _weightAdded ? _latestWeight : null,
         weightDeltaKg: _weightAdded && _latestWeight != null && _previousWeight != null
             ? _latestWeight! - _previousWeight!
             : null,
         attachments: _attachments,
       );
-      if (_type == HealthEntryType.vaccine && _createAlert) await _createAgendaAlert(title);
+      if (_createAlert) {
+        if (_type == HealthEntryType.vaccine) {
+          await _createAgendaAlert('Rappel vaccin : $title', _nextReminder);
+        } else if (_type == HealthEntryType.visit && _followUp != null) {
+          await _createAgendaAlert('Contrôle : $title', _followUp!);
+        }
+      }
       if (mounted) Navigator.of(context).pop(true);
     } catch (e) {
       if (mounted) {
@@ -241,16 +270,16 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
   }
 
   /// « Créer une alerte dans l'agenda » : un rappel du module 3, le jour du rappel à 9 h.
-  Future<void> _createAgendaAlert(String vaccine) async {
+  Future<void> _createAgendaAlert(String alertTitle, DateTime due) async {
     try {
       await ReminderRepository().create(
         petName: _pet?.name ?? '',
         petBreed: _pet?.breed,
-        title: 'Rappel vaccin : $vaccine',
+        title: alertTitle,
         description: _practitioner.text.trim().isEmpty ? null : _practitioner.text.trim(),
         detail: 'Carnet de santé',
         category: ReminderCategory.vet,
-        dueAt: DateTime(_nextReminder.year, _nextReminder.month, _nextReminder.day, 9),
+        dueAt: DateTime(due.year, due.month, due.day, 9),
       );
     } catch (_) {
       // Le soin est enregistré ; seule l'alerte a échoué.
@@ -260,7 +289,6 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isVaccine = _type == HealthEntryType.vaccine;
     return Scaffold(
       backgroundColor: HealthColors.surface,
       appBar: const HealthAppBar(title: 'Ajouter Un Soin Médical'),
@@ -299,17 +327,21 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
                     runSpacing: 8,
                     children: [
                       for (final t in HealthEntryType.values)
-                        _TypePill(type: t, selected: t == _type, onTap: () => setState(() => _type = t)),
+                        _TypePill(
+                          type: t,
+                          selected: t == _type,
+                          onTap: () => setState(() {
+                            if (t != _type) _subject.clear();
+                            _type = t;
+                          }),
+                        ),
                     ],
                   ),
                 ],
               ),
             ),
             const SizedBox(height: 16),
-            Opacity(
-              opacity: isVaccine ? 1 : 0.4,
-              child: IgnorePointer(ignoring: !isVaccine, child: _vaccineSection(isVaccine)),
-            ),
+            _typeSection(),
             const SizedBox(height: 16),
             _detailsSection(),
             const SizedBox(height: 16),
@@ -323,6 +355,186 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
   }
 
   Widget _section({required Widget child}) => HealthCard(child: child);
+
+  /// Bloc propre au type d'acte : vaccin, visite, examen, allergie ou note libre.
+  Widget _typeSection() => switch (_type) {
+        HealthEntryType.vaccine => _vaccineSection(true),
+        HealthEntryType.visit => _subjectSection(
+            icon: Symbols.stethoscope,
+            title: 'Visite vétérinaire',
+            subtitle: 'Le motif de la consultation et le prochain contrôle',
+            label: 'Motif de la visite',
+            hint: 'Ex: Contrôle annuel, boiterie...',
+            error: 'Indiquez le motif de la visite.',
+            suggestions: _visitReasons,
+            extra: [const SizedBox(height: 16), _followUpCard()],
+          ),
+        HealthEntryType.exam => _subjectSection(
+            icon: Symbols.radiology,
+            title: "Détails de l'examen",
+            subtitle: 'Le type d\'examen ; le résultat va dans les observations',
+            label: "Type d'examen",
+            hint: 'Ex: Prise de sang, Radiographie...',
+            error: "Indiquez le type d'examen.",
+            suggestions: _examTypes,
+          ),
+        HealthEntryType.allergy => _subjectSection(
+            icon: Symbols.warning,
+            title: 'Allergie ou sensibilité',
+            subtitle: "Ce qui provoque la réaction et sa gravité",
+            label: 'Allergène ou réaction',
+            hint: 'Ex: Poulet, pollen, piqûres de puces...',
+            error: "Indiquez l'allergène ou la réaction.",
+            suggestions: _allergens,
+            extra: [const SizedBox(height: 16), _severityPicker()],
+          ),
+        HealthEntryType.note => _subjectSection(
+            icon: Symbols.edit_note,
+            title: 'Note libre',
+            subtitle: 'Un titre court pour retrouver la note dans le carnet',
+            label: 'Titre de la note',
+            hint: 'Ex: Changement de croquettes',
+            error: 'Donnez un titre à la note.',
+            suggestions: const [],
+          ),
+      };
+
+  /// Carte avec un champ principal (qui devient le titre dans le carnet) et des suggestions.
+  Widget _subjectSection({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    required String label,
+    required String hint,
+    required String error,
+    required List<String> suggestions,
+    List<Widget> extra = const [],
+  }) {
+    return _section(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Container(
+                width: 32,
+                height: 32,
+                decoration: const BoxDecoration(color: HealthColors.primaryFixed, shape: BoxShape.circle),
+                child: Icon(icon, size: 18, color: HealthColors.onPrimaryFixed),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: HealthText.headlineSm),
+                    Text(subtitle, style: HealthText.bodySm),
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          HealthFieldLabel(label, required: true),
+          TextFormField(
+            controller: _subject,
+            textCapitalization: TextCapitalization.sentences,
+            maxLength: 120,
+            buildCounter: _noCounter,
+            decoration: healthInputDecoration(hint: hint, suffixIcon: icon),
+            validator: (v) => (v ?? '').trim().isEmpty ? error : null,
+          ),
+          if (suggestions.isNotEmpty) ...[
+            const SizedBox(height: 8),
+            Wrap(
+              spacing: 6,
+              runSpacing: 6,
+              children: [for (final value in suggestions) _SmallChip(label: value, onTap: () => _subject.text = value)],
+            ),
+          ],
+          ...extra,
+        ],
+      ),
+    );
+  }
+
+  /// Visite : « Planifier un prochain contrôle », avec une alerte facultative dans l'agenda.
+  Widget _followUpCard() {
+    final date = _followUp;
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(color: HealthColors.surfaceLow, borderRadius: BorderRadius.circular(12)),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              const Icon(Symbols.event_repeat, size: 18, color: HealthColors.primary),
+              const SizedBox(width: 6),
+              const Expanded(child: HealthFieldLabel('Planifier un prochain contrôle')),
+              Switch(
+                value: date != null,
+                onChanged: (on) => setState(() => _followUp = on ? _defaultFollowUp(_careDate) : null),
+                activeTrackColor: HealthColors.primaryContainer,
+                activeThumbColor: Colors.white,
+              ),
+            ],
+          ),
+          if (date != null) ...[
+            const SizedBox(height: 8),
+            _DateField(
+              text: formatSlashDate(date),
+              icon: Symbols.calendar_month,
+              iconColor: HealthColors.primary,
+              fill: Colors.white,
+              onTap: _pickFollowUp,
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Symbols.notifications_active, size: 18, color: HealthColors.onSurfaceVariant),
+                const SizedBox(width: 8),
+                const Expanded(
+                  child: Text(
+                    "Créer une alerte dans l'agenda",
+                    style: TextStyle(fontSize: 14, color: HealthColors.onSurface),
+                  ),
+                ),
+                Switch(
+                  value: _createAlert,
+                  onChanged: (v) => setState(() => _createAlert = v),
+                  activeTrackColor: HealthColors.primaryContainer,
+                  activeThumbColor: Colors.white,
+                ),
+              ],
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
+  /// Allergie : gravité de la réaction (enregistrée en tête des observations).
+  Widget _severityPicker() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const HealthFieldLabel('Gravité de la réaction', required: true),
+        Wrap(
+          spacing: 8,
+          children: [
+            for (final level in _severities)
+              ChoiceChip(
+                label: Text(level),
+                selected: _severity == level,
+                onSelected: (_) => setState(() => _severity = level),
+                selectedColor: HealthColors.primaryFixed,
+              ),
+          ],
+        ),
+      ],
+    );
+  }
 
   Widget _vaccineSection(bool active) {
     return Container(
@@ -468,7 +680,7 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
         children: [
           const Text('Détails de la consultation', style: HealthText.headlineSm),
           const SizedBox(height: 16),
-          const HealthFieldLabel("Date d'administration", required: true),
+          HealthFieldLabel(_type == HealthEntryType.vaccine ? "Date d'administration" : 'Date du soin', required: true),
           _DateField(text: formatCareDate(_careDate), icon: Symbols.today, onTap: _pickCareDate),
           const SizedBox(height: 16),
           HealthFieldLabel('Vétérinaire ou clinique', required: needsPractitioner, optional: !needsPractitioner),
