@@ -22,15 +22,18 @@ class ApiClient {
 
   Future<dynamic> get(String path) => _send('GET', path);
 
-  Future<dynamic> post(String path, [Map<String, dynamic>? body]) => _send('POST', path, body);
+  /// [timeout] : à allonger pour un envoi de photos, sinon une écriture lente passerait pour un serveur éteint.
+  Future<dynamic> post(String path, [Map<String, dynamic>? body, Duration timeout = _timeout]) =>
+      _send('POST', path, body, timeout);
 
-  Future<dynamic> put(String path, Map<String, dynamic> body) => _send('PUT', path, body);
+  Future<dynamic> put(String path, Map<String, dynamic> body, {Duration timeout = _timeout}) =>
+      _send('PUT', path, body, timeout);
 
   Future<dynamic> delete(String path) => _send('DELETE', path);
 
   Future<dynamic> patch(String path, [Map<String, dynamic>? body]) => _send('PATCH', path, body);
 
-  Future<dynamic> _send(String method, String path, [Map<String, dynamic>? body]) async {
+  Future<dynamic> _send(String method, String path, [Map<String, dynamic>? body, Duration timeout = _timeout]) async {
     final request = http.Request(method, Uri.parse('$baseUrl$path'))
       ..headers['Content-Type'] = 'application/json';
     // Un visiteur n'a pas de jeton : le serveur ne lui sert que les routes publiques.
@@ -40,7 +43,7 @@ class ApiClient {
 
     final http.Response response;
     try {
-      response = await http.Response.fromStream(await _client.send(request).timeout(_timeout));
+      response = await http.Response.fromStream(await _client.send(request).timeout(timeout));
     } on Exception {
       // Serveur éteint, mauvaise adresse ou pas de réseau.
       throw const ApiException.unreachable();

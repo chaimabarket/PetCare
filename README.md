@@ -35,9 +35,9 @@ Pour générer l'APK de démonstration :
 flutter build apk --release
 ```
 
-## API REST (module Utilisateurs)
+## API REST (Utilisateurs, Adoption, Profils des animaux)
 
-Le profil et les notifications passent par une API REST Node.js dans [backend/](backend/README.md) :
+Le profil, les notifications, l'adoption et les animaux passent par une API REST Node.js dans [backend/](backend/README.md) :
 `cd backend && npm install && npm start`, puis lancer l'application. Si le serveur est éteint,
 l'application utilise Firestore directement.
 
@@ -61,8 +61,37 @@ lib/
     profile/       Mon profil, modification du profil
     notifications/ notifications dans l'application
     home/          Accueil et barre de navigation (4 onglets)
+    pets/          Mes animaux, fiche animal, ajout / modification, archivage
     appointments/  agenda, rendez-vous, rappels (module 3)
 ```
+
+## Langues (français / anglais)
+
+L'utilisateur choisit la langue avec le bouton 🌐 de l'en-tête ; le choix est mémorisé sur l'appareil (`LocaleController`). Les textes sont dans `lib/l10n/app_fr.arb` (modèle) et `lib/l10n/app_en.arb`, générés par `flutter gen-l10n` (automatique avec `flutter pub get` / `flutter run`).
+
+Pour traduire un écran : ajouter la clé dans les deux fichiers `.arb`, puis
+
+```dart
+final l = AppLocalizations.of(context);
+Text(l.maCle)
+```
+
+## Module Profils des animaux (branche `animals`)
+
+Maquettes utilisées : `designs/animals/` (copie des écrans Stitch du module 1).
+
+- Liste « Mes animaux » (actifs / archivés, recherche, tri), état vide, fiche animal, formulaire d'ajout et de modification, archivage.
+- Fiche `pets/{petId}` : `ownerId`, `name`, `species`, `sex`, `breed`, `birthDate`, `birthDateEstimated`, `chipNumber`, `sterilized`, `notes`, `status` (`active` / `archived`), `favorite`, `contacts`.
+- Photos `pets/{petId}/photos/{id}` : image compressée stockée dans Firestore (plan Spark, pas de Cloud Storage), 5 au maximum, `sortOrder` 0 = photo principale.
+- Pesées `pets/{petId}/weights/{AAAA-MM-JJ}` : une par jour, le poids courant est la pesée la plus récente.
+
+Lire les animaux de l'utilisateur depuis un autre module (santé, rendez-vous, adoption…) :
+
+```dart
+PetRepository().watchMine(uid) // Stream<List<Pet>>, filtrer sur !pet.isArchived pour les actifs
+```
+
+Pour bloquer l'archivage tant qu'un rendez-vous ou une annonce est ouvert, passer des `ArchiveBlocker` à `showArchivePetDialog` (voir `pet_detail_screen.dart`, méthode `_archive`).
 
 ## Module Utilisateurs (branche `Users`)
 
