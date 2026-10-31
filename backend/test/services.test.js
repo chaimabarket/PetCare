@@ -58,3 +58,16 @@ test('statuts acceptés', () => {
   assert.throws(() => V.oneOf('actif', V.PROVIDER_STATUSES, 'Le statut'), { status: 400 });
   assert.ok(V.BOOKING_STATUSES.includes('cancelled'));
 });
+
+const { categoryFields, DEFAULT_CATEGORIES } = require('../src/services/categories');
+
+test('catégorie : nom de 2 à 40 caractères et icône connue', () => {
+  assert.deepStrictEqual(categoryFields({ name: ' Pharmacies ', icon: 'pharmacie' }), { name: 'Pharmacies', icon: 'pharmacie' });
+  assert.strictEqual(categoryFields({ name: 'Éducateurs' }).icon, 'autre');
+  assert.throws(() => categoryFields({ name: 'x' }), { status: 400 });
+  assert.throws(() => categoryFields({ name: 'Ok ok', icon: 'inconnue' }), { status: 400 });
+});
+
+test('les catégories par défaut sont les six historiques', () => {
+  assert.deepStrictEqual(DEFAULT_CATEGORIES.map((c) => c.name), ['Vétérinaires', 'Toiletteurs', 'Promeneurs', 'Pensions', 'Boutiques', 'Autres']);
+});

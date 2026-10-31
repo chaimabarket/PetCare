@@ -6,14 +6,8 @@ import '../../../core/theme/app_colors.dart';
 import '../data/service_models.dart';
 import '../data/service_repository.dart';
 
-const _providerCategories = [
-  'Vétérinaires',
-  'Toiletteurs',
-  'Promeneurs',
-  'Pensions',
-  'Boutiques',
-  'Autres',
-];
+/// Catégories proposées dans les formulaires : celles de la base, lues par l'annuaire.
+List<String> get _providerCategories => ServiceCategory.knownNames;
 const _dayNames = [
   'Lundi',
   'Mardi',
@@ -500,7 +494,8 @@ Future<void> _showServiceEditor(
                     initialValue: category,
                     decoration: const InputDecoration(labelText: 'Catégorie'),
                     items: [
-                      for (final value in _providerCategories)
+                      // Une catégorie supprimée depuis reste choisie pour les prestations qui l'utilisent.
+                      for (final value in {..._providerCategories, category})
                         DropdownMenuItem(value: value, child: Text(value)),
                     ],
                     onChanged: (value) =>
@@ -1060,12 +1055,141 @@ class ServicesAdminScreen extends StatelessWidget {
                       }
                     },
                   ),
+              const SizedBox(height: 22),
+              _AdminCategoriesCard(repository: repository),
             ],
           );
         },
       ),
     );
   }
+}
+
+/// Catégories de l'annuaire : l'administrateur en ajoute ou en supprime.
+class _AdminCategoriesCard extends StatefulWidget {
+  const _AdminCategoriesCard({required this.repository});
+
+  final ServiceRepository repository;
+
+  @override
+  State<_AdminCategoriesCard> createState() => _AdminCategoriesCardState();
+}
+
+class _AdminCategoriesCardState extends State<_AdminCategoriesCard> {
+  static const _icons = [
+    'veterinaire', 'toilettage', 'promenade', 'pension', 'boutique', 'education', 'pharmacie', 'transport', 'autre',
+  ];
+
+  late final _stream = widget.repository.watchCategories();
+  final _name = TextEditingController();
+  String _icon = 'autre';
+  bool _busy = false;
+
+  @override
+  void dispose() {
+    _name.dispose();
+    super.dispose();
+  }
+
+  Future<void> _run(Future<void> Function() action) async {
+    setState(() => _busy = true);
+    try {
+      await action();
+    } catch (error) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Action impossible : $error')));
+      }
+    } finally {
+      if (mounted) setState(() => _busy = false);
+    }
+  }
+
+  Future<void> _add() async {
+    final name = _name.text.trim();
+    if (name.length < 2) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Le nom doit contenir au moins 2 caractères.')),
+      );
+      return;
+    }
+    await _run(() async {
+      await widget.repository.addCategory(name, _icon);
+      _name.clear();
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) => Container(
+    padding: const EdgeInsets.all(18),
+    decoration: BoxDecoration(color: AppColors.surface, borderRadius: BorderRadius.circular(16)),
+    child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text("Catégories de l'annuaire", style: TextStyle(fontSize: 20, fontWeight: FontWeight.w700)),
+        const SizedBox(height: 4),
+        const Text(
+          'Les professionnels sont classés dans ces catégories.',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
+        const SizedBox(height: 12),
+        StreamBuilder<List<ServiceCategory>>(
+          stream: _stream,
+          initialData: ServiceCategory.defaults,
+          builder: (context, snapshot) {
+            final categories = snapshot.data ?? ServiceCategory.defaults;
+            return Column(
+              children: [
+                for (final category in categories)
+                  ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    leading: Icon(category.iconData, color: AppColors.teal),
+                    title: Text(category.name),
+                    // Les catégories par défaut ne sont pas encore dans la base : rien à supprimer.
+                    trailing: identical(categories, ServiceCategory.defaults)
+                        ? null
+                        : IconButton(
+                            tooltip: 'Supprimer',
+                            icon: const Icon(Icons.delete_outline),
+                            onPressed: _busy ? null : () => _run(() => widget.repository.deleteCategory(category.id)),
+                          ),
+                  ),
+              ],
+            );
+          },
+        ),
+        const Divider(),
+        Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _name,
+                maxLength: 40,
+                decoration: const InputDecoration(labelText: 'Nouvelle catégorie', counterText: ''),
+              ),
+            ),
+            const SizedBox(width: 10),
+            DropdownButton<String>(
+              value: _icon,
+              onChanged: (value) => setState(() => _icon = value ?? 'autre'),
+              items: [
+                for (final key in _icons)
+                  DropdownMenuItem(value: key, child: Icon(serviceCategoryIcon(key), color: AppColors.teal)),
+              ],
+            ),
+          ],
+        ),
+        const SizedBox(height: 10),
+        Align(
+          alignment: Alignment.centerRight,
+          child: FilledButton.icon(
+            onPressed: _busy ? null : _add,
+            icon: const Icon(Icons.add),
+            label: const Text('Ajouter'),
+          ),
+        ),
+      ],
+    ),
+  );
 }
 
 class _AdminProviderCard extends StatelessWidget {

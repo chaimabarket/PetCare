@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart' show IconData, Icons;
 
 /// Date venue de Firestore (`Timestamp`) ou de l'API REST (texte ISO).
 DateTime? _toDate(Object? value) {
@@ -6,6 +7,57 @@ DateTime? _toDate(Object? value) {
   if (value is String) return DateTime.tryParse(value)?.toLocal();
   return null;
 }
+
+/// Catégorie de l'annuaire (Vétérinaires, Toiletteurs…), gérée par l'administrateur.
+class ServiceCategory {
+  const ServiceCategory({required this.id, required this.name, required this.icon, required this.order});
+
+  factory ServiceCategory.fromData(String id, Map<String, dynamic> data) => ServiceCategory(
+    id: id,
+    name: data['name'] as String? ?? '',
+    icon: data['icon'] as String? ?? 'autre',
+    order: (data['order'] as num?)?.toInt() ?? 99,
+  );
+
+  factory ServiceCategory.fromJson(Map<String, dynamic> json) =>
+      ServiceCategory.fromData(json['id'] as String? ?? '', json);
+
+  final String id;
+  final String name;
+
+  /// Clé d'icône : `veterinaire`, `toilettage`, `promenade`, `pension`, `boutique`, `education`, `pharmacie`, `transport`, `autre`.
+  final String icon;
+  final int order;
+
+  IconData get iconData => serviceCategoryIcon(icon);
+
+  /// Catégories proposées tant que l'administrateur n'en a pas enregistré (identiques à celles du serveur).
+  static const defaults = [
+    ServiceCategory(id: 'veterinaires', name: 'Vétérinaires', icon: 'veterinaire', order: 1),
+    ServiceCategory(id: 'toiletteurs', name: 'Toiletteurs', icon: 'toilettage', order: 2),
+    ServiceCategory(id: 'promeneurs', name: 'Promeneurs', icon: 'promenade', order: 3),
+    ServiceCategory(id: 'pensions', name: 'Pensions', icon: 'pension', order: 4),
+    ServiceCategory(id: 'boutiques', name: 'Boutiques', icon: 'boutique', order: 5),
+    ServiceCategory(id: 'autres', name: 'Autres', icon: 'autre', order: 99),
+  ];
+
+  /// Noms des catégories connus, mis à jour à chaque lecture : les formulaires du prestataire s'en servent.
+  static List<String> knownNames = [for (final c in defaults) c.name];
+}
+
+/// Icône d'une catégorie ; une clé inconnue donne l'icône par défaut.
+IconData serviceCategoryIcon(String key) => switch (key) {
+  'veterinaire' => Icons.medical_services_outlined,
+  'toilettage' => Icons.content_cut_rounded,
+  'promenade' => Icons.directions_walk_rounded,
+  'pension' => Icons.hotel_outlined,
+  'boutique' => Icons.storefront_outlined,
+  'education' => Icons.school_outlined,
+  'pharmacie' => Icons.local_pharmacy_outlined,
+  'transport' => Icons.local_taxi_outlined,
+  'autre' => Icons.more_horiz_rounded,
+  _ => Icons.pets_outlined,
+};
 
 class ServiceProvider {
   const ServiceProvider({

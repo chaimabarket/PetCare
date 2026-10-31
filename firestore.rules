@@ -439,6 +439,19 @@ service cloud.firestore {
       }
     }
 
+    // Catégories de l'annuaire : lues par tout le monde, gérées par l'administrateur.
+    match /serviceCategories/{categoryId} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['name', 'icon', 'order', 'updatedAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 40
+        && request.resource.data.icon is string
+        && request.resource.data.order is int;
+      allow delete: if isAdmin();
+    }
+
     // Booking details are private to the customer and provider; providers cannot create bookings.
     match /serviceBookings/{bookingId} {
       allow read: if signedIn()

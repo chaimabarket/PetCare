@@ -10,15 +10,6 @@ import '../data/service_repository.dart';
 import 'provider_screens.dart';
 import 'service_detail_screen.dart';
 
-const _categories = <(String, IconData)>[
-  ('Vétérinaires', Icons.medical_services_outlined),
-  ('Toiletteurs', Icons.content_cut_rounded),
-  ('Promeneurs', Icons.directions_walk_rounded),
-  ('Pensions', Icons.hotel_outlined),
-  ('Boutiques', Icons.storefront_outlined),
-  ('Autres', Icons.more_horiz_rounded),
-];
-
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
 
@@ -28,6 +19,7 @@ class ServicesScreen extends StatefulWidget {
 
 class _ServicesScreenState extends State<ServicesScreen> {
   final _repository = ServiceRepository();
+  late final _categoriesStream = _repository.watchCategories();
   final _searchController = TextEditingController();
   String _category = 'Tous';
   String _city = '';
@@ -123,23 +115,30 @@ class _ServicesScreenState extends State<ServicesScreen> {
           ],
         ),
         const SizedBox(height: 8),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          itemCount: _categories.length,
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 3,
-            crossAxisSpacing: 9,
-            mainAxisSpacing: 9,
-            childAspectRatio: 1.16,
-          ),
-          itemBuilder: (context, index) {
-            final category = _categories[index];
-            return _CategoryTile(
-              label: category.$1,
-              icon: category.$2,
-              selected: _category == category.$1,
-              onTap: () => setState(() => _category = category.$1),
+        StreamBuilder<List<ServiceCategory>>(
+          stream: _categoriesStream,
+          initialData: ServiceCategory.defaults,
+          builder: (context, snapshot) {
+            final categories = snapshot.data ?? ServiceCategory.defaults;
+            return GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: categories.length,
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 3,
+                crossAxisSpacing: 9,
+                mainAxisSpacing: 9,
+                childAspectRatio: 1.16,
+              ),
+              itemBuilder: (context, index) {
+                final category = categories[index];
+                return _CategoryTile(
+                  label: category.name,
+                  icon: category.iconData,
+                  selected: _category == category.name,
+                  onTap: () => setState(() => _category = category.name),
+                );
+              },
             );
           },
         ),

@@ -69,6 +69,22 @@ class ServiceRepository {
 
   // ---------------------------------------------------------------- Lectures
 
+  /// Catégories de l'annuaire, dans l'ordre d'affichage ; les six historiques tant que la base est vide.
+  Stream<List<ServiceCategory>> watchCategories() => poll(
+    () async {
+      final categories = await _read(
+        () async => _list(await _api.get('$_base/categories'), ServiceCategory.fromJson),
+        () async {
+          final snapshot = await _firestore.collection('serviceCategories').orderBy('order').get();
+          return [for (final d in snapshot.docs) ServiceCategory.fromData(d.id, d.data())];
+        },
+      );
+      final result = categories.isEmpty ? ServiceCategory.defaults : categories;
+      ServiceCategory.knownNames = [for (final c in result) c.name];
+      return result;
+    },
+  );
+
   Stream<List<ServiceProvider>> watchPublishedProviders() => poll(
     () => _read(
       () async => _list(await _api.get('$_base/providers'), ServiceProvider.fromJson),
@@ -168,6 +184,30 @@ class ServiceRepository {
   }
 
   // ---------------------------------------------------------------- Écritures
+
+  /// Ajoute une catégorie (administrateur).
+  Future<void> addCategory(String name, String icon) => _write(
+    () => _api.post('$_base/categories', {'name': name, 'icon': icon}),
+    () async {
+      final snapshot = await _firestore.collection('serviceCategories').get();
+      final orders = [
+        for (final d in snapshot.docs)
+          if (((d.data()['order'] as num?)?.toInt() ?? 99) < 99) (d.data()['order'] as num?)?.toInt() ?? 0,
+      ];
+      await _firestore.collection('serviceCategories').add({
+        'name': name.trim(),
+        'icon': icon,
+        'order': orders.isEmpty ? 1 : orders.reduce((a, b) => a > b ? a : b) + 1,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+    },
+  );
+
+  /// Supprime une catégorie (administrateur) ; les prestataires déjà classés dedans gardent leur texte.
+  Future<void> deleteCategory(String id) => _write(
+    () => _api.delete('$_base/categories/$id'),
+    () => _firestore.collection('serviceCategories').doc(id).delete(),
+  );
 
   Future<void> saveProvider(ServiceProvider provider) => _write(
     () => _api.put('$_base/providers/me', {
