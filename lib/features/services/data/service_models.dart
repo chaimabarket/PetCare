@@ -1,5 +1,12 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Date venue de Firestore (`Timestamp`) ou de l'API REST (texte ISO).
+DateTime? _toDate(Object? value) {
+  if (value is Timestamp) return value.toDate();
+  if (value is String) return DateTime.tryParse(value)?.toLocal();
+  return null;
+}
+
 class ServiceProvider {
   const ServiceProvider({
     required this.id,
@@ -17,11 +24,19 @@ class ServiceProvider {
 
   factory ServiceProvider.fromDocument(
     DocumentSnapshot<Map<String, dynamic>> document,
-  ) {
-    final data = document.data() ?? const <String, dynamic>{};
+  ) => ServiceProvider.fromData(
+    document.id,
+    document.data() ?? const <String, dynamic>{},
+  );
+
+  /// Prestataire renvoyé par l'API REST (`GET /api/services/providers`).
+  factory ServiceProvider.fromJson(Map<String, dynamic> json) =>
+      ServiceProvider.fromData(json['id'] as String? ?? '', json);
+
+  factory ServiceProvider.fromData(String id, Map<String, dynamic> data) {
     return ServiceProvider(
-      id: document.id,
-      ownerId: data['ownerId'] as String? ?? document.id,
+      id: id,
+      ownerId: data['ownerId'] as String? ?? id,
       name: data['name'] as String? ?? '',
       category: data['category'] as String? ?? 'Autres',
       city: data['city'] as String? ?? '',
@@ -75,10 +90,18 @@ class ProviderService {
 
   factory ProviderService.fromDocument(
     DocumentSnapshot<Map<String, dynamic>> document,
-  ) {
-    final data = document.data() ?? const <String, dynamic>{};
+  ) => ProviderService.fromData(
+    document.id,
+    document.data() ?? const <String, dynamic>{},
+  );
+
+  /// Prestation renvoyée par l'API REST.
+  factory ProviderService.fromJson(Map<String, dynamic> json) =>
+      ProviderService.fromData(json['id'] as String? ?? '', json);
+
+  factory ProviderService.fromData(String id, Map<String, dynamic> data) {
     return ProviderService(
-      id: document.id,
+      id: id,
       providerId: data['providerId'] as String? ?? '',
       name: data['name'] as String? ?? '',
       category: data['category'] as String? ?? 'Autres',
@@ -127,11 +150,18 @@ class ServiceBooking {
 
   factory ServiceBooking.fromDocument(
     DocumentSnapshot<Map<String, dynamic>> document,
-  ) {
-    final data = document.data() ?? const <String, dynamic>{};
-    final dateTime = data['dateTime'];
+  ) => ServiceBooking.fromData(
+    document.id,
+    document.data() ?? const <String, dynamic>{},
+  );
+
+  /// Réservation renvoyée par l'API REST.
+  factory ServiceBooking.fromJson(Map<String, dynamic> json) =>
+      ServiceBooking.fromData(json['id'] as String? ?? '', json);
+
+  factory ServiceBooking.fromData(String id, Map<String, dynamic> data) {
     return ServiceBooking(
-      id: document.id,
+      id: id,
       providerUid: data['providerUid'] as String? ?? '',
       clientUid: data['clientUid'] as String? ?? '',
       clientName: data['clientName'] as String? ?? '',
@@ -139,7 +169,7 @@ class ServiceBooking {
       serviceId: data['serviceId'] as String? ?? '',
       serviceName: data['serviceName'] as String? ?? '',
       animalName: data['animalName'] as String? ?? '',
-      dateTime: dateTime is Timestamp ? dateTime.toDate() : DateTime.now(),
+      dateTime: _toDate(data['dateTime']) ?? DateTime.now(),
       status: data['status'] as String? ?? 'pending',
       notes: data['notes'] as String? ?? '',
     );

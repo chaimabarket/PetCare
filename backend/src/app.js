@@ -6,6 +6,7 @@ const { profileFields, role } = require('./validation');
 const { listingsRouter, applicationsRouter } = require('./adoption/routes');
 const { appointmentsRouter, remindersRouter } = require('./appointments/routes');
 const { petsRouter } = require('./pets/routes');
+const { providersRouter, bookingsRouter } = require('./services/routes');
 
 function publicProfile(doc) {
   const { id, fullName, email, city, phone, role: userRole, createdAt } = doc;
@@ -100,6 +101,8 @@ function createApp() {
   app.use('/api/appointments', appointmentsRouter());
   app.use('/api/reminders', remindersRouter());
   app.use('/api/pets', petsRouter());
+  app.use('/api/services/providers', providersRouter());
+  app.use('/api/services/bookings', bookingsRouter());
   app.use('/api', (_req, _res, next) => next(new ApiError(404, 'Route inconnue.')));
 
   // eslint-disable-next-line no-unused-vars

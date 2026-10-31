@@ -127,6 +127,30 @@ Firestore garde les photos d'animaux en octets (`bytesValue`) ; l'API les échan
 Le blocage des animaux archivés est appliqué par l'API : les écritures directes à Firestore (serveur éteint) ne
 passent pas par ce contrôle, l'application masque alors simplement les actions.
 
+### Module Services
+
+Les annuaires sont publics ; le reste exige un jeton. Un prestataire est identifié par l'uid de son compte
+(`serviceProviders/{uid}`). Un nouveau profil est « en attente » jusqu'à la validation d'un administrateur.
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/api/services/providers` | Annuaire : prestataires publiés. Filtres : `category`, `city`, `q` |
+| GET | `/api/services/providers/pending` | Profils en attente (administrateur) |
+| PUT | `/api/services/providers/me` | Crée ou modifie mon profil ; un profil refusé qui est corrigé repart en validation |
+| PUT | `/api/services/providers/{id}/status` | L'administrateur valide ou refuse : `published`, `rejected`, `pending` |
+| GET | `/api/services/providers/{id}` | Un prestataire |
+| GET | `/api/services/providers/{id}/services` | Ses prestations publiées (`?all=1` : toutes, pour son propriétaire) |
+| GET | `/api/services/providers/{id}/availability` | `{"1": {"enabled": true, "ranges": [{"start": "09:00", "end": "12:00"}]}}` (1 = lundi … 7 = dimanche) |
+| GET | `/api/services/providers/me/services` | Mes prestations, archivées comprises |
+| POST / PUT | `/api/services/providers/me/services[/{id}]` | Crée ou modifie une prestation : `name`, `category`, `durationMinutes` (5-480), `price`, `status` (`published`, `archived`), `description` |
+| PUT | `/api/services/providers/me/availability/{jour}` | `enabled` et `ranges` au format HH:MM |
+| GET | `/api/services/bookings?as=client\|provider` | Mes réservations, ou celles que j'ai reçues |
+| POST | `/api/services/bookings` | Demande de réservation : `providerId`, `serviceId`, `animalName`, `dateTime` (à venir), `notes` |
+| PATCH | `/api/services/bookings/{id}/status` | Le prestataire confirme ou refuse (`confirmed`, `declined`), le client annule (`cancelled`) ; seulement une demande en attente |
+
+Les réservations de ce module sont dans `serviceBookings`. Elles ne créent pas encore de rendez-vous dans l'agenda du
+module Rendez-vous (`appointments`).
+
 Erreurs : JSON `{"error": "message en français"}` avec le code HTTP `400` (champ invalide), `401` (jeton manquant
 ou expiré), `403` (refusé par les règles), `404`, `409` (état incompatible : profil déjà créé, animal archivé…).
 
