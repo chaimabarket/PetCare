@@ -8,6 +8,7 @@ import '../../notifications/data/notification_service.dart';
 import '../../profile/data/profile_repository.dart';
 import '../../profile/data/user_profile.dart';
 import '../../profile/presentation/widgets/user_avatar.dart';
+import '../../services/presentation/service_directory_screen.dart';
 import 'home_screen.dart';
 
 /// Structure principale après connexion (ou en visiteur) : en-tête + 4 onglets du cahier des charges.
@@ -42,8 +43,7 @@ class _MainShellState extends State<MainShell> {
           const ComingSoonScreen(title: 'Mes animaux', embedded: true),
           // Modules 4 et 5 (Perdus & trouvés, Adoption) : remplacer par l'écran « Communauté ».
           const ComingSoonScreen(title: 'Communauté', embedded: true),
-          // Module 6 (Services) : remplacer par l'annuaire des prestataires.
-          const ComingSoonScreen(title: 'Services', embedded: true),
+          const ServicesScreen(),
         ],
       ),
       bottomNavigationBar: NavigationBar(

@@ -11,6 +11,11 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == userId;
     }
 
+    function isAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
     // Module Utilisateurs : chacun lit et modifie uniquement son propre profil.
     match /users/{userId} {
       allow read: if isOwner(userId);
@@ -43,6 +48,84 @@ service cloud.firestore {
         allow update: if isOwner(userId)
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
       }
+    }
+
+    // Module Services: providers publish only after an administrator validates their profile.
+    match /serviceProviders/{providerId} {
+      allow read: if resource.data.status == 'published' || isOwner(providerId) || isAdmin();
+      allow create: if isOwner(providerId)
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly([
+          'ownerId', 'name', 'category', 'city', 'description', 'phone', 'email',
+          'status', 'photoUrl', 'address', 'updatedAt'
+        ]);
+      allow update: if isAdmin()
+        || (isOwner(providerId)
+          && request.resource.data.ownerId == resource.data.ownerId
+          && (request.resource.data.status == resource.data.status
+            || (resource.data.status == 'rejected' && request.resource.data.status == 'pending'))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'name', 'category', 'city', 'description', 'phone', 'email', 'photoUrl', 'address', 'status', 'updatedAt'
+          ]));
+      allow delete: if isAdmin();
+
+      match /services/{serviceId} {
+        function ownsProvider() {
+          return isOwner(providerId);
+        }
+
+        allow read: if (get(/databases/$(database)/documents/serviceProviders/$(providerId)).data.status == 'published'
+            && resource.data.status == 'published')
+          || ownsProvider() || isAdmin();
+        allow create: if ownsProvider()
+          && request.resource.data.providerId == providerId
+          && request.resource.data.status in ['published', 'archived']
+          && request.resource.data.keys().hasOnly([
+            'providerId', 'name', 'category', 'durationMinutes', 'price', 'status', 'description', 'updatedAt'
+          ]);
+        allow update: if isAdmin()
+          || (ownsProvider()
+            && request.resource.data.providerId == resource.data.providerId
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'name', 'category', 'durationMinutes', 'price', 'status', 'description', 'updatedAt'
+            ]));
+        allow delete: if ownsProvider() || isAdmin();
+      }
+
+      match /availability/{dayId} {
+        allow read: if get(/databases/$(database)/documents/serviceProviders/$(providerId)).data.status == 'published'
+          || isOwner(providerId) || isAdmin();
+        allow create, update: if isOwner(providerId)
+          && request.resource.data.keys().hasOnly(['enabled', 'start', 'end', 'ranges', 'updatedAt']);
+        allow delete: if isOwner(providerId) || isAdmin();
+      }
+    }
+
+    // Booking details are private to the customer and provider; providers cannot create bookings.
+    match /serviceBookings/{bookingId} {
+      allow read: if signedIn()
+        && (resource.data.clientUid == request.auth.uid
+          || resource.data.providerUid == request.auth.uid
+          || isAdmin());
+      allow create: if signedIn()
+        && request.resource.data.clientUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.dateTime > request.time
+        && request.resource.data.keys().hasOnly([
+          'providerUid', 'providerName', 'clientUid', 'clientName', 'serviceId', 'serviceName',
+          'animalName', 'dateTime', 'notes', 'status', 'createdAt'
+        ])
+        && get(/databases/$(database)/documents/serviceProviders/$(request.resource.data.providerUid)).data.status == 'published'
+        && get(/databases/$(database)/documents/serviceProviders/$(request.resource.data.providerUid)/services/$(request.resource.data.serviceId)).data.status == 'published';
+      allow update: if signedIn()
+        && resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+        && ((resource.data.providerUid == request.auth.uid
+            && request.resource.data.status in ['confirmed', 'declined'])
+          || (resource.data.clientUid == request.auth.uid
+            && request.resource.data.status == 'cancelled'));
+      allow delete: if false;
     }
 
     // Tout le reste reste fermé tant que les autres modules n'ont pas ajouté leurs règles.
