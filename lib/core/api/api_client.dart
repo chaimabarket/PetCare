@@ -20,7 +20,27 @@ class ApiClient {
   final http.Client _client;
   final FirebaseAuth _auth;
 
-  Future<dynamic> get(String path) => _send('GET', path);
+  // Plusieurs écrans demandent souvent la même ressource en même temps (profil, notifications…) :
+  // une seule requête part, et sa réponse sert les autres pendant quelques secondes.
+  static const _freshFor = Duration(seconds: 10);
+  static final _inFlight = <String, Future<dynamic>>{};
+  static final _recent = <String, ({DateTime at, dynamic value})>{};
+
+  Future<dynamic> get(String path) {
+    final key = '${_auth.currentUser?.uid}|$path';
+    final recent = _recent[key];
+    if (recent != null && DateTime.now().difference(recent.at) < _freshFor) return Future.value(recent.value);
+
+    return _inFlight[key] ??= _send('GET', path)
+        .then((value) {
+          _recent[key] = (at: DateTime.now(), value: value);
+          return value;
+        })
+        .whenComplete(() {
+          // Bloc volontaire : `remove` renvoie ce même Future, et le renvoyer ferait attendre le Future sur lui-même.
+          _inFlight.remove(key);
+        });
+  }
 
   /// [timeout] : à allonger pour un envoi de photos, sinon une écriture lente passerait pour un serveur éteint.
   Future<dynamic> post(String path, [Map<String, dynamic>? body, Duration timeout = _timeout]) =>
@@ -50,7 +70,11 @@ class ApiClient {
     }
 
     final decoded = response.body.isEmpty ? null : jsonDecode(utf8.decode(response.bodyBytes));
-    if (response.statusCode >= 200 && response.statusCode < 300) return decoded;
+    if (response.statusCode >= 200 && response.statusCode < 300) {
+      // Une écriture a réussi : les lectures gardées en mémoire ne sont plus à jour.
+      if (method != 'GET') _recent.clear();
+      return decoded;
+    }
 
     final message = decoded is Map && decoded['error'] is String
         ? decoded['error'] as String
