@@ -134,7 +134,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
                           _RoundIconButton(
                             icon: Icons.tune,
                             tooltip: l.petsHealthNotificationsTooltip,
-                            onTap: () => _openComingSoon(l.petsScreenReminders),
+                            onTap: () => Navigator.of(context).pushNamed(AppRoutes.reminders),
                           ),
                         ],
                       ),
@@ -193,7 +193,7 @@ class _MyPetsScreenState extends State<MyPetsScreen> {
                       ),
                       const SizedBox(height: 16),
                       // Module 2 (Santé) : alimentera ce bandeau avec le prochain rappel réel.
-                      _ReminderBanner(onTap: () => _openComingSoon(l.petsScreenReminders)),
+                      _ReminderBanner(onTap: () => Navigator.of(context).pushNamed(AppRoutes.reminders)),
                       const SizedBox(height: 16),
                       if (visible.isEmpty)
                         _NoResult(
@@ -586,14 +586,14 @@ class _PetCardState extends State<_PetCard> {
                     icon: Icons.medical_services_outlined,
                     label: l.petsActionHealth,
                     color: PetColors.primaryContainer,
-                    onTap: () => widget.onComingSoon(l.petsScreenHealthBook),
+                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.healthRecord, arguments: widget.pet.id),
                   ),
                   const SizedBox(width: 8),
                   _QuickButton(
                     icon: Icons.calendar_today_outlined,
                     label: l.petsActionAppointments,
                     color: PetColors.onSurfaceVariant,
-                    onTap: () => widget.onComingSoon(l.petsScreenAppointments),
+                    onTap: () => Navigator.of(context).pushNamed(AppRoutes.agenda, arguments: widget.pet.name),
                   ),
                   const Spacer(),
                   TextButton(

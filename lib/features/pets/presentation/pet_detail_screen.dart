@@ -43,10 +43,6 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   void _snack(String message) =>
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
 
-  void _openComingSoon(String title) => Navigator.of(context).push(
-        MaterialPageRoute<void>(builder: (_) => ComingSoonScreen(title: title)),
-      );
-
   void _edit(Pet pet) => Navigator.of(context).push(
         MaterialPageRoute<void>(
           builder: (_) => PetFormScreen(pet: pet, photos: _photos, currentWeight: _weights.firstOrNull),
@@ -365,7 +361,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
         const SizedBox(height: 24),
         _healthCard(l),
         const SizedBox(height: 16),
-        _appointmentsCard(l),
+        _appointmentsCard(l, pet),
         const SizedBox(height: 24),
         _contactsCard(l, pet),
         const SizedBox(height: 32),
@@ -781,7 +777,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     );
   }
 
-  /// Carte « Carnet de santé » : le contenu viendra du module 2 (Santé).
+  /// Carte « Carnet de santé » : ouvre le carnet de santé de l'animal (module 2).
   Widget _healthCard(AppLocalizations l) {
     return _shortcutCard(
       icon: Icons.monitor_heart_outlined,
@@ -789,7 +785,7 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
       iconColor: PetColors.primary,
       title: l.petsScreenHealthBook,
       subtitle: l.petsHealthSubtitle,
-      onTap: () => _openComingSoon(l.petsScreenHealthBook),
+      onTap: () => Navigator.of(context).pushNamed(AppRoutes.healthRecord, arguments: widget.petId),
       children: [
         const SizedBox(height: 8),
         Container(
@@ -838,15 +834,15 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     );
   }
 
-  /// Carte « Rendez-vous » : le contenu viendra du module 3 (Rendez-vous).
-  Widget _appointmentsCard(AppLocalizations l) {
+  /// Carte « Rendez-vous » : ouvre l'agenda filtré sur cet animal (module 3).
+  Widget _appointmentsCard(AppLocalizations l, Pet pet) {
     return _shortcutCard(
       icon: Icons.calendar_month_outlined,
       iconBackground: PetColors.secondaryFixed,
       iconColor: PetColors.secondary,
       title: l.petsScreenAppointments,
       subtitle: l.petsAppointmentsSubtitle,
-      onTap: () => _openComingSoon(l.petsScreenAppointments),
+      onTap: () => Navigator.of(context).pushNamed(AppRoutes.agenda, arguments: pet.name),
       children: [
         const SizedBox(height: 8),
         Container(
