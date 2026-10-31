@@ -4,7 +4,10 @@ const { ApiError } = require('./firestore');
 const { usersRouter } = require('./users/routes');
 const { createUsersRepository } = require('./users/repository');
 const { createUsersService } = require('./users/service');
+const { createNotifier } = require('./notifier');
 const { listingsRouter, applicationsRouter } = require('./adoption/routes');
+const { createAdoptionRepository } = require('./adoption/repository');
+const { createAdoptionService } = require('./adoption/service');
 const { appointmentsRouter, remindersRouter } = require('./appointments/routes');
 const { petsRouter } = require('./pets/routes');
 const { providersRouter, bookingsRouter, categoriesRouter } = require('./services/routes');
@@ -13,6 +16,7 @@ const { createServicesService } = require('./services/service');
 
 function createApp() {
   const app = express();
+  const notify = createNotifier();
   // Une fiche d'animal peut envoyer 5 photos de 750 Ko, soit 5 Mo en base64.
   app.use(express.json({ limit: '6mb' }));
   app.use((req, res, next) => {
@@ -23,8 +27,9 @@ function createApp() {
   app.get('/api/health', (_req, res) => res.json({ status: 'ok' }));
 
   app.use('/api/users/me', usersRouter(createUsersService(createUsersRepository())));
-  app.use('/api/adoptions', listingsRouter());
-  app.use('/api/applications', applicationsRouter());
+  const adoptionService = createAdoptionService(createAdoptionRepository(), notify);
+  app.use('/api/adoptions', listingsRouter(adoptionService));
+  app.use('/api/applications', applicationsRouter(adoptionService));
   app.use('/api/appointments', appointmentsRouter());
   app.use('/api/reminders', remindersRouter());
   app.use('/api/pets', petsRouter());
