@@ -63,6 +63,7 @@ lib/
     home/          Accueil et barre de navigation (4 onglets)
     pets/          Mes animaux, fiche animal, ajout / modification, archivage
     appointments/  agenda, rendez-vous, rappels (module 3)
+    health/        carnet de santé, traitements, fiches santé (module 2)
 ```
 
 ## Langues (français / anglais)
@@ -142,6 +143,44 @@ Collections Firestore :
 | `reports/{id}` | signalements pour l'administrateur |
 
 Pour le module 1 : `AdoptionRepository.confirmAdoption` est l'endroit où copier la fiche de l'animal vers l'adoptant (`adopterId`) ; le carnet de santé n'est pas transmis.
+
+## Module Santé et dossier médical (branche `health_record`)
+
+Écrans (maquettes Stitch, dossier `designs/stitch_petcare_flutter`) :
+
+| Écran | Maquette | Route |
+| --- | --- | --- |
+| Carnet de santé (historique filtrable, prochain rappel vaccinal, urgences) | `carnet_de_sant_milo` | `AppRoutes.healthRecord` (argument : id de l'animal) |
+| Ajouter un soin médical (visite, vaccin, examen, allergie, note, pièces jointes) | `ajouter_un_soin_m_dical_milo` | `AppRoutes.healthEntryForm` (id de l'animal) |
+| Traitements (en cours / terminés / arrêtés, prises notées) | `traitements_milo` | `AppRoutes.treatments` (id de l'animal) |
+| Nouveau traitement | pas de maquette, mêmes composants que « Ajouter un soin » | `AppRoutes.treatmentForm` (id de l'animal) |
+| Fiches Santé & Conseils (recherche, catégories, marque-pages) | `fiches_sant_pr_vention_petcare_community_2` | `AppRoutes.healthSheets` |
+| Détail d'une fiche | pas de maquette, consigne 2.5 de STITCH_PROMPTS.md | `AppRoutes.healthSheetDetail` (`HealthSheet`) |
+
+L'Accueil affiche la carte « Vaccins & traitements » (prochains rappels et prises, accès au carnet de chaque animal
+et aux fiches santé). Le vaccin peut créer une alerte dans les rappels du module 3 (« Créer une alerte dans l'agenda ») ;
+« Prendre RDV rappel » ouvre le formulaire de rendez-vous du module 3.
+
+Données Firestore (privées au propriétaire de l'animal, voir `firestore.rules`) :
+
+| Collection | Contenu |
+|---|---|
+| `pets/{petId}/healthEntries/{id}` | `type` (`visite`, `vaccin`, `examen`, `allergie`, `note`), `title`, `date`, `description`, `practitioner`, `cost`, `vaccineName`, `batchNumber`, `nextReminderAt`, `reminderDone`, `weightKg`, `attachments` |
+| `pets/{petId}/healthEntries/{id}/files/{0-2}` | pièces jointes en octets (PDF ou photo, 900 Ko max, pas de Firebase Storage) |
+| `pets/{petId}/treatments/{id}` | `category`, `name`, `form`, `posology` (texte du vétérinaire), `startDate`, `endDate`, `doseTimes`, `doses`, `stoppedAt`, `stopReason`, `renewalAt` |
+| `healthSheets/{id}` | fiches publiques, écrites par l'administrateur (`title`, `summary`, `category`, `species`, `sections`, `source`, `imageUrl`, `featured`, `published`) ; 5 fiches de départ sont intégrées à l'application |
+| `users/{uid}/healthBookmarks/{sheetId}` | fiches enregistrées |
+
+Le carnet et les traitements sont des sous-collections de la fiche : une copie de la fiche vers l'adoptant
+(`AdoptionRepository.confirmAdoption`) ne transmet donc pas le carnet de santé.
+
+### Pour les autres modules
+
+Module 1 (Profils) — carte « Carnet de santé » de la fiche animal :
+
+```dart
+Navigator.of(context).pushNamed(AppRoutes.healthRecord, arguments: pet.id);
+```
 
 ## Module Rendez-vous et rappels (branche `rendez-vous`)
 

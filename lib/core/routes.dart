@@ -18,6 +18,13 @@ import '../features/appointments/presentation/appointment_detail_screen.dart';
 import '../features/appointments/presentation/appointment_form_screen.dart';
 import '../features/appointments/presentation/reminders_screen.dart';
 import '../features/auth/presentation/forgot_password_screen.dart';
+import '../features/health/data/health_sheet.dart';
+import '../features/health/presentation/health_record_screen.dart';
+import '../features/health/presentation/health_sheet_detail_screen.dart';
+import '../features/health/presentation/health_sheets_screen.dart';
+import '../features/health/presentation/medical_entry_form_screen.dart';
+import '../features/health/presentation/treatment_form_screen.dart';
+import '../features/health/presentation/treatments_screen.dart';
 import '../features/auth/presentation/login_screen.dart';
 import '../features/auth/presentation/register_screen.dart';
 import '../features/home/presentation/main_shell.dart';
@@ -57,6 +64,14 @@ abstract final class AppRoutes {
   static const appointmentForm = '/agenda/new';
   static const reminders = '/reminders';
 
+  // Module 2 (Santé et dossier médical).
+  static const healthRecord = '/health'; // String : id de l'animal (`pets/{id}`)
+  static const healthEntryForm = '/health/entry'; // String : id de l'animal
+  static const treatments = '/health/treatments'; // String : id de l'animal
+  static const treatmentForm = '/health/treatments/new'; // String : id de l'animal
+  static const healthSheets = '/health/sheets';
+  static const healthSheetDetail = '/health/sheets/detail'; // HealthSheet
+
   static Map<String, WidgetBuilder> get all => {
         login: (_) => const LoginScreen(),
         register: (_) => const RegisterScreen(),
@@ -89,5 +104,12 @@ abstract final class AppRoutes {
               args: ModalRoute.of(context)?.settings.arguments as AppointmentFormArgs? ?? const AppointmentFormArgs(),
             ),
         reminders: (_) => const RemindersScreen(),
+
+        healthRecord: (context) => HealthRecordScreen(petId: _args(context)! as String),
+        healthEntryForm: (context) => MedicalEntryFormScreen(petId: _args(context)! as String),
+        treatments: (context) => TreatmentsScreen(petId: _args(context)! as String),
+        treatmentForm: (context) => TreatmentFormScreen(petId: _args(context)! as String),
+        healthSheets: (_) => const HealthSheetsScreen(),
+        healthSheetDetail: (context) => HealthSheetDetailScreen(sheet: _args(context)! as HealthSheet),
       };
 }
