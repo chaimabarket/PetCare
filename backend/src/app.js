@@ -6,6 +6,7 @@ const { profileFields, role } = require('./validation');
 const { listingsRouter, applicationsRouter } = require('./adoption/routes');
 const { appointmentsRouter, remindersRouter } = require('./appointments/routes');
 const { petsRouter } = require('./pets/routes');
+const { healthRouter, healthSummaryRouter } = require('./health/routes');
 const { providersRouter, bookingsRouter } = require('./services/routes');
 const { categoriesRouter } = require('./services/categories');
 
@@ -101,7 +102,9 @@ function createApp() {
   app.use('/api/applications', applicationsRouter());
   app.use('/api/appointments', appointmentsRouter());
   app.use('/api/reminders', remindersRouter());
+  app.use('/api/pets/:petId/health', healthRouter());
   app.use('/api/pets', petsRouter());
+  app.use('/api/health', healthSummaryRouter());
   app.use('/api/services/categories', categoriesRouter());
   app.use('/api/services/providers', providersRouter());
   app.use('/api/services/bookings', bookingsRouter());
