@@ -1316,6 +1316,126 @@ abstract class AppLocalizations {
   /// **'Corriger la pesée'**
   String get petsWeightEdit;
 
+  /// No description provided for @petsWeightAlertConsult.
+  ///
+  /// In fr, this message translates to:
+  /// **'Consultez un vétérinaire'**
+  String get petsWeightAlertConsult;
+
+  /// No description provided for @petsWeightAlertWatch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Poids à surveiller'**
+  String get petsWeightAlertWatch;
+
+  /// No description provided for @petsWeightAlertLoss.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} a perdu {percent} % en {days, plural, =1{1 jour} other{{days} jours}}'**
+  String petsWeightAlertLoss(String name, String percent, int days);
+
+  /// No description provided for @petsWeightAlertGain.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} a pris {percent} % en {days, plural, =1{1 jour} other{{days} jours}}'**
+  String petsWeightAlertGain(String name, String percent, int days);
+
+  /// No description provided for @petsWeightAlertCheck.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le poids de {name} a varié de {percent} % en {days, plural, =1{1 jour} other{{days} jours}} : vérifiez la pesée'**
+  String petsWeightAlertCheck(String name, String percent, int days);
+
+  /// No description provided for @petsWeightAlertValues.
+  ///
+  /// In fr, this message translates to:
+  /// **'{from} kg → {to} kg'**
+  String petsWeightAlertValues(String from, String to);
+
+  /// No description provided for @petsWeightAlertAdviceConsult.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prenez rendez-vous avec un vétérinaire.'**
+  String get petsWeightAlertAdviceConsult;
+
+  /// No description provided for @petsWeightAlertAdviceWatch.
+  ///
+  /// In fr, this message translates to:
+  /// **'Surveillez son poids et parlez-en à votre vétérinaire.'**
+  String get petsWeightAlertAdviceWatch;
+
+  /// No description provided for @petsWeightAlertDisclaimer.
+  ///
+  /// In fr, this message translates to:
+  /// **'Repère d\'alerte, pas un diagnostic.'**
+  String get petsWeightAlertDisclaimer;
+
+  /// No description provided for @petsWeightAlertBook.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre rendez-vous'**
+  String get petsWeightAlertBook;
+
+  /// No description provided for @petsWeightAlertVets.
+  ///
+  /// In fr, this message translates to:
+  /// **'Voir les vétérinaires'**
+  String get petsWeightAlertVets;
+
+  /// No description provided for @petsWeightAlertIgnore.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ignorer'**
+  String get petsWeightAlertIgnore;
+
+  /// No description provided for @petsWeightAlertSources.
+  ///
+  /// In fr, this message translates to:
+  /// **'Sources'**
+  String get petsWeightAlertSources;
+
+  /// No description provided for @petsWeightAlertBooked.
+  ///
+  /// In fr, this message translates to:
+  /// **'Rendez-vous vétérinaire prévu le {date}'**
+  String petsWeightAlertBooked(String date);
+
+  /// No description provided for @petsWeightAlertBadge.
+  ///
+  /// In fr, this message translates to:
+  /// **'Alerte poids'**
+  String get petsWeightAlertBadge;
+
+  /// No description provided for @petsWeightAlertSourcesTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'D\'où viennent ces seuils ?'**
+  String get petsWeightAlertSourcesTitle;
+
+  /// No description provided for @petsWeightAlertSourcesIntro.
+  ///
+  /// In fr, this message translates to:
+  /// **'La WSAVA recommande de faire examiner tout changement de poids inexpliqué. Ces seuils déclenchent une alerte : seul un vétérinaire peut poser un diagnostic.'**
+  String get petsWeightAlertSourcesIntro;
+
+  /// No description provided for @petsWeightAlertSourceVca.
+  ///
+  /// In fr, this message translates to:
+  /// **'Seuil de cette alerte : VCA Hospitals (fiches rédigées par des vétérinaires), une perte de plus de 10 % du poids habituel est cliniquement significative.'**
+  String get petsWeightAlertSourceVca;
+
+  /// No description provided for @petsWeightAlertSourceAaha.
+  ///
+  /// In fr, this message translates to:
+  /// **'Seuil de cette alerte : AAHA et iCatCare, 1 point de score corporel correspond à environ 10 % du poids.'**
+  String get petsWeightAlertSourceAaha;
+
+  /// No description provided for @petsWeightAlertSourcePetcare.
+  ///
+  /// In fr, this message translates to:
+  /// **'Seuil de cette alerte : repère PetCare (non officiel), aucune source officielle ne donne de chiffre pour ce cas.'**
+  String get petsWeightAlertSourcePetcare;
+
   /// No description provided for @petsWeightCurrent.
   ///
   /// In fr, this message translates to:

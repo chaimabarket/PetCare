@@ -735,6 +735,101 @@ class AppLocalizationsFr extends AppLocalizations {
   String get petsWeightEdit => 'Corriger la pesée';
 
   @override
+  String get petsWeightAlertConsult => 'Consultez un vétérinaire';
+
+  @override
+  String get petsWeightAlertWatch => 'Poids à surveiller';
+
+  @override
+  String petsWeightAlertLoss(String name, String percent, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days jours',
+      one: '1 jour',
+    );
+    return '$name a perdu $percent % en $_temp0';
+  }
+
+  @override
+  String petsWeightAlertGain(String name, String percent, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days jours',
+      one: '1 jour',
+    );
+    return '$name a pris $percent % en $_temp0';
+  }
+
+  @override
+  String petsWeightAlertCheck(String name, String percent, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days jours',
+      one: '1 jour',
+    );
+    return 'Le poids de $name a varié de $percent % en $_temp0 : vérifiez la pesée';
+  }
+
+  @override
+  String petsWeightAlertValues(String from, String to) {
+    return '$from kg → $to kg';
+  }
+
+  @override
+  String get petsWeightAlertAdviceConsult =>
+      'Prenez rendez-vous avec un vétérinaire.';
+
+  @override
+  String get petsWeightAlertAdviceWatch =>
+      'Surveillez son poids et parlez-en à votre vétérinaire.';
+
+  @override
+  String get petsWeightAlertDisclaimer =>
+      'Repère d\'alerte, pas un diagnostic.';
+
+  @override
+  String get petsWeightAlertBook => 'Prendre rendez-vous';
+
+  @override
+  String get petsWeightAlertVets => 'Voir les vétérinaires';
+
+  @override
+  String get petsWeightAlertIgnore => 'Ignorer';
+
+  @override
+  String get petsWeightAlertSources => 'Sources';
+
+  @override
+  String petsWeightAlertBooked(String date) {
+    return 'Rendez-vous vétérinaire prévu le $date';
+  }
+
+  @override
+  String get petsWeightAlertBadge => 'Alerte poids';
+
+  @override
+  String get petsWeightAlertSourcesTitle => 'D\'où viennent ces seuils ?';
+
+  @override
+  String get petsWeightAlertSourcesIntro =>
+      'La WSAVA recommande de faire examiner tout changement de poids inexpliqué. Ces seuils déclenchent une alerte : seul un vétérinaire peut poser un diagnostic.';
+
+  @override
+  String get petsWeightAlertSourceVca =>
+      'Seuil de cette alerte : VCA Hospitals (fiches rédigées par des vétérinaires), une perte de plus de 10 % du poids habituel est cliniquement significative.';
+
+  @override
+  String get petsWeightAlertSourceAaha =>
+      'Seuil de cette alerte : AAHA et iCatCare, 1 point de score corporel correspond à environ 10 % du poids.';
+
+  @override
+  String get petsWeightAlertSourcePetcare =>
+      'Seuil de cette alerte : repère PetCare (non officiel), aucune source officielle ne donne de chiffre pour ce cas.';
+
+  @override
   String get petsWeightCurrent => '(Actuel)';
 
   @override

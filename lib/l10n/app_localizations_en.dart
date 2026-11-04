@@ -727,6 +727,100 @@ class AppLocalizationsEn extends AppLocalizations {
   String get petsWeightEdit => 'Correct weigh-in';
 
   @override
+  String get petsWeightAlertConsult => 'See a vet';
+
+  @override
+  String get petsWeightAlertWatch => 'Keep an eye on the weight';
+
+  @override
+  String petsWeightAlertLoss(String name, String percent, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$name lost $percent% in $_temp0';
+  }
+
+  @override
+  String petsWeightAlertGain(String name, String percent, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$name gained $percent% in $_temp0';
+  }
+
+  @override
+  String petsWeightAlertCheck(String name, String percent, int days) {
+    String _temp0 = intl.Intl.pluralLogic(
+      days,
+      locale: localeName,
+      other: '$days days',
+      one: '1 day',
+    );
+    return '$name\'s weight changed by $percent% in $_temp0: check the weigh-in';
+  }
+
+  @override
+  String petsWeightAlertValues(String from, String to) {
+    return '$from kg → $to kg';
+  }
+
+  @override
+  String get petsWeightAlertAdviceConsult => 'Book an appointment with a vet.';
+
+  @override
+  String get petsWeightAlertAdviceWatch =>
+      'Keep an eye on the weight and mention it to your vet.';
+
+  @override
+  String get petsWeightAlertDisclaimer => 'This is an alert, not a diagnosis.';
+
+  @override
+  String get petsWeightAlertBook => 'Book an appointment';
+
+  @override
+  String get petsWeightAlertVets => 'See vets';
+
+  @override
+  String get petsWeightAlertIgnore => 'Dismiss';
+
+  @override
+  String get petsWeightAlertSources => 'Sources';
+
+  @override
+  String petsWeightAlertBooked(String date) {
+    return 'Vet appointment on $date';
+  }
+
+  @override
+  String get petsWeightAlertBadge => 'Weight alert';
+
+  @override
+  String get petsWeightAlertSourcesTitle =>
+      'Where do these thresholds come from?';
+
+  @override
+  String get petsWeightAlertSourcesIntro =>
+      'WSAVA recommends having any unexplained weight change examined. These thresholds trigger an alert: only a vet can make a diagnosis.';
+
+  @override
+  String get petsWeightAlertSourceVca =>
+      'Threshold for this alert: VCA Hospitals (vet-written articles), losing more than 10% of usual body weight is clinically significant.';
+
+  @override
+  String get petsWeightAlertSourceAaha =>
+      'Threshold for this alert: AAHA and iCatCare, 1 body condition score point is about 10% of body weight.';
+
+  @override
+  String get petsWeightAlertSourcePetcare =>
+      'Threshold for this alert: PetCare guideline (not official), no official source gives a figure for this case.';
+
+  @override
   String get petsWeightCurrent => '(Current)';
 
   @override

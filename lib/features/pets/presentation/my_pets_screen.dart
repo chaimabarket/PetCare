@@ -7,6 +7,8 @@ import '../../../l10n/app_localizations.dart';
 import '../data/pet.dart';
 import '../data/pet_media.dart';
 import '../data/pet_repository.dart';
+import '../data/weight_alert.dart';
+import '../data/weight_alert_dismissals.dart';
 import 'pet_detail_screen.dart';
 import 'pet_form_screen.dart';
 import 'pet_format.dart';
@@ -494,7 +496,27 @@ class _PetCard extends StatefulWidget {
 }
 
 class _PetCardState extends State<_PetCard> {
-  late final _lastWeight = PetRepository().watchWeights(widget.pet.id, limit: 1);
+  // Assez de pesées pour l'alerte de poids, rafraîchies chaque minute au plus (quota Firestore).
+  late final _recentWeights = PetRepository().watchWeights(widget.pet.id, limit: 20, every: const Duration(minutes: 1));
+  Set<String> _dismissedAlerts = const {};
+
+  @override
+  void initState() {
+    super.initState();
+    _loadDismissedAlerts();
+    WeightAlertDismissals.changes.addListener(_loadDismissedAlerts);
+  }
+
+  @override
+  void dispose() {
+    WeightAlertDismissals.changes.removeListener(_loadDismissedAlerts);
+    super.dispose();
+  }
+
+  Future<void> _loadDismissedAlerts() async {
+    final dismissed = await WeightAlertDismissals.load();
+    if (mounted) setState(() => _dismissedAlerts = dismissed);
+  }
 
   static const _rings = [
     [PetColors.primaryContainer, PetColors.secondaryContainer],
@@ -561,13 +583,29 @@ class _PetCardState extends State<_PetCard> {
                         const SizedBox(height: 2),
                         Text(details, style: PetText.bodySm.copyWith(color: PetColors.outline)),
                         StreamBuilder<List<WeightEntry>>(
-                          stream: _lastWeight,
+                          stream: _recentWeights,
                           builder: (context, snapshot) {
-                            final last = snapshot.data?.firstOrNull;
+                            final weights = snapshot.data ?? const <WeightEntry>[];
+                            final last = weights.firstOrNull;
                             if (last == null) return const SizedBox.shrink();
+                            final alert = analyzeWeights(
+                              entries: weights,
+                              species: pet.species.code,
+                              birthDate: pet.birthDate,
+                              archived: pet.isArchived,
+                            );
+                            final showAlert =
+                                alert != null && !_dismissedAlerts.contains(WeightAlertDismissals.keyFor(pet.id, alert));
                             return Padding(
                               padding: const EdgeInsets.only(top: 10),
-                              child: _WeightPill(entry: last),
+                              child: Wrap(
+                                spacing: 6,
+                                runSpacing: 6,
+                                children: [
+                                  _WeightPill(entry: last),
+                                  if (showAlert) _WeightAlertBadge(level: alert.level),
+                                ],
+                              ),
                             );
                           },
                         ),
@@ -664,6 +702,37 @@ class _PetAvatar extends StatelessWidget {
                 color: female ? PetColors.secondary : PetColors.primary,
               ),
             ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Pastille « Alerte poids » : le détail et les actions sont sur la fiche de l'animal.
+class _WeightAlertBadge extends StatelessWidget {
+  const _WeightAlertBadge({required this.level});
+
+  final WeightAlertLevel level;
+
+  @override
+  Widget build(BuildContext context) {
+    final consult = level == WeightAlertLevel.consult;
+    final color = consult ? PetColors.onErrorContainer : PetColors.onTertiaryFixed;
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: consult ? PetColors.errorContainer : PetColors.tertiaryFixed,
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(consult ? Icons.warning_amber_rounded : Icons.info_outline, size: 16, color: color),
+          const SizedBox(width: 4),
+          Text(
+            AppLocalizations.of(context).petsWeightAlertBadge,
+            style: PetText.bodySm.copyWith(color: color, fontWeight: FontWeight.w600),
           ),
         ],
       ),

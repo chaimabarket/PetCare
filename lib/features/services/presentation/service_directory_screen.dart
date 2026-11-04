@@ -11,7 +11,10 @@ import 'provider_screens.dart';
 import 'service_detail_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
-  const ServicesScreen({super.key});
+  const ServicesScreen({super.key, this.initialCategory});
+
+  /// Catégorie sélectionnée à l'ouverture (ex. « Vétérinaires » depuis une alerte de poids) ; « Tous » sinon.
+  final String? initialCategory;
 
   @override
   State<ServicesScreen> createState() => _ServicesScreenState();
@@ -20,7 +23,7 @@ class ServicesScreen extends StatefulWidget {
 class _ServicesScreenState extends State<ServicesScreen> {
   final _repository = ServiceRepository();
   final _searchController = TextEditingController();
-  String _category = 'Tous';
+  late String _category = widget.initialCategory ?? 'Tous';
   String _city = '';
   String _search = '';
 
