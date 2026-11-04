@@ -331,5 +331,23 @@
   "@healthTabAllergy": {"placeholders": {"name": {"type": "String"}}},
   "healthTabLoadError": "Impossible de charger la santé de vos animaux.",
   "healthTabRetry": "Réessayer",
-  "healthArchivedBanner": "Animal archivé : son carnet est en lecture seule. Restaurez-le depuis « Mes animaux » pour le modifier."
+  "healthArchivedBanner": "Animal archivé : son carnet est en lecture seule. Restaurez-le depuis « Mes animaux » pour le modifier.",
+
+  "healthTodayTitle": "Aujourd'hui",
+  "healthTodayDoses": "Prises du jour",
+  "healthTodayNoDoses": "Aucune prise prévue aujourd'hui.",
+  "healthTodayUpcoming": "À venir",
+  "healthTodayDone": "Faite",
+  "healthTodayConfirmTitle": "Noter cette prise ?",
+  "healthTodayConfirmBody": "{pet} · {treatment}, prise de {time}. Une prise notée ne peut pas être annulée.",
+  "@healthTodayConfirmBody": {"placeholders": {"pet": {"type": "String"}, "treatment": {"type": "String"}, "time": {"type": "String"}}},
+  "healthTodayConfirm": "Noter la prise",
+  "healthTodayCancel": "Annuler",
+  "healthTodayDoseSaved": "Prise notée.",
+  "healthTodayVaccines": "Vaccins à surveiller",
+  "healthTodayNoVaccines": "Aucun vaccin en retard ni prévu dans les 30 prochains jours.",
+  "healthTodayOverdueSince": "En retard depuis le {date}",
+  "@healthTodayOverdueSince": {"placeholders": {"date": {"type": "String"}}},
+  "healthTodayDueOn": "Prévu le {date}",
+  "@healthTodayDueOn": {"placeholders": {"date": {"type": "String"}}}
 }

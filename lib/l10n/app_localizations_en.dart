@@ -1009,4 +1009,53 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get healthArchivedBanner =>
       'Archived pet: its health record is read-only. Restore it from “My pets” to edit it.';
+
+  @override
+  String get healthTodayTitle => 'Today';
+
+  @override
+  String get healthTodayDoses => 'Today\'s doses';
+
+  @override
+  String get healthTodayNoDoses => 'No dose planned today.';
+
+  @override
+  String get healthTodayUpcoming => 'Upcoming';
+
+  @override
+  String get healthTodayDone => 'Done';
+
+  @override
+  String get healthTodayConfirmTitle => 'Record this dose?';
+
+  @override
+  String healthTodayConfirmBody(String pet, String treatment, String time) {
+    return '$pet · $treatment, $time dose. A recorded dose cannot be undone.';
+  }
+
+  @override
+  String get healthTodayConfirm => 'Record dose';
+
+  @override
+  String get healthTodayCancel => 'Cancel';
+
+  @override
+  String get healthTodayDoseSaved => 'Dose recorded.';
+
+  @override
+  String get healthTodayVaccines => 'Vaccines to watch';
+
+  @override
+  String get healthTodayNoVaccines =>
+      'No vaccine overdue or due in the next 30 days.';
+
+  @override
+  String healthTodayOverdueSince(String date) {
+    return 'Overdue since $date';
+  }
+
+  @override
+  String healthTodayDueOn(String date) {
+    return 'Due on $date';
+  }
 }

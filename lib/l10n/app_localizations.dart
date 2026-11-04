@@ -1741,6 +1741,90 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Animal archivé : son carnet est en lecture seule. Restaurez-le depuis « Mes animaux » pour le modifier.'**
   String get healthArchivedBanner;
+
+  /// No description provided for @healthTodayTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd\'hui'**
+  String get healthTodayTitle;
+
+  /// No description provided for @healthTodayDoses.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prises du jour'**
+  String get healthTodayDoses;
+
+  /// No description provided for @healthTodayNoDoses.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune prise prévue aujourd\'hui.'**
+  String get healthTodayNoDoses;
+
+  /// No description provided for @healthTodayUpcoming.
+  ///
+  /// In fr, this message translates to:
+  /// **'À venir'**
+  String get healthTodayUpcoming;
+
+  /// No description provided for @healthTodayDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faite'**
+  String get healthTodayDone;
+
+  /// No description provided for @healthTodayConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Noter cette prise ?'**
+  String get healthTodayConfirmTitle;
+
+  /// No description provided for @healthTodayConfirmBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'{pet} · {treatment}, prise de {time}. Une prise notée ne peut pas être annulée.'**
+  String healthTodayConfirmBody(String pet, String treatment, String time);
+
+  /// No description provided for @healthTodayConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Noter la prise'**
+  String get healthTodayConfirm;
+
+  /// No description provided for @healthTodayCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get healthTodayCancel;
+
+  /// No description provided for @healthTodayDoseSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prise notée.'**
+  String get healthTodayDoseSaved;
+
+  /// No description provided for @healthTodayVaccines.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vaccins à surveiller'**
+  String get healthTodayVaccines;
+
+  /// No description provided for @healthTodayNoVaccines.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun vaccin en retard ni prévu dans les 30 prochains jours.'**
+  String get healthTodayNoVaccines;
+
+  /// No description provided for @healthTodayOverdueSince.
+  ///
+  /// In fr, this message translates to:
+  /// **'En retard depuis le {date}'**
+  String healthTodayOverdueSince(String date);
+
+  /// No description provided for @healthTodayDueOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prévu le {date}'**
+  String healthTodayDueOn(String date);
 }
 
 class _AppLocalizationsDelegate

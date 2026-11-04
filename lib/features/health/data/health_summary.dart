@@ -57,6 +57,13 @@ class DoseSlot {
   final Treatment treatment;
   final DateTime time;
   final bool done;
+
+  /// Se coche s'il n'est pas fait et commence dans moins de 3 h : une prise notée maintenant le couvre encore.
+  bool canCheck(DateTime now) =>
+      !done && time.isBefore(now.add(const Duration(minutes: _doseToleranceMinutes)));
+
+  /// Heure enregistrée en cochant : celle du créneau s'il est passé, sinon maintenant (jamais dans le futur).
+  DateTime logTime(DateTime now) => time.isAfter(now) ? now : time;
 }
 
 /// Résumé santé d'un animal pour l'onglet Santé (réponse de `GET /api/health/summary`).

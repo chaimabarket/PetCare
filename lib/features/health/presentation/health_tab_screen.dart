@@ -12,9 +12,11 @@ import '../../pets/presentation/pet_form_screen.dart';
 import '../../pets/presentation/pet_format.dart' as pet_format;
 import '../data/health_repository.dart';
 import '../data/health_summary.dart';
+import 'widgets/health_today_card.dart';
 import 'widgets/health_ui.dart';
 
-/// Onglet « Santé » : une carte par animal, ceux qui demandent une action en premier.
+/// Onglet « Santé » : le tableau du jour ([HealthTodayCard]), puis une carte par animal, ceux qui demandent
+/// une action en premier.
 ///
 /// Tout vient d'un seul appel (`GET /api/health/summary`), relu toutes les 60 s et aussitôt après
 /// une modification : le carnet lui-même s'ouvre au toucher d'une carte.
@@ -67,6 +69,8 @@ class _HealthTabScreenState extends State<HealthTabScreen> {
             padding: const EdgeInsets.fromLTRB(16, 8, 16, 32),
             children: [
               if (active.isNotEmpty) ...[
+                HealthTodayCard(summary: summary, now: now, onOpenRecord: _openRecord),
+                const SizedBox(height: 24),
                 Text(l.healthTabMyPets, style: HealthText.headlineSm),
                 const SizedBox(height: 12),
                 for (final pet in active) ...[

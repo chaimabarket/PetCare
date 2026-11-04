@@ -1020,4 +1020,53 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get healthArchivedBanner =>
       'Animal archivé : son carnet est en lecture seule. Restaurez-le depuis « Mes animaux » pour le modifier.';
+
+  @override
+  String get healthTodayTitle => 'Aujourd\'hui';
+
+  @override
+  String get healthTodayDoses => 'Prises du jour';
+
+  @override
+  String get healthTodayNoDoses => 'Aucune prise prévue aujourd\'hui.';
+
+  @override
+  String get healthTodayUpcoming => 'À venir';
+
+  @override
+  String get healthTodayDone => 'Faite';
+
+  @override
+  String get healthTodayConfirmTitle => 'Noter cette prise ?';
+
+  @override
+  String healthTodayConfirmBody(String pet, String treatment, String time) {
+    return '$pet · $treatment, prise de $time. Une prise notée ne peut pas être annulée.';
+  }
+
+  @override
+  String get healthTodayConfirm => 'Noter la prise';
+
+  @override
+  String get healthTodayCancel => 'Annuler';
+
+  @override
+  String get healthTodayDoseSaved => 'Prise notée.';
+
+  @override
+  String get healthTodayVaccines => 'Vaccins à surveiller';
+
+  @override
+  String get healthTodayNoVaccines =>
+      'Aucun vaccin en retard ni prévu dans les 30 prochains jours.';
+
+  @override
+  String healthTodayOverdueSince(String date) {
+    return 'En retard depuis le $date';
+  }
+
+  @override
+  String healthTodayDueOn(String date) {
+    return 'Prévu le $date';
+  }
 }

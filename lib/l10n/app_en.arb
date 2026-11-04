@@ -285,5 +285,20 @@
   "healthTabAllergy": "Allergy: {name}",
   "healthTabLoadError": "Your pets' health could not be loaded.",
   "healthTabRetry": "Retry",
-  "healthArchivedBanner": "Archived pet: its health record is read-only. Restore it from “My pets” to edit it."
+  "healthArchivedBanner": "Archived pet: its health record is read-only. Restore it from “My pets” to edit it.",
+
+  "healthTodayTitle": "Today",
+  "healthTodayDoses": "Today's doses",
+  "healthTodayNoDoses": "No dose planned today.",
+  "healthTodayUpcoming": "Upcoming",
+  "healthTodayDone": "Done",
+  "healthTodayConfirmTitle": "Record this dose?",
+  "healthTodayConfirmBody": "{pet} · {treatment}, {time} dose. A recorded dose cannot be undone.",
+  "healthTodayConfirm": "Record dose",
+  "healthTodayCancel": "Cancel",
+  "healthTodayDoseSaved": "Dose recorded.",
+  "healthTodayVaccines": "Vaccines to watch",
+  "healthTodayNoVaccines": "No vaccine overdue or due in the next 30 days.",
+  "healthTodayOverdueSince": "Overdue since {date}",
+  "healthTodayDueOn": "Due on {date}"
 }
