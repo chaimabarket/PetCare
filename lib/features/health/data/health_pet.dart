@@ -15,6 +15,7 @@ class HealthPet {
     required this.name,
     this.species,
     this.breed,
+    this.sex,
     this.birthDate,
     this.chipNumber,
     this.photo,
@@ -34,6 +35,7 @@ class HealthPet {
       name: data['name'] as String? ?? 'Mon animal',
       species: data['species'] as String?,
       breed: data['breed'] as String?,
+      sex: data['sex'] as String?,
       birthDate: healthDate(data['birthDate']),
       chipNumber: data['chipNumber'] as String?,
       photo: photo,
@@ -48,6 +50,9 @@ class HealthPet {
   final String name;
   final String? species;
   final String? breed;
+
+  /// `male` ou `female` (module 1).
+  final String? sex;
   final DateTime? birthDate;
 
   /// Numéro d'identification (puce, 15 chiffres), affiché « ICAD ».

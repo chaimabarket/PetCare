@@ -1,9 +1,9 @@
-import 'dart:convert';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/navigation/main_tabs.dart';
@@ -12,6 +12,7 @@ import '../../../l10n/app_localizations.dart';
 import '../../appointments/presentation/appointment_form_screen.dart';
 import '../data/health_entry.dart';
 import '../data/health_format.dart';
+import '../data/health_pdf.dart';
 import '../data/health_pet.dart';
 import '../data/health_repository.dart';
 import '../data/treatment.dart';
@@ -89,55 +90,44 @@ class _HealthRecordScreenState extends State<HealthRecordScreen> {
         attachment: entry.attachments[index],
       );
 
-  /// Résumé texte du carnet : enregistré sur le téléphone (⤓) ou copié pour le partager.
-  String _summary() {
+  var _exporting = false;
+
+  /// PDF du carnet : profil, vaccins, visites et examens, allergies, traitements. Aucune coordonnée du propriétaire.
+  Future<(String, Uint8List)?> _buildPdf() async {
     final pet = _pet;
-    final buffer = StringBuffer()
-      ..writeln('Carnet de santé – ${pet?.name ?? ''}')
-      ..writeln(pet?.breedAndAge() ?? '');
-    if (pet?.chipNumber != null) buffer.writeln('ICAD : ${pet!.chipNumber}');
-    buffer
-      ..writeln()
-      ..writeln('Historique médical');
-    for (final e in _entries) {
-      buffer.writeln('- ${formatHealthDate(e.date)} · ${e.type.cardLabel} · ${e.title}'
-          '${e.practitioner == null ? '' : ' · ${e.practitioner}'}');
-      if (e.description != null) buffer.writeln('  ${e.description}');
-      if (e.type == HealthEntryType.vaccine) {
-        buffer.writeln('  Lot : ${e.batchNumber ?? '—'} · Prochain rappel : '
-            '${e.nextReminderAt == null ? '—' : formatHealthDate(e.nextReminderAt!)}');
-      }
-    }
-    if (_treatments.isNotEmpty) {
-      buffer
-        ..writeln()
-        ..writeln('Traitements');
-      for (final t in _treatments) {
-        buffer
-          ..writeln('- ${t.name} (${t.status.label}) · ${formatHealthRange(t.startDate, t.endDate)}')
-          ..writeln('  ${t.posology}');
-      }
-    }
-    return buffer.toString();
+    if (pet == null) return null;
+    final fonts = await Future.wait([
+      rootBundle.load('assets/fonts/Inter-Regular.ttf'),
+      rootBundle.load('assets/fonts/Inter-Bold.ttf'),
+    ]);
+    final bytes = await renderHealthPdf(
+      buildHealthPdfContent(pet: pet, entries: _entries, treatments: _treatments),
+      regular: pw.Font.ttf(fonts[0]),
+      bold: pw.Font.ttf(fonts[1]),
+      photo: pet.photo,
+    );
+    return (healthPdfFileName(pet.name), bytes);
   }
 
-  Future<void> _export() async {
-    final name = 'Carnet_${(_pet?.name ?? 'animal').replaceAll(' ', '_')}.txt';
+  /// Bouton ⤓ (enregistrer) ou bouton de partage de l'en-tête (feuille de partage du téléphone).
+  Future<void> _exportPdf({required bool share}) async {
+    if (_exporting) return;
+    setState(() => _exporting = true);
     try {
-      final uri = await FilePicker.saveFile(
-        fileName: name,
-        bytes: Uint8List.fromList(utf8.encode(_summary())),
-        mimeType: 'text/plain',
-      );
-      if (uri != null && mounted) showHealthToast(context, 'Téléchargement de : $name');
+      final pdf = await _buildPdf();
+      if (pdf == null) return;
+      final (name, bytes) = pdf;
+      if (share) {
+        await Printing.sharePdf(bytes: bytes, filename: name);
+      } else {
+        final uri = await FilePicker.saveFile(fileName: name, bytes: bytes, mimeType: 'application/pdf');
+        if (uri != null && mounted) showHealthToast(context, 'Téléchargement de : $name');
+      }
     } catch (e) {
       if (mounted) showHealthToast(context, friendlyHealthError(e), icon: Symbols.error);
+    } finally {
+      if (mounted) setState(() => _exporting = false);
     }
-  }
-
-  Future<void> _share() async {
-    await Clipboard.setData(ClipboardData(text: _summary()));
-    if (mounted) showHealthToast(context, 'Résumé du carnet copié : collez-le pour le partager.');
   }
 
   @override
@@ -150,8 +140,8 @@ class _HealthRecordScreenState extends State<HealthRecordScreen> {
           title: 'Mes Animaux',
           actions: [
             IconButton(
-              tooltip: 'Partager ou exporter',
-              onPressed: _share,
+              tooltip: 'Partager le carnet (PDF)',
+              onPressed: _exporting ? null : () => _exportPdf(share: true),
               icon: const Icon(Symbols.ios_share, size: 22, color: HealthColors.onSurface),
             ),
           ],
@@ -223,7 +213,7 @@ class _HealthRecordScreenState extends State<HealthRecordScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
       children: [
-        _PetHeader(pet: pet, upToDate: !overdue, onExport: _export),
+        _PetHeader(pet: pet, upToDate: !overdue, onExport: () => _exportPdf(share: false)),
         if (pet.archived) ...[
           const SizedBox(height: 16),
           const _ArchivedBanner(),
