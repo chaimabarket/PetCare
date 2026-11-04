@@ -300,5 +300,22 @@
   "healthTodayVaccines": "Vaccines to watch",
   "healthTodayNoVaccines": "No vaccine overdue or due in the next 30 days.",
   "healthTodayOverdueSince": "Overdue since {date}",
-  "healthTodayDueOn": "Due on {date}"
+  "healthTodayDueOn": "Due on {date}",
+
+  "healthScanButton": "Scan a vaccine sticker or prescription",
+  "healthScanHint": "Sharp, well-lit photo. The text is read on the phone, offline.",
+  "healthScanFromCamera": "Take a photo",
+  "healthScanFromGallery": "Choose from gallery",
+  "healthScanReading": "Reading text…",
+  "healthScanNothing": "Nothing usable could be read. Please fill in the fields by hand.",
+  "healthScanError": "Reading failed. Try again with a sharper photo.",
+  "healthScanReview": "Pre-filled by the scan: {fields}. Check and correct before saving.",
+  "healthScanFieldVaccine": "vaccine",
+  "healthScanFieldMedicine": "medicine",
+  "healthScanFieldDate": "date",
+  "healthScanFieldNextDate": "next booster",
+  "healthScanFieldBatch": "batch number",
+  "healthScanFieldPractitioner": "vet",
+  "healthScanMedicineHint": "“{name}” looks like a medicine: add it from “Treatments”.",
+  "healthScanVaccineHint": "“{name}” looks like a vaccine: record it as a “Vaccine” entry in the health record."
 }

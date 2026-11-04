@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../data/health_format.dart';
 import '../data/health_repository.dart';
+import '../data/prescription_parser.dart';
+import '../data/text_scanner.dart';
 import '../data/treatment.dart';
 import 'widgets/health_ui.dart';
+import 'widgets/scan_prescription.dart';
 
 /// « Nouveau traitement » (bouton de la maquette « Traitements »).
 ///
@@ -35,6 +39,10 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
   DateTime? _renewal;
   var _saving = false;
 
+  /// Champs pré-remplis par le dernier scan (à vérifier) et conseil éventuel.
+  var _scanFields = <String>[];
+  String? _scanHint;
+
   @override
   void dispose() {
     for (final c in [_name, _subtitle, _practitioner, _posology, _scheduleNote]) {
@@ -61,6 +69,37 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
   }
 
   String _hhmm(TimeOfDay t) => '${t.hour.toString().padLeft(2, '0')}:${t.minute.toString().padLeft(2, '0')}';
+
+  /// Pré-remplit le nom du médicament, la date de début et le vétérinaire à partir d'un scan d'ordonnance.
+  /// La posologie n'est jamais proposée : l'utilisateur la recopie telle que prescrite.
+  void _applyScan(ScanResult r) {
+    final l = AppLocalizations.of(context);
+    final today = dayOf(DateTime.now());
+    final fields = <String>[];
+    String? hint;
+    setState(() {
+      if (r.isVaccine) {
+        // Un vaccin s'enregistre comme soin du carnet, pas comme traitement.
+        if (r.productName != null) hint = l.healthScanVaccineHint(r.productName!);
+      } else {
+        if (r.productName != null) {
+          _name.text = r.productName!;
+          fields.add(l.healthScanFieldMedicine);
+        }
+        if (r.date != null && !dayOf(r.date!).isAfter(today)) {
+          _start = dayOf(r.date!);
+          if (_end.isBefore(_start)) _end = _start.add(const Duration(days: 6));
+          fields.add(l.healthScanFieldDate);
+        }
+        if (r.practitioner != null) {
+          _practitioner.text = r.practitioner!;
+          fields.add(l.healthScanFieldPractitioner);
+        }
+      }
+      _scanFields = fields;
+      _scanHint = hint;
+    });
+  }
 
   Future<void> _save() async {
     if (_saving || !_formKey.currentState!.validate()) return;
@@ -134,6 +173,14 @@ class _TreatmentFormScreenState extends State<TreatmentFormScreen> {
         child: ListView(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
           children: [
+            if (isTextScanSupported) ...[
+              ScanPrescriptionButton(onResult: _applyScan),
+              const SizedBox(height: 16),
+            ],
+            if (_scanFields.isNotEmpty || _scanHint != null) ...[
+              ScanReviewBanner(fields: _scanFields, hint: _scanHint),
+              const SizedBox(height: 16),
+            ],
             HealthCard(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,

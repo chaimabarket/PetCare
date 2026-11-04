@@ -1825,6 +1825,102 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Prévu le {date}'**
   String healthTodayDueOn(String date);
+
+  /// No description provided for @healthScanButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Scanner une vignette ou une ordonnance'**
+  String get healthScanButton;
+
+  /// No description provided for @healthScanHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo nette et bien éclairée. Le texte est lu sur le téléphone, sans connexion.'**
+  String get healthScanHint;
+
+  /// No description provided for @healthScanFromCamera.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une photo'**
+  String get healthScanFromCamera;
+
+  /// No description provided for @healthScanFromGallery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir dans la galerie'**
+  String get healthScanFromGallery;
+
+  /// No description provided for @healthScanReading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lecture du texte…'**
+  String get healthScanReading;
+
+  /// No description provided for @healthScanNothing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune information utilisable n\'a été lue. Saisissez les champs à la main.'**
+  String get healthScanNothing;
+
+  /// No description provided for @healthScanError.
+  ///
+  /// In fr, this message translates to:
+  /// **'La lecture a échoué. Réessayez avec une photo plus nette.'**
+  String get healthScanError;
+
+  /// No description provided for @healthScanReview.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pré-rempli par le scan : {fields}. Vérifiez et corrigez avant d\'enregistrer.'**
+  String healthScanReview(String fields);
+
+  /// No description provided for @healthScanFieldVaccine.
+  ///
+  /// In fr, this message translates to:
+  /// **'vaccin'**
+  String get healthScanFieldVaccine;
+
+  /// No description provided for @healthScanFieldMedicine.
+  ///
+  /// In fr, this message translates to:
+  /// **'médicament'**
+  String get healthScanFieldMedicine;
+
+  /// No description provided for @healthScanFieldDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'date'**
+  String get healthScanFieldDate;
+
+  /// No description provided for @healthScanFieldNextDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'prochain rappel'**
+  String get healthScanFieldNextDate;
+
+  /// No description provided for @healthScanFieldBatch.
+  ///
+  /// In fr, this message translates to:
+  /// **'numéro de lot'**
+  String get healthScanFieldBatch;
+
+  /// No description provided for @healthScanFieldPractitioner.
+  ///
+  /// In fr, this message translates to:
+  /// **'vétérinaire'**
+  String get healthScanFieldPractitioner;
+
+  /// No description provided for @healthScanMedicineHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {name} » ressemble à un médicament : ajoutez-le depuis « Traitements ».'**
+  String healthScanMedicineHint(String name);
+
+  /// No description provided for @healthScanVaccineHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {name} » ressemble à un vaccin : enregistrez-le comme soin « Vaccin » dans le carnet.'**
+  String healthScanVaccineHint(String name);
 }
 
 class _AppLocalizationsDelegate

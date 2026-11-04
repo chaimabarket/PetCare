@@ -1069,4 +1069,61 @@ class AppLocalizationsFr extends AppLocalizations {
   String healthTodayDueOn(String date) {
     return 'Prévu le $date';
   }
+
+  @override
+  String get healthScanButton => 'Scanner une vignette ou une ordonnance';
+
+  @override
+  String get healthScanHint =>
+      'Photo nette et bien éclairée. Le texte est lu sur le téléphone, sans connexion.';
+
+  @override
+  String get healthScanFromCamera => 'Prendre une photo';
+
+  @override
+  String get healthScanFromGallery => 'Choisir dans la galerie';
+
+  @override
+  String get healthScanReading => 'Lecture du texte…';
+
+  @override
+  String get healthScanNothing =>
+      'Aucune information utilisable n\'a été lue. Saisissez les champs à la main.';
+
+  @override
+  String get healthScanError =>
+      'La lecture a échoué. Réessayez avec une photo plus nette.';
+
+  @override
+  String healthScanReview(String fields) {
+    return 'Pré-rempli par le scan : $fields. Vérifiez et corrigez avant d\'enregistrer.';
+  }
+
+  @override
+  String get healthScanFieldVaccine => 'vaccin';
+
+  @override
+  String get healthScanFieldMedicine => 'médicament';
+
+  @override
+  String get healthScanFieldDate => 'date';
+
+  @override
+  String get healthScanFieldNextDate => 'prochain rappel';
+
+  @override
+  String get healthScanFieldBatch => 'numéro de lot';
+
+  @override
+  String get healthScanFieldPractitioner => 'vétérinaire';
+
+  @override
+  String healthScanMedicineHint(String name) {
+    return '« $name » ressemble à un médicament : ajoutez-le depuis « Traitements ».';
+  }
+
+  @override
+  String healthScanVaccineHint(String name) {
+    return '« $name » ressemble à un vaccin : enregistrez-le comme soin « Vaccin » dans le carnet.';
+  }
 }

@@ -3,13 +3,17 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../l10n/app_localizations.dart';
 import '../../appointments/data/reminder.dart';
 import '../../appointments/data/reminder_repository.dart';
 import '../data/health_entry.dart';
 import '../data/health_format.dart';
 import '../data/health_pet.dart';
 import '../data/health_repository.dart';
+import '../data/prescription_parser.dart';
+import '../data/text_scanner.dart';
 import 'widgets/health_ui.dart';
+import 'widgets/scan_prescription.dart';
 
 /// Suggestions sous « Nom ou Spécialité du vaccin » : libellé de la puce → texte inséré.
 const _visitReasons = ['Contrôle annuel', 'Maladie', 'Blessure', 'Suivi après opération', 'Urgence'];
@@ -58,6 +62,10 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
   DateTime? _followUp;
   final _attachments = <PendingAttachment>[];
   var _saving = false;
+
+  /// Champs pré-remplis par le dernier scan (à vérifier) et conseil éventuel.
+  var _scanFields = <String>[];
+  String? _scanHint;
 
   HealthPet? _pet;
   String? _usualPractitioner;
@@ -223,6 +231,52 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
     return (title, text.isEmpty ? null : text);
   }
 
+  /// Pré-remplit le formulaire à partir d'un scan d'ordonnance ou de vignette ; rien n'est enregistré :
+  /// l'utilisateur vérifie et corrige avant « Enregistrer ».
+  void _applyScan(ScanResult r) {
+    final l = AppLocalizations.of(context);
+    final today = dayOf(DateTime.now());
+    final fields = <String>[];
+    String? hint;
+    setState(() {
+      if (r.isVaccine && _type != HealthEntryType.vaccine) {
+        _type = HealthEntryType.vaccine;
+        _subject.clear();
+      }
+      final vaccine = _type == HealthEntryType.vaccine;
+      if (r.productName != null) {
+        if (vaccine) {
+          _vaccineName.text = r.productName!;
+          fields.add(l.healthScanFieldVaccine);
+        } else {
+          // Un médicament se suit dans « Traitements », pas comme soin du carnet.
+          hint = l.healthScanMedicineHint(r.productName!);
+        }
+      }
+      if (vaccine && r.batchNumber != null) {
+        _batchNumber.text = r.batchNumber!;
+        fields.add(l.healthScanFieldBatch);
+      }
+      if (r.date != null && !dayOf(r.date!).isAfter(today)) {
+        _careDate = dayOf(r.date!);
+        if (!_nextReminder.isAfter(_careDate)) {
+          _nextReminder = DateTime(_careDate.year + 1, _careDate.month, _careDate.day);
+        }
+        fields.add(l.healthScanFieldDate);
+      }
+      if (vaccine && r.nextDate != null && r.nextDate!.isAfter(_careDate)) {
+        _nextReminder = dayOf(r.nextDate!);
+        fields.add(l.healthScanFieldNextDate);
+      }
+      if (r.practitioner != null) {
+        _practitioner.text = r.practitioner!;
+        fields.add(l.healthScanFieldPractitioner);
+      }
+      _scanFields = fields;
+      _scanHint = hint;
+    });
+  }
+
   Future<void> _save() async {
     if (_saving || !_formKey.currentState!.validate()) return;
     final cost = double.tryParse(_cost.text.replaceAll('€', '').replaceAll(' ', '').replaceAll(',', '.'));
@@ -315,6 +369,14 @@ class _MedicalEntryFormScreenState extends State<MedicalEntryFormScreen> {
               style: HealthText.bodyMd,
             ),
             const SizedBox(height: 16),
+            if (isTextScanSupported) ...[
+              ScanPrescriptionButton(onResult: _applyScan),
+              const SizedBox(height: 16),
+            ],
+            if (_scanFields.isNotEmpty || _scanHint != null) ...[
+              ScanReviewBanner(fields: _scanFields, hint: _scanHint),
+              const SizedBox(height: 16),
+            ],
             _section(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,

@@ -1058,4 +1058,61 @@ class AppLocalizationsEn extends AppLocalizations {
   String healthTodayDueOn(String date) {
     return 'Due on $date';
   }
+
+  @override
+  String get healthScanButton => 'Scan a vaccine sticker or prescription';
+
+  @override
+  String get healthScanHint =>
+      'Sharp, well-lit photo. The text is read on the phone, offline.';
+
+  @override
+  String get healthScanFromCamera => 'Take a photo';
+
+  @override
+  String get healthScanFromGallery => 'Choose from gallery';
+
+  @override
+  String get healthScanReading => 'Reading text…';
+
+  @override
+  String get healthScanNothing =>
+      'Nothing usable could be read. Please fill in the fields by hand.';
+
+  @override
+  String get healthScanError =>
+      'Reading failed. Try again with a sharper photo.';
+
+  @override
+  String healthScanReview(String fields) {
+    return 'Pre-filled by the scan: $fields. Check and correct before saving.';
+  }
+
+  @override
+  String get healthScanFieldVaccine => 'vaccine';
+
+  @override
+  String get healthScanFieldMedicine => 'medicine';
+
+  @override
+  String get healthScanFieldDate => 'date';
+
+  @override
+  String get healthScanFieldNextDate => 'next booster';
+
+  @override
+  String get healthScanFieldBatch => 'batch number';
+
+  @override
+  String get healthScanFieldPractitioner => 'vet';
+
+  @override
+  String healthScanMedicineHint(String name) {
+    return '“$name” looks like a medicine: add it from “Treatments”.';
+  }
+
+  @override
+  String healthScanVaccineHint(String name) {
+    return '“$name” looks like a vaccine: record it as a “Vaccine” entry in the health record.';
+  }
 }
