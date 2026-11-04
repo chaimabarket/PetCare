@@ -245,6 +245,51 @@ test('une pesée se corrige sans changer de jour', async () => {
   });
 });
 
+/** Pesée datée de [daysAgo] jours, au format envoyé par l'application. */
+const recentWeight = (daysAgo, weightKg) => {
+  const date = new Date(Date.now() - daysAgo * 86400000).toISOString().slice(0, 10);
+  return { date, measuredOn: `${date}T00:00:00.000Z`, weightKg };
+};
+
+const weightNotifications = (docs) => [...docs.keys()].filter((p) => p.startsWith(`users/${UID}/notifications/poids-`));
+
+test('alerte de poids : une chute brutale notifie tout de suite, une seule fois par épisode', async () => {
+  await withServer(async (api, { docs }) => {
+    const { json: pet } = await api('POST', '', body({ species: 'dog', birthDate: '2020-01-01T00:00:00.000Z' }));
+    await api('POST', `/${pet.id}/weights`, recentWeight(7, 10));
+    assert.deepStrictEqual(weightNotifications(docs), []);
+
+    assert.strictEqual((await api('POST', `/${pet.id}/weights`, recentWeight(0, 9.4))).status, 201);
+    const [path] = weightNotifications(docs);
+    assert.strictEqual(path, `users/${UID}/notifications/poids-${pet.id}-rapid-loss-${recentWeight(7, 0).date}`);
+    const notification = docs.get(path);
+    assert.strictEqual(notification.category.stringValue, 'sante');
+    assert.strictEqual(notification.read.booleanValue, false);
+    assert.strictEqual(notification.title.stringValue, 'Poids de Milo : consultez un vétérinaire');
+
+    // Même épisode : la correction de la pesée ne renvoie pas de notification.
+    await api('PUT', `/${pet.id}/weights/${recentWeight(0, 0).date}`, { weightKg: 9.45 });
+    assert.strictEqual(weightNotifications(docs).length, 1);
+
+    // L'épisode s'aggrave (plus de 10 %) : nouvelle notification.
+    await api('PUT', `/${pet.id}/weights/${recentWeight(0, 0).date}`, { weightKg: 8.9 });
+    assert.strictEqual(weightNotifications(docs).length, 2);
+  });
+});
+
+test("alerte de poids : pas de notification sans variation anormale, ni si l'écriture échoue", async () => {
+  await withServer(async (api, { docs }) => {
+    const { json: pet } = await api('POST', '', body({ species: 'dog', birthDate: '2020-01-01T00:00:00.000Z' }));
+    await api('POST', `/${pet.id}/weights`, recentWeight(7, 10));
+    await api('POST', `/${pet.id}/weights`, recentWeight(0, 9.8));
+    assert.deepStrictEqual(weightNotifications(docs), []);
+
+    // Pesée en double : refusée (409) avant toute analyse.
+    assert.strictEqual((await api('POST', `/${pet.id}/weights`, recentWeight(0, 5))).status, 409);
+    assert.deepStrictEqual(weightNotifications(docs), []);
+  });
+});
+
 test('un animal archivé se lit et se restaure, mais ne se modifie plus', async () => {
   await withServer(async (api) => {
     const { json: pet } = await api('POST', '', body());

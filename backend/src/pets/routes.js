@@ -8,6 +8,7 @@ const E = require('./enums');
 const {
   petFields, petPatch, photoBytes, gallery, weightEntry, weightCorrection, MAX_PHOTOS,
 } = require('./validation');
+const { analyzeWeights, alertMessage, alertNotificationId } = require('./weight_alert');
 
 const wrap = (handler) => (req, res, next) => Promise.resolve(handler(req, res)).catch(next);
 
@@ -57,6 +58,24 @@ function reorderOps(petId, ordered) {
 function todayWeightOp(petId, body) {
   const { id, data } = weightEntry(body);
   return writeOp(weightPath(petId, id), data, { serverTimestamps: ['createdAt'], replace: true });
+}
+
+/**
+ * Analyse les pesées juste après une écriture et notifie le propriétaire tout de suite si le poids varie
+ * anormalement. C'est un complément : son échec ne bloque jamais l'enregistrement de la pesée.
+ */
+async function notifyWeightAlert(token, pet) {
+  try {
+    const entries = await queryCollection(token, petPath(pet.id), 'weights', { orderBy: 'measuredOn', limit: 60 });
+    const alert = analyzeWeights({ entries, species: pet.species, birthDate: pet.birthDate, status: pet.status });
+    if (!alert) return;
+    const { title, body } = alertMessage(alert, pet.name);
+    await writeDocument(token, `users/${pet.ownerId}/notifications/${alertNotificationId(pet.id, alert)}`, {
+      title, body, category: 'sante', read: false,
+    }, { serverTimestamps: ['createdAt'], mustNotExist: true });
+  } catch {
+    // Même épisode déjà notifié, ou écriture refusée : ignoré volontairement.
+  }
 }
 
 function petsRouter() {
@@ -129,6 +148,7 @@ function petsRouter() {
     if (req.body.weight) writes.push(todayWeightOp(pet.id, req.body.weight));
 
     await commit(req.token, writes);
+    if (req.body.weight) await notifyWeightAlert(req.token, { ...pet, ...fields });
     res.json(await getDocument(req.token, petPath(pet.id)));
   }));
 
@@ -239,6 +259,7 @@ function petsRouter() {
       if (error.status === 409) throw new ApiError(409, 'Une pesée existe déjà à cette date.');
       throw error;
     }
+    await notifyWeightAlert(req.token, pet);
     res.status(201).json(await getDocument(req.token, weightPath(pet.id, id)));
   }));
 
@@ -250,6 +271,7 @@ function petsRouter() {
     if (!await getDocument(req.token, path)) throw new ApiError(404, 'Pesée introuvable.');
 
     await writeDocument(req.token, path, data, { mustExist: true });
+    await notifyWeightAlert(req.token, pet);
     res.json(await getDocument(req.token, path));
   }));
 
