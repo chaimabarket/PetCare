@@ -8,6 +8,7 @@
 
   "navHome": "Home",
   "navPets": "My pets",
+  "navHealth": "Health",
   "navCommunity": "Community",
   "navServices": "Services",
   "shellSignIn": "Sign in",
@@ -262,5 +263,27 @@
   "petsArchiveBlockersFooter": "{count, plural, =1{Archiving will be unlocked once this item is resolved.} other{Archiving will be unlocked once these {count} items are resolved.}}",
   "petsArchiveLockedTooltip": "Complete the pending actions to be able to archive",
   "petsArchiveChecksTitle": "Before archiving: appointments and listings",
-  "petsArchiveChecksBody": "Checking upcoming appointments and open listings will be available soon."
+  "petsArchiveChecksBody": "Checking upcoming appointments and open listings will be available soon.",
+
+  "healthTabVisitorTitle": "Sign in to follow your pets' health",
+  "healthTabVisitorBody": "Health records are private and linked to your account.",
+  "healthTabSignIn": "Sign in",
+  "healthTabEmptyTitle": "No pets yet",
+  "healthTabEmptyBody": "A health record belongs to a pet's profile. Add your companion first.",
+  "healthTabAddPet": "Add a pet",
+  "healthTabMyPets": "My pets",
+  "healthTabArchived": "{count, plural, =1{1 archived pet} other{{count} archived pets}}",
+  "healthTabReadOnly": "Read-only record",
+  "healthTabVaccineOverdue": "Vaccine overdue",
+  "healthTabVaccineSoon": "Vaccine due soon",
+  "healthTabVaccineUpToDate": "Vaccines up to date",
+  "healthTabVaccineNone": "No booster scheduled",
+  "healthTabVaccineDue": "{name}: {date}",
+  "healthTabTreatments": "{count, plural, =0{No ongoing treatment} =1{1 ongoing treatment} other{{count} ongoing treatments}}",
+  "healthTabDosesToday": "Today's doses: {done}/{total}",
+  "healthTabLastVisit": "Last visit: {date}",
+  "healthTabAllergy": "Allergy: {name}",
+  "healthTabLoadError": "Your pets' health could not be loaded.",
+  "healthTabRetry": "Retry",
+  "healthArchivedBanner": "Archived pet: its health record is read-only. Restore it from “My pets” to edit it."
 }

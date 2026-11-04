@@ -28,6 +28,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navPets => 'My pets';
 
   @override
+  String get navHealth => 'Health';
+
+  @override
   String get navCommunity => 'Community';
 
   @override
@@ -915,4 +918,95 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get petsArchiveChecksBody =>
       'Checking upcoming appointments and open listings will be available soon.';
+
+  @override
+  String get healthTabVisitorTitle => 'Sign in to follow your pets\' health';
+
+  @override
+  String get healthTabVisitorBody =>
+      'Health records are private and linked to your account.';
+
+  @override
+  String get healthTabSignIn => 'Sign in';
+
+  @override
+  String get healthTabEmptyTitle => 'No pets yet';
+
+  @override
+  String get healthTabEmptyBody =>
+      'A health record belongs to a pet\'s profile. Add your companion first.';
+
+  @override
+  String get healthTabAddPet => 'Add a pet';
+
+  @override
+  String get healthTabMyPets => 'My pets';
+
+  @override
+  String healthTabArchived(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count archived pets',
+      one: '1 archived pet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get healthTabReadOnly => 'Read-only record';
+
+  @override
+  String get healthTabVaccineOverdue => 'Vaccine overdue';
+
+  @override
+  String get healthTabVaccineSoon => 'Vaccine due soon';
+
+  @override
+  String get healthTabVaccineUpToDate => 'Vaccines up to date';
+
+  @override
+  String get healthTabVaccineNone => 'No booster scheduled';
+
+  @override
+  String healthTabVaccineDue(String name, String date) {
+    return '$name: $date';
+  }
+
+  @override
+  String healthTabTreatments(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ongoing treatments',
+      one: '1 ongoing treatment',
+      zero: 'No ongoing treatment',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String healthTabDosesToday(int done, int total) {
+    return 'Today\'s doses: $done/$total';
+  }
+
+  @override
+  String healthTabLastVisit(String date) {
+    return 'Last visit: $date';
+  }
+
+  @override
+  String healthTabAllergy(String name) {
+    return 'Allergy: $name';
+  }
+
+  @override
+  String get healthTabLoadError => 'Your pets\' health could not be loaded.';
+
+  @override
+  String get healthTabRetry => 'Retry';
+
+  @override
+  String get healthArchivedBanner =>
+      'Archived pet: its health record is read-only. Restore it from “My pets” to edit it.';
 }

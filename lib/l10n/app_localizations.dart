@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'Mes animaux'**
   String get navPets;
 
+  /// No description provided for @navHealth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Santé'**
+  String get navHealth;
+
   /// No description provided for @navCommunity.
   ///
   /// In fr, this message translates to:
@@ -1609,6 +1615,132 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'La vérification des rendez-vous à venir et des annonces ouvertes sera bientôt disponible.'**
   String get petsArchiveChecksBody;
+
+  /// No description provided for @healthTabVisitorTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connectez-vous pour suivre la santé de vos animaux'**
+  String get healthTabVisitorTitle;
+
+  /// No description provided for @healthTabVisitorBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le carnet de santé est privé : il est lié à votre compte.'**
+  String get healthTabVisitorBody;
+
+  /// No description provided for @healthTabSignIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se connecter'**
+  String get healthTabSignIn;
+
+  /// No description provided for @healthTabEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun animal pour l\'instant'**
+  String get healthTabEmptyTitle;
+
+  /// No description provided for @healthTabEmptyBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le carnet de santé se tient depuis la fiche d\'un animal. Ajoutez d\'abord votre compagnon.'**
+  String get healthTabEmptyBody;
+
+  /// No description provided for @healthTabAddPet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un animal'**
+  String get healthTabAddPet;
+
+  /// No description provided for @healthTabMyPets.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes animaux'**
+  String get healthTabMyPets;
+
+  /// No description provided for @healthTabArchived.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 animal archivé} other{{count} animaux archivés}}'**
+  String healthTabArchived(int count);
+
+  /// No description provided for @healthTabReadOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carnet en lecture seule'**
+  String get healthTabReadOnly;
+
+  /// No description provided for @healthTabVaccineOverdue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vaccin en retard'**
+  String get healthTabVaccineOverdue;
+
+  /// No description provided for @healthTabVaccineSoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vaccin bientôt'**
+  String get healthTabVaccineSoon;
+
+  /// No description provided for @healthTabVaccineUpToDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vaccins à jour'**
+  String get healthTabVaccineUpToDate;
+
+  /// No description provided for @healthTabVaccineNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun rappel prévu'**
+  String get healthTabVaccineNone;
+
+  /// No description provided for @healthTabVaccineDue.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} : {date}'**
+  String healthTabVaccineDue(String name, String date);
+
+  /// No description provided for @healthTabTreatments.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =0{Aucun traitement en cours} =1{1 traitement en cours} other{{count} traitements en cours}}'**
+  String healthTabTreatments(int count);
+
+  /// No description provided for @healthTabDosesToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prises du jour : {done}/{total}'**
+  String healthTabDosesToday(int done, int total);
+
+  /// No description provided for @healthTabLastVisit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dernière visite : {date}'**
+  String healthTabLastVisit(String date);
+
+  /// No description provided for @healthTabAllergy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Allergie : {name}'**
+  String healthTabAllergy(String name);
+
+  /// No description provided for @healthTabLoadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de charger la santé de vos animaux.'**
+  String get healthTabLoadError;
+
+  /// No description provided for @healthTabRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get healthTabRetry;
+
+  /// No description provided for @healthArchivedBanner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Animal archivé : son carnet est en lecture seule. Restaurez-le depuis « Mes animaux » pour le modifier.'**
+  String get healthArchivedBanner;
 }
 
 class _AppLocalizationsDelegate

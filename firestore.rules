@@ -188,6 +188,13 @@ service cloud.firestore {
           && get(/databases/$(database)/documents/pets/$(petId)).data.ownerId == request.auth.uid;
       }
 
+      // Module 2 : le carnet d'un animal archivé se lit, mais ne se modifie plus (même règle que l'API, 409).
+      // Le get() est le même que celui de petOwner() : Firestore ne le facture qu'une fois par requête.
+      function petOwnerActive() {
+        return petOwner()
+          && get(/databases/$(database)/documents/pets/$(petId)).data.status == 'active';
+      }
+
       function validPet(d) {
         return d.keys().hasOnly(['ownerId', 'name', 'species', 'sex', 'breed', 'birthDate',
             'birthDateEstimated', 'chipNumber', 'sterilized', 'notes', 'status', 'archivedReason',
@@ -265,17 +272,19 @@ service cloud.firestore {
       }
 
       match /healthEntries/{entryId} {
-        allow read, delete: if petOwner();
-        allow create: if petOwner() && validHealthEntry(request.resource.data);
+        allow read: if petOwner();
+        allow delete: if petOwnerActive();
+        allow create: if petOwnerActive() && validHealthEntry(request.resource.data);
         // Seul le bouton « rappel déjà fait » modifie un soin enregistré.
-        allow update: if petOwner()
+        allow update: if petOwnerActive()
           && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reminderDone'])
           && request.resource.data.reminderDone is bool;
 
         // Pièces jointes (ordonnance, vignette) : octets, 3 au maximum par soin.
         match /files/{fileId} {
-          allow read, delete: if petOwner();
-          allow create: if petOwner()
+          allow read: if petOwner();
+          allow delete: if petOwnerActive();
+          allow create: if petOwnerActive()
             && fileId in ['0', '1', '2']
             && request.resource.data.keys().hasOnly(['name', 'mimeType', 'data'])
             && request.resource.data.name is string && request.resource.data.name.size() <= 200
@@ -304,13 +313,14 @@ service cloud.firestore {
       }
 
       match /treatments/{treatmentId} {
-        allow read, delete: if petOwner();
-        allow create: if petOwner()
+        allow read: if petOwner();
+        allow delete: if petOwnerActive();
+        allow create: if petOwnerActive()
           && validTreatment(request.resource.data)
           && request.resource.data.doses.size() == 0
           && request.resource.data.get('stoppedAt', null) == null;
         // Noter une prise, ou arrêter un traitement (une seule fois, avec une raison).
-        allow update: if petOwner() && validTreatment(request.resource.data) && (
+        allow update: if petOwnerActive() && validTreatment(request.resource.data) && (
           (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['doses'])
             && request.resource.data.doses.size() == resource.data.doses.size() + 1
             && resource.data.get('stoppedAt', null) == null)

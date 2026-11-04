@@ -1,11 +1,13 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/navigation/main_tabs.dart';
 import '../../../core/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/widgets/language_button.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../community/presentation/community_screen.dart';
+import '../../health/presentation/health_tab_screen.dart';
 import '../../notifications/data/notification_service.dart';
 import '../../pets/presentation/my_pets_screen.dart';
 import '../../profile/data/profile_repository.dart';
@@ -14,7 +16,7 @@ import '../../profile/presentation/widgets/user_avatar.dart';
 import '../../services/presentation/service_directory_screen.dart';
 import 'home_screen.dart';
 
-/// Structure principale après connexion (ou en visiteur) : en-tête + 4 onglets du cahier des charges.
+/// Structure principale après connexion (ou en visiteur) : en-tête + 5 onglets (voir [MainTab]).
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -25,18 +27,11 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _index = 0;
 
-  static List<({String label, IconData icon, IconData activeIcon})> _tabs(AppLocalizations l) => [
-        (label: l.navHome, icon: Icons.home_outlined, activeIcon: Icons.home),
-        (label: l.navPets, icon: Icons.pets_outlined, activeIcon: Icons.pets),
-        (label: l.navCommunity, icon: Icons.volunteer_activism_outlined, activeIcon: Icons.volunteer_activism),
-        (label: l.navServices, icon: Icons.medical_services_outlined, activeIcon: Icons.medical_services),
-      ];
-
   void _selectTab(int index) => setState(() => _index = index);
 
   @override
   Widget build(BuildContext context) {
-    final tabs = _tabs(AppLocalizations.of(context));
+    final tabs = mainTabs(AppLocalizations.of(context));
     return Scaffold(
       appBar: _Header(title: tabs[_index].label),
       body: IndexedStack(
@@ -44,6 +39,8 @@ class _MainShellState extends State<MainShell> {
         children: [
           HomeScreen(onOpenTab: _selectTab),
           const MyPetsScreen(),
+          // Module 2 : santé de tous les animaux et tableau du jour.
+          HealthTabScreen(onOpenTab: _selectTab),
           // Modules 4 et 5 : écran « Communauté » (Adoption, Perdus & trouvés, Happy Tails).
           const CommunityScreen(),
           // Module 6 : annuaire des prestataires.

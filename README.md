@@ -157,8 +157,18 @@ Pour le module 1 : `AdoptionRepository.confirmAdoption` est l'endroit où copier
 | Fiches Santé & Conseils (recherche, catégories, marque-pages) | `fiches_sant_pr_vention_petcare_community_2` | `AppRoutes.healthSheets` |
 | Détail d'une fiche | pas de maquette, consigne 2.5 de STITCH_PROMPTS.md | `AppRoutes.healthSheetDetail` (`HealthSheet`) |
 
+Onglet **Santé** (3e onglet de la barre du bas, `HealthTabScreen`) : une carte par animal actif (prochain vaccin à jour,
+bientôt ou en retard, traitements en cours et prises du jour, dernière visite, allergies), les animaux qui demandent une
+action en premier ; les animaux archivés dans une section repliée, carnet en lecture seule. Tout vient d'un seul appel
+`GET /api/health/summary`, relu toutes les 60 s et aussitôt après une modification. Les numéros d'onglet sont dans
+`lib/core/navigation/main_tabs.dart` (`MainTab`).
+
+`HealthRepository` passe par l'API REST (`backend/src/health/`, voir `backend/README.md`) et, si le serveur est éteint,
+directement par Firestore. Le carnet d'un animal archivé ne se modifie plus : l'API renvoie `409` et les règles
+(`petOwnerActive`) refusent aussi l'écriture directe.
+
 L'Accueil affiche la carte « Vaccins & traitements » (prochains rappels et prises, accès au carnet de chaque animal
-et aux fiches santé). Le vaccin peut créer une alerte dans les rappels du module 3 (« Créer une alerte dans l'agenda ») ;
+et aux fiches santé), lue dans la même synthèse. Le vaccin peut créer une alerte dans les rappels du module 3 (« Créer une alerte dans l'agenda ») ;
 « Prendre RDV rappel » ouvre le formulaire de rendez-vous du module 3.
 
 Données Firestore (privées au propriétaire de l'animal, voir `firestore.rules`) :

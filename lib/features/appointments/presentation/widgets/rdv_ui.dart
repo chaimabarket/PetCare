@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/navigation/main_tabs.dart';
 import '../../../../core/routes.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../notifications/data/notification_service.dart';
 import '../../../profile/data/profile_repository.dart';
 import '../../../profile/data/user_profile.dart';
@@ -377,15 +379,9 @@ class RdvTabScaffold extends StatelessWidget {
   final bool showLogo;
   final Widget? extraAction;
 
-  static const _tabs = [
-    (label: 'Accueil', icon: Icons.home_outlined, activeIcon: Icons.home),
-    (label: 'Mes animaux', icon: Icons.pets_outlined, activeIcon: Icons.pets),
-    (label: 'Communauté', icon: Icons.volunteer_activism_outlined, activeIcon: Icons.volunteer_activism),
-    (label: 'Services', icon: Icons.medical_services_outlined, activeIcon: Icons.medical_services),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final tabs = mainTabs(AppLocalizations.of(context));
     return Scaffold(
       backgroundColor: RdvColors.surface,
       appBar: AppBar(
@@ -423,7 +419,7 @@ class RdvTabScaffold extends StatelessWidget {
       body: body,
       floatingActionButton: floatingActionButton,
       bottomNavigationBar: NavigationBar(
-        selectedIndex: 0,
+        selectedIndex: MainTab.home,
         onDestinationSelected: (index) => Navigator.of(context).pop(index),
         backgroundColor: AppColors.surface,
         indicatorColor: AppColors.teal.withValues(alpha: 0.12),
@@ -436,7 +432,7 @@ class RdvTabScaffold extends StatelessWidget {
           ),
         ),
         destinations: [
-          for (final tab in _tabs)
+          for (final tab in tabs)
             NavigationDestination(
               icon: Icon(tab.icon, color: RdvColors.onSurfaceVariant),
               selectedIcon: Icon(tab.activeIcon, color: AppColors.teal),

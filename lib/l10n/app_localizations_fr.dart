@@ -28,6 +28,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navPets => 'Mes animaux';
 
   @override
+  String get navHealth => 'Santé';
+
+  @override
   String get navCommunity => 'Communauté';
 
   @override
@@ -924,4 +927,97 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get petsArchiveChecksBody =>
       'La vérification des rendez-vous à venir et des annonces ouvertes sera bientôt disponible.';
+
+  @override
+  String get healthTabVisitorTitle =>
+      'Connectez-vous pour suivre la santé de vos animaux';
+
+  @override
+  String get healthTabVisitorBody =>
+      'Le carnet de santé est privé : il est lié à votre compte.';
+
+  @override
+  String get healthTabSignIn => 'Se connecter';
+
+  @override
+  String get healthTabEmptyTitle => 'Aucun animal pour l\'instant';
+
+  @override
+  String get healthTabEmptyBody =>
+      'Le carnet de santé se tient depuis la fiche d\'un animal. Ajoutez d\'abord votre compagnon.';
+
+  @override
+  String get healthTabAddPet => 'Ajouter un animal';
+
+  @override
+  String get healthTabMyPets => 'Mes animaux';
+
+  @override
+  String healthTabArchived(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count animaux archivés',
+      one: '1 animal archivé',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get healthTabReadOnly => 'Carnet en lecture seule';
+
+  @override
+  String get healthTabVaccineOverdue => 'Vaccin en retard';
+
+  @override
+  String get healthTabVaccineSoon => 'Vaccin bientôt';
+
+  @override
+  String get healthTabVaccineUpToDate => 'Vaccins à jour';
+
+  @override
+  String get healthTabVaccineNone => 'Aucun rappel prévu';
+
+  @override
+  String healthTabVaccineDue(String name, String date) {
+    return '$name : $date';
+  }
+
+  @override
+  String healthTabTreatments(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count traitements en cours',
+      one: '1 traitement en cours',
+      zero: 'Aucun traitement en cours',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String healthTabDosesToday(int done, int total) {
+    return 'Prises du jour : $done/$total';
+  }
+
+  @override
+  String healthTabLastVisit(String date) {
+    return 'Dernière visite : $date';
+  }
+
+  @override
+  String healthTabAllergy(String name) {
+    return 'Allergie : $name';
+  }
+
+  @override
+  String get healthTabLoadError =>
+      'Impossible de charger la santé de vos animaux.';
+
+  @override
+  String get healthTabRetry => 'Réessayer';
+
+  @override
+  String get healthArchivedBanner =>
+      'Animal archivé : son carnet est en lecture seule. Restaurez-le depuis « Mes animaux » pour le modifier.';
 }

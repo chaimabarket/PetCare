@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/navigation/main_tabs.dart';
 import '../../../core/routes.dart';
 import '../../appointments/presentation/widgets/rdv_ui.dart' show RdvBellButton;
 import '../data/health_format.dart';
@@ -86,7 +87,7 @@ class _HealthSheetsScreenState extends State<HealthSheetsScreen> {
           if (_uid != null) const RdvBellButton(),
         ],
       ),
-      bottomNavigationBar: const HealthBottomBar(selectedIndex: 0),
+      bottomNavigationBar: const HealthBottomBar(selectedIndex: MainTab.health),
       body: StreamBuilder<List<HealthSheet>>(
         stream: _sheetsStream,
         builder: (context, sheetsSnap) => StreamBuilder<Set<String>>(
@@ -619,7 +620,7 @@ class HealthHelpCard extends StatelessWidget {
           const SizedBox(height: 4),
           TextButton(
             // Annuaire des services (module 6) : l'onglet « Services » de la structure principale.
-            onPressed: () => Navigator.of(context).pop(3),
+            onPressed: () => Navigator.of(context).pop(MainTab.services),
             style: TextButton.styleFrom(
               foregroundColor: HealthColors.primary,
               minimumSize: const Size.fromHeight(40),

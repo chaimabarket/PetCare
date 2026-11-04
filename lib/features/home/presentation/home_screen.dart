@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/navigation/main_tabs.dart';
 import '../../../core/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../appointments/presentation/widgets/upcoming_appointments_card.dart';
@@ -53,11 +54,11 @@ class _HomeScreenState extends State<HomeScreen> {
               _SectionHeader(
                 title: 'Mes animaux',
                 actionLabel: 'Gérer',
-                onAction: () => widget.onOpenTab(1),
+                onAction: () => widget.onOpenTab(MainTab.pets),
               ),
               const SizedBox(height: 12),
               // Module 1 (Profils des animaux) : afficher ici les animaux de l'utilisateur.
-              _AddPetButton(onTap: () => widget.onOpenTab(1)),
+              _AddPetButton(onTap: () => widget.onOpenTab(MainTab.pets)),
               const SizedBox(height: 24),
               // Module 3 (Rendez-vous) : les 2 prochains rendez-vous et l'agenda.
               UpcomingAppointmentsCard(onOpenTab: widget.onOpenTab),
@@ -89,7 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     iconColor: const Color(0xFF8C4E38),
                     title: 'Adoption',
                     subtitle: 'Trouver un compagnon',
-                    onTap: () => widget.onOpenTab(2),
+                    onTap: () => widget.onOpenTab(MainTab.community),
                   ),
                 ),
                 const SizedBox(width: 12),
@@ -100,7 +101,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     iconColor: const Color(0xFF00504A),
                     title: 'Perdus & Trouvés',
                     subtitle: 'Signaler ou aider',
-                    onTap: () => widget.onOpenTab(2),
+                    onTap: () => widget.onOpenTab(MainTab.community),
                   ),
                 ),
               ],
