@@ -6,7 +6,7 @@ import 'assistant_pet.dart';
 
 /// Modèle Gemini gratuit (Gemini Developer API, plan Spark).
 /// Vérifier le nom dans la console Firebase (AI Logic) : Google renomme parfois ses modèles.
-const kAssistantModel = 'gemini-2.5-flash-lite';
+const kAssistantModel = 'gemini-3.5-flash-lite';
 
 /// Messages par utilisateur connecté et par jour (protège le quota gratuit). Même valeur dans firestore.rules.
 const kAssistantDailyLimit = 30;
