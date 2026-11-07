@@ -3,7 +3,9 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../../core/navigation/main_tabs.dart';
 import '../../../../core/theme/app_colors.dart';
+import '../../../../l10n/app_localizations.dart';
 import '../../../appointments/presentation/widgets/rdv_ui.dart' show RdvColors, RdvProfileButton;
 
 /// Couleurs des maquettes Stitch du module Santé (palette Material 3 de `code.html`,
@@ -259,22 +261,16 @@ class HealthAppBar extends StatelessWidget implements PreferredSizeWidget {
   }
 }
 
-/// Barre du bas commune aux 4 onglets. Toucher un autre onglet ferme l'écran et renvoie son
-/// numéro, que l'écran appelant transmet jusqu'à la structure principale.
+/// Barre du bas commune aux 5 onglets ([mainTabs]). Toucher un autre onglet ferme l'écran et renvoie son
+/// numéro ([MainTab]), que l'écran appelant transmet jusqu'à la structure principale.
 class HealthBottomBar extends StatelessWidget {
   const HealthBottomBar({super.key, required this.selectedIndex});
 
   final int selectedIndex;
 
-  static const _tabs = [
-    (label: 'Accueil', icon: Icons.home_outlined, activeIcon: Icons.home),
-    (label: 'Mes animaux', icon: Icons.pets_outlined, activeIcon: Icons.pets),
-    (label: 'Communauté', icon: Icons.volunteer_activism_outlined, activeIcon: Icons.volunteer_activism),
-    (label: 'Services', icon: Icons.medical_services_outlined, activeIcon: Icons.medical_services),
-  ];
-
   @override
   Widget build(BuildContext context) {
+    final tabs = mainTabs(AppLocalizations.of(context));
     return NavigationBar(
       selectedIndex: selectedIndex,
       onDestinationSelected: (index) => Navigator.of(context).pop(index),
@@ -289,7 +285,7 @@ class HealthBottomBar extends StatelessWidget {
         ),
       ),
       destinations: [
-        for (final tab in _tabs)
+        for (final tab in tabs)
           NavigationDestination(
             icon: Icon(tab.icon, color: HealthColors.onSurfaceVariant),
             selectedIcon: Icon(tab.activeIcon, color: AppColors.teal),

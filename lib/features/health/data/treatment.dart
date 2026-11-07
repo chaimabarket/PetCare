@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'health_entry.dart' show healthDate;
 import 'health_format.dart';
 
 /// Statut affiché sur la carte (maquette « Traitements ») : En cours, Terminé, Arrêté.
@@ -64,11 +65,16 @@ class Treatment {
     this.scheduleNote,
   });
 
-  factory Treatment.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? const {};
-    final start = (data['startDate'] as Timestamp?)?.toDate() ?? DateTime.now();
+  factory Treatment.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      Treatment.fromData(doc.id, doc.data() ?? const {});
+
+  /// Traitement renvoyé par l'API REST (`/api/pets/{petId}/health/treatments` ou la synthèse).
+  factory Treatment.fromJson(Map<String, dynamic> json) => Treatment.fromData(json['id'] as String? ?? '', json);
+
+  factory Treatment.fromData(String id, Map<String, dynamic> data) {
+    final start = healthDate(data['startDate']) ?? DateTime.now();
     return Treatment(
-      id: doc.id,
+      id: id,
       category: data['category'] as String? ?? 'Autre',
       name: data['name'] as String? ?? '',
       subtitle: data['subtitle'] as String?,
@@ -76,15 +82,12 @@ class Treatment {
       practitioner: data['practitioner'] as String?,
       posology: data['posology'] as String? ?? '',
       startDate: start,
-      endDate: (data['endDate'] as Timestamp?)?.toDate() ?? start,
+      endDate: healthDate(data['endDate']) ?? start,
       doseTimes: [for (final t in (data['doseTimes'] as List?) ?? const []) if (t is String) t],
-      doses: [
-        for (final t in (data['doses'] as List?) ?? const [])
-          if (t is Timestamp) t.toDate(),
-      ]..sort(),
-      stoppedAt: (data['stoppedAt'] as Timestamp?)?.toDate(),
+      doses: [for (final t in (data['doses'] as List?) ?? const []) ?healthDate(t)]..sort(),
+      stoppedAt: healthDate(data['stoppedAt']),
       stopReason: data['stopReason'] as String?,
-      renewalAt: (data['renewalAt'] as Timestamp?)?.toDate(),
+      renewalAt: healthDate(data['renewalAt']),
       scheduleNote: data['scheduleNote'] as String?,
     );
   }

@@ -28,6 +28,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get navPets => 'My pets';
 
   @override
+  String get navHealth => 'Health';
+
+  @override
   String get navCommunity => 'Community';
 
   @override
@@ -1009,4 +1012,201 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get petsArchiveChecksBody =>
       'Checking upcoming appointments and open listings will be available soon.';
+
+  @override
+  String get healthTabVisitorTitle => 'Sign in to follow your pets\' health';
+
+  @override
+  String get healthTabVisitorBody =>
+      'Health records are private and linked to your account.';
+
+  @override
+  String get healthTabSignIn => 'Sign in';
+
+  @override
+  String get healthTabEmptyTitle => 'No pets yet';
+
+  @override
+  String get healthTabEmptyBody =>
+      'A health record belongs to a pet\'s profile. Add your companion first.';
+
+  @override
+  String get healthTabAddPet => 'Add a pet';
+
+  @override
+  String get healthTabMyPets => 'My pets';
+
+  @override
+  String healthTabArchived(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count archived pets',
+      one: '1 archived pet',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get healthTabReadOnly => 'Read-only record';
+
+  @override
+  String get healthTabVaccineOverdue => 'Vaccine overdue';
+
+  @override
+  String get healthTabVaccineSoon => 'Vaccine due soon';
+
+  @override
+  String get healthTabVaccineUpToDate => 'Vaccines up to date';
+
+  @override
+  String get healthTabVaccineNone => 'No booster scheduled';
+
+  @override
+  String healthTabVaccineDue(String name, String date) {
+    return '$name: $date';
+  }
+
+  @override
+  String healthTabTreatments(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count ongoing treatments',
+      one: '1 ongoing treatment',
+      zero: 'No ongoing treatment',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String healthTabDosesToday(int done, int total) {
+    return 'Today\'s doses: $done/$total';
+  }
+
+  @override
+  String healthTabLastVisit(String date) {
+    return 'Last visit: $date';
+  }
+
+  @override
+  String healthTabAllergy(String name) {
+    return 'Allergy: $name';
+  }
+
+  @override
+  String get healthTabLoadError => 'Your pets\' health could not be loaded.';
+
+  @override
+  String get healthTabRetry => 'Retry';
+
+  @override
+  String get healthArchivedBanner =>
+      'Archived pet: its health record is read-only. Restore it from “My pets” to edit it.';
+
+  @override
+  String get healthTodayTitle => 'Today';
+
+  @override
+  String get healthTodayDoses => 'Today\'s doses';
+
+  @override
+  String get healthTodayNoDoses => 'No dose planned today.';
+
+  @override
+  String get healthTodayUpcoming => 'Upcoming';
+
+  @override
+  String get healthTodayDone => 'Done';
+
+  @override
+  String get healthTodayConfirmTitle => 'Record this dose?';
+
+  @override
+  String healthTodayConfirmBody(String pet, String treatment, String time) {
+    return '$pet · $treatment, $time dose. A recorded dose cannot be undone.';
+  }
+
+  @override
+  String get healthTodayConfirm => 'Record dose';
+
+  @override
+  String get healthTodayCancel => 'Cancel';
+
+  @override
+  String get healthTodayDoseSaved => 'Dose recorded.';
+
+  @override
+  String get healthTodayVaccines => 'Vaccines to watch';
+
+  @override
+  String get healthTodayNoVaccines =>
+      'No vaccine overdue or due in the next 30 days.';
+
+  @override
+  String healthTodayOverdueSince(String date) {
+    return 'Overdue since $date';
+  }
+
+  @override
+  String healthTodayDueOn(String date) {
+    return 'Due on $date';
+  }
+
+  @override
+  String get healthScanButton => 'Scan a vaccine sticker or prescription';
+
+  @override
+  String get healthScanHint =>
+      'Sharp, well-lit photo. The text is read on the phone, offline.';
+
+  @override
+  String get healthScanFromCamera => 'Take a photo';
+
+  @override
+  String get healthScanFromGallery => 'Choose from gallery';
+
+  @override
+  String get healthScanReading => 'Reading text…';
+
+  @override
+  String get healthScanNothing =>
+      'Nothing usable could be read. Please fill in the fields by hand.';
+
+  @override
+  String get healthScanError =>
+      'Reading failed. Try again with a sharper photo.';
+
+  @override
+  String healthScanReview(String fields) {
+    return 'Pre-filled by the scan: $fields. Check and correct before saving.';
+  }
+
+  @override
+  String get healthScanFieldVaccine => 'vaccine';
+
+  @override
+  String get healthScanFieldMedicine => 'medicine';
+
+  @override
+  String get healthScanFieldDate => 'date';
+
+  @override
+  String get healthScanFieldNextDate => 'next booster';
+
+  @override
+  String get healthScanFieldBatch => 'batch number';
+
+  @override
+  String get healthScanFieldPractitioner => 'vet';
+
+  @override
+  String healthScanMedicineHint(String name) {
+    return '“$name” looks like a medicine: add it from “Treatments”.';
+  }
+
+  @override
+  String healthScanVaccineHint(String name) {
+    return '“$name” looks like a vaccine: record it as a “Vaccine” entry in the health record.';
+  }
 }

@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
+import '../../../core/navigation/main_tabs.dart';
 import '../data/health_sheet.dart';
 import '../data/health_sheet_repository.dart';
 import 'health_sheets_screen.dart';
@@ -137,7 +138,7 @@ class _HealthSheetDetailScreenState extends State<HealthSheetDetailScreen> {
           const SizedBox(height: 24),
           FilledButton.icon(
             // Annuaire des services (module 6) : l'onglet « Services » de la structure principale.
-            onPressed: () => Navigator.of(context).pop(3),
+            onPressed: () => Navigator.of(context).pop(MainTab.services),
             style: FilledButton.styleFrom(
               backgroundColor: HealthColors.primary,
               minimumSize: const Size.fromHeight(48),

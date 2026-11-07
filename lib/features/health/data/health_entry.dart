@@ -1,5 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+/// Date venue de Firestore (`Timestamp`) ou de l'API REST (texte ISO).
+DateTime? healthDate(Object? value) {
+  if (value is Timestamp) return value.toDate();
+  if (value is DateTime) return value;
+  if (value is String) return DateTime.tryParse(value)?.toLocal();
+  return null;
+}
+
 /// Type d'acte médical (puces du formulaire « Ajouter un soin médical »).
 enum HealthEntryType {
   visit('visite', 'Visite', 'Clinique'),
@@ -66,19 +74,24 @@ class HealthEntry {
     this.attachments = const [],
   });
 
-  factory HealthEntry.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? const {};
+  factory HealthEntry.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      HealthEntry.fromData(doc.id, doc.data() ?? const {});
+
+  /// Soin renvoyé par l'API REST (`/api/pets/{petId}/health/entries`).
+  factory HealthEntry.fromJson(Map<String, dynamic> json) => HealthEntry.fromData(json['id'] as String? ?? '', json);
+
+  factory HealthEntry.fromData(String id, Map<String, dynamic> data) {
     return HealthEntry(
-      id: doc.id,
+      id: id,
       type: HealthEntryType.fromFirestore(data['type'] as String?),
       title: data['title'] as String? ?? '',
-      date: (data['date'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      date: healthDate(data['date']) ?? DateTime.now(),
       description: data['description'] as String?,
       practitioner: data['practitioner'] as String?,
       cost: (data['cost'] as num?)?.toDouble(),
       vaccineName: data['vaccineName'] as String?,
       batchNumber: data['batchNumber'] as String?,
-      nextReminderAt: (data['nextReminderAt'] as Timestamp?)?.toDate(),
+      nextReminderAt: healthDate(data['nextReminderAt']),
       reminderDone: data['reminderDone'] as bool? ?? false,
       weightKg: (data['weightKg'] as num?)?.toDouble(),
       weightDeltaKg: (data['weightDeltaKg'] as num?)?.toDouble(),

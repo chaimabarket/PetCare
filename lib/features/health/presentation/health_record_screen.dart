@@ -1,15 +1,18 @@
-import 'dart:convert';
-
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:material_symbols_icons/symbols.dart';
+import 'package:pdf/widgets.dart' as pw;
+import 'package:printing/printing.dart';
 import 'package:url_launcher/url_launcher.dart';
 
+import '../../../core/navigation/main_tabs.dart';
 import '../../../core/routes.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../appointments/presentation/appointment_form_screen.dart';
 import '../data/health_entry.dart';
 import '../data/health_format.dart';
+import '../data/health_pdf.dart';
 import '../data/health_pet.dart';
 import '../data/health_repository.dart';
 import '../data/treatment.dart';
@@ -87,115 +90,109 @@ class _HealthRecordScreenState extends State<HealthRecordScreen> {
         attachment: entry.attachments[index],
       );
 
-  /// Résumé texte du carnet : enregistré sur le téléphone (⤓) ou copié pour le partager.
-  String _summary() {
+  var _exporting = false;
+
+  /// PDF du carnet : profil, vaccins, visites et examens, allergies, traitements. Aucune coordonnée du propriétaire.
+  Future<(String, Uint8List)?> _buildPdf() async {
     final pet = _pet;
-    final buffer = StringBuffer()
-      ..writeln('Carnet de santé – ${pet?.name ?? ''}')
-      ..writeln(pet?.breedAndAge() ?? '');
-    if (pet?.chipNumber != null) buffer.writeln('ICAD : ${pet!.chipNumber}');
-    buffer
-      ..writeln()
-      ..writeln('Historique médical');
-    for (final e in _entries) {
-      buffer.writeln('- ${formatHealthDate(e.date)} · ${e.type.cardLabel} · ${e.title}'
-          '${e.practitioner == null ? '' : ' · ${e.practitioner}'}');
-      if (e.description != null) buffer.writeln('  ${e.description}');
-      if (e.type == HealthEntryType.vaccine) {
-        buffer.writeln('  Lot : ${e.batchNumber ?? '—'} · Prochain rappel : '
-            '${e.nextReminderAt == null ? '—' : formatHealthDate(e.nextReminderAt!)}');
-      }
-    }
-    if (_treatments.isNotEmpty) {
-      buffer
-        ..writeln()
-        ..writeln('Traitements');
-      for (final t in _treatments) {
-        buffer
-          ..writeln('- ${t.name} (${t.status.label}) · ${formatHealthRange(t.startDate, t.endDate)}')
-          ..writeln('  ${t.posology}');
-      }
-    }
-    return buffer.toString();
+    if (pet == null) return null;
+    final fonts = await Future.wait([
+      rootBundle.load('assets/fonts/Inter-Regular.ttf'),
+      rootBundle.load('assets/fonts/Inter-Bold.ttf'),
+    ]);
+    final bytes = await renderHealthPdf(
+      buildHealthPdfContent(pet: pet, entries: _entries, treatments: _treatments),
+      regular: pw.Font.ttf(fonts[0]),
+      bold: pw.Font.ttf(fonts[1]),
+      photo: pet.photo,
+    );
+    return (healthPdfFileName(pet.name), bytes);
   }
 
-  Future<void> _export() async {
-    final name = 'Carnet_${(_pet?.name ?? 'animal').replaceAll(' ', '_')}.txt';
+  /// Bouton ⤓ (enregistrer) ou bouton de partage de l'en-tête (feuille de partage du téléphone).
+  Future<void> _exportPdf({required bool share}) async {
+    if (_exporting) return;
+    setState(() => _exporting = true);
     try {
-      final uri = await FilePicker.saveFile(
-        fileName: name,
-        bytes: Uint8List.fromList(utf8.encode(_summary())),
-        mimeType: 'text/plain',
-      );
-      if (uri != null && mounted) showHealthToast(context, 'Téléchargement de : $name');
+      final pdf = await _buildPdf();
+      if (pdf == null) return;
+      final (name, bytes) = pdf;
+      if (share) {
+        await Printing.sharePdf(bytes: bytes, filename: name);
+      } else {
+        final uri = await FilePicker.saveFile(fileName: name, bytes: bytes, mimeType: 'application/pdf');
+        if (uri != null && mounted) showHealthToast(context, 'Téléchargement de : $name');
+      }
     } catch (e) {
       if (mounted) showHealthToast(context, friendlyHealthError(e), icon: Symbols.error);
+    } finally {
+      if (mounted) setState(() => _exporting = false);
     }
-  }
-
-  Future<void> _share() async {
-    await Clipboard.setData(ClipboardData(text: _summary()));
-    if (mounted) showHealthToast(context, 'Résumé du carnet copié : collez-le pour le partager.');
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: HealthColors.surface,
-      appBar: HealthAppBar(
-        title: 'Mes Animaux',
-        actions: [
-          IconButton(
-            tooltip: 'Partager ou exporter',
-            onPressed: _share,
-            icon: const Icon(Symbols.ios_share, size: 22, color: HealthColors.onSurface),
-          ),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton.extended(
-        onPressed: _addEntry,
-        backgroundColor: HealthColors.primary,
-        foregroundColor: Colors.white,
-        elevation: 4,
-        shape: const StadiumBorder(),
-        icon: const Icon(Symbols.add, size: 22),
-        label: const Text('Ajouter un soin', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
-      ),
-      bottomNavigationBar: const HealthBottomBar(selectedIndex: 1),
-      body: StreamBuilder<HealthPet?>(
-        stream: _petStream,
-        builder: (context, petSnap) {
-          if (petSnap.hasError) {
-            return _Message(
-              icon: Symbols.lock,
-              title: 'Carnet inaccessible',
-              message: friendlyHealthError(petSnap.error!),
-            );
-          }
-          if (petSnap.connectionState == ConnectionState.waiting && !petSnap.hasData) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          final pet = petSnap.data;
-          if (pet == null) {
-            return const _Message(
-              icon: Symbols.pets,
-              title: 'Animal introuvable',
-              message: "Cette fiche n'existe plus ou a été archivée.",
-            );
-          }
-          _pet = pet;
-          return StreamBuilder<List<HealthEntry>>(
-            stream: _entriesStream,
-            builder: (context, entriesSnap) => StreamBuilder<List<Treatment>>(
-              stream: _treatmentsStream,
-              builder: (context, treatmentsSnap) {
-                final error = entriesSnap.error ?? treatmentsSnap.error;
-                _entries = entriesSnap.data ?? const [];
-                _treatments = treatmentsSnap.data ?? const [];
-                return _buildContent(pet, error, loading: !entriesSnap.hasData && error == null);
-              },
+    return StreamBuilder<HealthPet?>(
+      stream: _petStream,
+      builder: (context, petSnap) => Scaffold(
+        backgroundColor: HealthColors.surface,
+        appBar: HealthAppBar(
+          title: 'Mes Animaux',
+          actions: [
+            IconButton(
+              tooltip: 'Partager le carnet (PDF)',
+              onPressed: _exporting ? null : () => _exportPdf(share: true),
+              icon: const Icon(Symbols.ios_share, size: 22, color: HealthColors.onSurface),
             ),
-          );
+          ],
+        ),
+        // Animal archivé : carnet en lecture seule, pas d'ajout (l'API refuse aussi, 409).
+        floatingActionButton: petSnap.data == null || petSnap.data!.archived
+            ? null
+            : FloatingActionButton.extended(
+              onPressed: _addEntry,
+              backgroundColor: HealthColors.primary,
+              foregroundColor: Colors.white,
+              elevation: 4,
+              shape: const StadiumBorder(),
+              icon: const Icon(Symbols.add, size: 22),
+              label: const Text('Ajouter un soin', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w600)),
+            ),
+        bottomNavigationBar: const HealthBottomBar(selectedIndex: MainTab.health),
+        body: _body(petSnap),
+      ),
+    );
+  }
+
+  Widget _body(AsyncSnapshot<HealthPet?> petSnap) {
+    if (petSnap.hasError) {
+      return _Message(
+        icon: Symbols.lock,
+        title: 'Carnet inaccessible',
+        message: friendlyHealthError(petSnap.error!),
+      );
+    }
+    if (petSnap.connectionState == ConnectionState.waiting && !petSnap.hasData) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    final pet = petSnap.data;
+    if (pet == null) {
+      return const _Message(
+        icon: Symbols.pets,
+        title: 'Animal introuvable',
+        message: "Cette fiche n'existe plus ou a été archivée.",
+      );
+    }
+    _pet = pet;
+    return StreamBuilder<List<HealthEntry>>(
+      stream: _entriesStream,
+      builder: (context, entriesSnap) => StreamBuilder<List<Treatment>>(
+        stream: _treatmentsStream,
+        builder: (context, treatmentsSnap) {
+          final error = entriesSnap.error ?? treatmentsSnap.error;
+          _entries = entriesSnap.data ?? const [];
+          _treatments = treatmentsSnap.data ?? const [];
+          return _buildContent(pet, error, loading: !entriesSnap.hasData && error == null);
         },
       ),
     );
@@ -216,13 +213,17 @@ class _HealthRecordScreenState extends State<HealthRecordScreen> {
     return ListView(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 96),
       children: [
-        _PetHeader(pet: pet, upToDate: !overdue, onExport: _export),
+        _PetHeader(pet: pet, upToDate: !overdue, onExport: () => _exportPdf(share: false)),
+        if (pet.archived) ...[
+          const SizedBox(height: 16),
+          const _ArchivedBanner(),
+        ],
         if (pendingReminders.isNotEmpty) ...[
           const SizedBox(height: 24),
           _ReminderHighlight(
             entry: pendingReminders.first,
-            onBook: () => _bookReminder(pendingReminders.first),
-            onDone: () => _markReminderDone(pendingReminders.first),
+            onBook: pet.archived ? null : () => _bookReminder(pendingReminders.first),
+            onDone: pet.archived ? null : () => _markReminderDone(pendingReminders.first),
           ),
         ],
         const SizedBox(height: 24),
@@ -438,13 +439,35 @@ class _PetHeader extends StatelessWidget {
   }
 }
 
+/// Bandeau d'un animal archivé : son carnet se consulte, mais ne se modifie plus.
+class _ArchivedBanner extends StatelessWidget {
+  const _ArchivedBanner();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(color: HealthColors.surfaceHigh, borderRadius: BorderRadius.circular(12)),
+      child: Row(
+        children: [
+          const Icon(Symbols.inventory_2, size: 20, color: HealthColors.onSurfaceVariant),
+          const SizedBox(width: 8),
+          Expanded(child: Text(AppLocalizations.of(context).healthArchivedBanner, style: HealthText.bodySm)),
+        ],
+      ),
+    );
+  }
+}
+
 /// 2. Carte « Prochain rappel vaccinal » (fond corail pâle, filigrane seringue).
 class _ReminderHighlight extends StatelessWidget {
   const _ReminderHighlight({required this.entry, required this.onBook, required this.onDone});
 
   final HealthEntry entry;
-  final VoidCallback onBook;
-  final VoidCallback onDone;
+
+  /// Null pour un animal archivé : les boutons ne s'affichent pas.
+  final VoidCallback? onBook;
+  final VoidCallback? onDone;
 
   @override
   Widget build(BuildContext context) {
@@ -551,44 +574,46 @@ class _ReminderHighlight extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: SizedBox(
-                        height: 44,
-                        child: FilledButton.icon(
-                          onPressed: onBook,
-                          style: FilledButton.styleFrom(
-                            backgroundColor: HealthColors.primary,
-                            minimumSize: const Size.fromHeight(44),
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                            textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                if (onBook != null && onDone != null) ...[
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: SizedBox(
+                          height: 44,
+                          child: FilledButton.icon(
+                            onPressed: onBook,
+                            style: FilledButton.styleFrom(
+                              backgroundColor: HealthColors.primary,
+                              minimumSize: const Size.fromHeight(44),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                              textStyle: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+                            ),
+                            icon: const Icon(Symbols.calendar_add_on, size: 18),
+                            label: const Text('Prendre RDV rappel'),
                           ),
-                          icon: const Icon(Symbols.calendar_add_on, size: 18),
-                          label: const Text('Prendre RDV rappel'),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Material(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      child: InkWell(
-                        onTap: onDone,
+                      const SizedBox(width: 8),
+                      Material(
+                        color: Colors.white,
                         borderRadius: BorderRadius.circular(12),
-                        child: const Tooltip(
-                          message: 'Marquer comme déjà effectué',
-                          child: SizedBox(
-                            width: 48,
-                            height: 44,
-                            child: Icon(Symbols.done_all, size: 20, color: HealthColors.onSurfaceVariant),
+                        child: InkWell(
+                          onTap: onDone,
+                          borderRadius: BorderRadius.circular(12),
+                          child: const Tooltip(
+                            message: 'Marquer comme déjà effectué',
+                            child: SizedBox(
+                              width: 48,
+                              height: 44,
+                              child: Icon(Symbols.done_all, size: 20, color: HealthColors.onSurfaceVariant),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  ),
+                ],
               ],
             ),
           ),

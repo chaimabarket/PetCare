@@ -134,6 +134,12 @@ abstract class AppLocalizations {
   /// **'Mes animaux'**
   String get navPets;
 
+  /// No description provided for @navHealth.
+  ///
+  /// In fr, this message translates to:
+  /// **'Santé'**
+  String get navHealth;
+
   /// No description provided for @navCommunity.
   ///
   /// In fr, this message translates to:
@@ -1729,6 +1735,312 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'La vérification des rendez-vous à venir et des annonces ouvertes sera bientôt disponible.'**
   String get petsArchiveChecksBody;
+
+  /// No description provided for @healthTabVisitorTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Connectez-vous pour suivre la santé de vos animaux'**
+  String get healthTabVisitorTitle;
+
+  /// No description provided for @healthTabVisitorBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le carnet de santé est privé : il est lié à votre compte.'**
+  String get healthTabVisitorBody;
+
+  /// No description provided for @healthTabSignIn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Se connecter'**
+  String get healthTabSignIn;
+
+  /// No description provided for @healthTabEmptyTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun animal pour l\'instant'**
+  String get healthTabEmptyTitle;
+
+  /// No description provided for @healthTabEmptyBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'Le carnet de santé se tient depuis la fiche d\'un animal. Ajoutez d\'abord votre compagnon.'**
+  String get healthTabEmptyBody;
+
+  /// No description provided for @healthTabAddPet.
+  ///
+  /// In fr, this message translates to:
+  /// **'Ajouter un animal'**
+  String get healthTabAddPet;
+
+  /// No description provided for @healthTabMyPets.
+  ///
+  /// In fr, this message translates to:
+  /// **'Mes animaux'**
+  String get healthTabMyPets;
+
+  /// No description provided for @healthTabArchived.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =1{1 animal archivé} other{{count} animaux archivés}}'**
+  String healthTabArchived(int count);
+
+  /// No description provided for @healthTabReadOnly.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carnet en lecture seule'**
+  String get healthTabReadOnly;
+
+  /// No description provided for @healthTabVaccineOverdue.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vaccin en retard'**
+  String get healthTabVaccineOverdue;
+
+  /// No description provided for @healthTabVaccineSoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vaccin bientôt'**
+  String get healthTabVaccineSoon;
+
+  /// No description provided for @healthTabVaccineUpToDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vaccins à jour'**
+  String get healthTabVaccineUpToDate;
+
+  /// No description provided for @healthTabVaccineNone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun rappel prévu'**
+  String get healthTabVaccineNone;
+
+  /// No description provided for @healthTabVaccineDue.
+  ///
+  /// In fr, this message translates to:
+  /// **'{name} : {date}'**
+  String healthTabVaccineDue(String name, String date);
+
+  /// No description provided for @healthTabTreatments.
+  ///
+  /// In fr, this message translates to:
+  /// **'{count, plural, =0{Aucun traitement en cours} =1{1 traitement en cours} other{{count} traitements en cours}}'**
+  String healthTabTreatments(int count);
+
+  /// No description provided for @healthTabDosesToday.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prises du jour : {done}/{total}'**
+  String healthTabDosesToday(int done, int total);
+
+  /// No description provided for @healthTabLastVisit.
+  ///
+  /// In fr, this message translates to:
+  /// **'Dernière visite : {date}'**
+  String healthTabLastVisit(String date);
+
+  /// No description provided for @healthTabAllergy.
+  ///
+  /// In fr, this message translates to:
+  /// **'Allergie : {name}'**
+  String healthTabAllergy(String name);
+
+  /// No description provided for @healthTabLoadError.
+  ///
+  /// In fr, this message translates to:
+  /// **'Impossible de charger la santé de vos animaux.'**
+  String get healthTabLoadError;
+
+  /// No description provided for @healthTabRetry.
+  ///
+  /// In fr, this message translates to:
+  /// **'Réessayer'**
+  String get healthTabRetry;
+
+  /// No description provided for @healthArchivedBanner.
+  ///
+  /// In fr, this message translates to:
+  /// **'Animal archivé : son carnet est en lecture seule. Restaurez-le depuis « Mes animaux » pour le modifier.'**
+  String get healthArchivedBanner;
+
+  /// No description provided for @healthTodayTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aujourd\'hui'**
+  String get healthTodayTitle;
+
+  /// No description provided for @healthTodayDoses.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prises du jour'**
+  String get healthTodayDoses;
+
+  /// No description provided for @healthTodayNoDoses.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune prise prévue aujourd\'hui.'**
+  String get healthTodayNoDoses;
+
+  /// No description provided for @healthTodayUpcoming.
+  ///
+  /// In fr, this message translates to:
+  /// **'À venir'**
+  String get healthTodayUpcoming;
+
+  /// No description provided for @healthTodayDone.
+  ///
+  /// In fr, this message translates to:
+  /// **'Faite'**
+  String get healthTodayDone;
+
+  /// No description provided for @healthTodayConfirmTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Noter cette prise ?'**
+  String get healthTodayConfirmTitle;
+
+  /// No description provided for @healthTodayConfirmBody.
+  ///
+  /// In fr, this message translates to:
+  /// **'{pet} · {treatment}, prise de {time}. Une prise notée ne peut pas être annulée.'**
+  String healthTodayConfirmBody(String pet, String treatment, String time);
+
+  /// No description provided for @healthTodayConfirm.
+  ///
+  /// In fr, this message translates to:
+  /// **'Noter la prise'**
+  String get healthTodayConfirm;
+
+  /// No description provided for @healthTodayCancel.
+  ///
+  /// In fr, this message translates to:
+  /// **'Annuler'**
+  String get healthTodayCancel;
+
+  /// No description provided for @healthTodayDoseSaved.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prise notée.'**
+  String get healthTodayDoseSaved;
+
+  /// No description provided for @healthTodayVaccines.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vaccins à surveiller'**
+  String get healthTodayVaccines;
+
+  /// No description provided for @healthTodayNoVaccines.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucun vaccin en retard ni prévu dans les 30 prochains jours.'**
+  String get healthTodayNoVaccines;
+
+  /// No description provided for @healthTodayOverdueSince.
+  ///
+  /// In fr, this message translates to:
+  /// **'En retard depuis le {date}'**
+  String healthTodayOverdueSince(String date);
+
+  /// No description provided for @healthTodayDueOn.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prévu le {date}'**
+  String healthTodayDueOn(String date);
+
+  /// No description provided for @healthScanButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Scanner une vignette ou une ordonnance'**
+  String get healthScanButton;
+
+  /// No description provided for @healthScanHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'Photo nette et bien éclairée. Le texte est lu sur le téléphone, sans connexion.'**
+  String get healthScanHint;
+
+  /// No description provided for @healthScanFromCamera.
+  ///
+  /// In fr, this message translates to:
+  /// **'Prendre une photo'**
+  String get healthScanFromCamera;
+
+  /// No description provided for @healthScanFromGallery.
+  ///
+  /// In fr, this message translates to:
+  /// **'Choisir dans la galerie'**
+  String get healthScanFromGallery;
+
+  /// No description provided for @healthScanReading.
+  ///
+  /// In fr, this message translates to:
+  /// **'Lecture du texte…'**
+  String get healthScanReading;
+
+  /// No description provided for @healthScanNothing.
+  ///
+  /// In fr, this message translates to:
+  /// **'Aucune information utilisable n\'a été lue. Saisissez les champs à la main.'**
+  String get healthScanNothing;
+
+  /// No description provided for @healthScanError.
+  ///
+  /// In fr, this message translates to:
+  /// **'La lecture a échoué. Réessayez avec une photo plus nette.'**
+  String get healthScanError;
+
+  /// No description provided for @healthScanReview.
+  ///
+  /// In fr, this message translates to:
+  /// **'Pré-rempli par le scan : {fields}. Vérifiez et corrigez avant d\'enregistrer.'**
+  String healthScanReview(String fields);
+
+  /// No description provided for @healthScanFieldVaccine.
+  ///
+  /// In fr, this message translates to:
+  /// **'vaccin'**
+  String get healthScanFieldVaccine;
+
+  /// No description provided for @healthScanFieldMedicine.
+  ///
+  /// In fr, this message translates to:
+  /// **'médicament'**
+  String get healthScanFieldMedicine;
+
+  /// No description provided for @healthScanFieldDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'date'**
+  String get healthScanFieldDate;
+
+  /// No description provided for @healthScanFieldNextDate.
+  ///
+  /// In fr, this message translates to:
+  /// **'prochain rappel'**
+  String get healthScanFieldNextDate;
+
+  /// No description provided for @healthScanFieldBatch.
+  ///
+  /// In fr, this message translates to:
+  /// **'numéro de lot'**
+  String get healthScanFieldBatch;
+
+  /// No description provided for @healthScanFieldPractitioner.
+  ///
+  /// In fr, this message translates to:
+  /// **'vétérinaire'**
+  String get healthScanFieldPractitioner;
+
+  /// No description provided for @healthScanMedicineHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {name} » ressemble à un médicament : ajoutez-le depuis « Traitements ».'**
+  String healthScanMedicineHint(String name);
+
+  /// No description provided for @healthScanVaccineHint.
+  ///
+  /// In fr, this message translates to:
+  /// **'« {name} » ressemble à un vaccin : enregistrez-le comme soin « Vaccin » dans le carnet.'**
+  String healthScanVaccineHint(String name);
 }
 
 class _AppLocalizationsDelegate

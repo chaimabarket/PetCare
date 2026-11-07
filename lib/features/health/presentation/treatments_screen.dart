@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:material_symbols_icons/symbols.dart';
 
 import '../../../core/routes.dart';
+import '../../../l10n/app_localizations.dart';
 import '../data/health_format.dart';
 import '../data/health_pet.dart';
 import '../data/health_repository.dart';
@@ -45,12 +46,12 @@ class _TreatmentsScreenState extends State<TreatmentsScreen> {
     }
   }
 
-  void _openHistory(Treatment t) => showModalBottomSheet<void>(
+  void _openHistory(Treatment t, {required bool readOnly}) => showModalBottomSheet<void>(
         context: context,
         isScrollControlled: true,
         showDragHandle: true,
         backgroundColor: Colors.white,
-        builder: (context) => _HistorySheet(petId: widget.petId, treatment: t),
+        builder: (context) => _HistorySheet(petId: widget.petId, treatment: t, readOnly: readOnly),
       );
 
   @override
@@ -92,6 +93,8 @@ class _TreatmentsScreenState extends State<TreatmentsScreen> {
 
   Widget _buildList(HealthPet? pet, List<Treatment> treatments, Object? error, {required bool loading}) {
     final now = DateTime.now();
+    // Animal archivé : on consulte, sans noter de prise ni ajouter ou arrêter de traitement (l'API refuse aussi).
+    final readOnly = pet?.archived ?? false;
     int count(TreatmentStatus s) => treatments.where((t) => t.statusAt(now) == s).length;
     final active = count(TreatmentStatus.active);
     final filter = _filter ?? (active > 0 ? _TreatmentFilter.active : _TreatmentFilter.all);
@@ -113,6 +116,19 @@ class _TreatmentsScreenState extends State<TreatmentsScreen> {
       children: [
         if (pet != null) _Summary(pet: pet, activeCount: active, followedBy: followedBy),
         const SizedBox(height: 16),
+        if (readOnly)
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(color: HealthColors.surfaceHigh, borderRadius: BorderRadius.circular(12)),
+            child: Row(
+              children: [
+                const Icon(Symbols.inventory_2, size: 20, color: HealthColors.onSurfaceVariant),
+                const SizedBox(width: 8),
+                Expanded(child: Text(AppLocalizations.of(context).healthArchivedBanner, style: HealthText.bodySm)),
+              ],
+            ),
+          )
+        else
         SizedBox(
           height: 48,
           child: FilledButton.icon(
@@ -163,8 +179,8 @@ class _TreatmentsScreenState extends State<TreatmentsScreen> {
             _TreatmentCard(
               treatment: t,
               now: now,
-              onLogDose: () => _logDose(t),
-              onHistory: () => _openHistory(t),
+              onLogDose: readOnly ? null : () => _logDose(t),
+              onHistory: () => _openHistory(t, readOnly: readOnly),
             ),
             const SizedBox(height: 16),
           ],
@@ -332,7 +348,9 @@ class _TreatmentCard extends StatelessWidget {
 
   final Treatment treatment;
   final DateTime now;
-  final VoidCallback onLogDose;
+
+  /// Null pour un animal archivé : le bouton de prise ne s'affiche pas.
+  final VoidCallback? onLogDose;
   final VoidCallback onHistory;
 
   static const _formIcons = {
@@ -443,15 +461,18 @@ class _TreatmentCard extends StatelessWidget {
             padding: const EdgeInsets.only(top: 4),
             child: Row(
               children: [
-                Expanded(
-                  child: _SoftButton(
-                    onTap: onLogDose,
-                    icon: Symbols.check,
-                    iconColor: HealthColors.primary,
-                    label: t.form.logLabel,
+                if (onLogDose != null) ...[
+                  Expanded(
+                    child: _SoftButton(
+                      onTap: onLogDose!,
+                      icon: Symbols.check,
+                      iconColor: HealthColors.primary,
+                      label: t.form.logLabel,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 4),
+                  const SizedBox(width: 4),
+                ] else
+                  const Spacer(),
                 _SoftButton(
                   onTap: onHistory,
                   icon: Symbols.history,
@@ -623,10 +644,13 @@ class _TreatmentCard extends StatelessWidget {
 
 /// Historique des prises, et pour un traitement en cours : arrêt avec la raison du praticien.
 class _HistorySheet extends StatefulWidget {
-  const _HistorySheet({required this.petId, required this.treatment});
+  const _HistorySheet({required this.petId, required this.treatment, this.readOnly = false});
 
   final String petId;
   final Treatment treatment;
+
+  /// Animal archivé : historique seulement, pas d'arrêt possible.
+  final bool readOnly;
 
   @override
   State<_HistorySheet> createState() => _HistorySheetState();
@@ -695,7 +719,7 @@ class _HistorySheetState extends State<_HistorySheet> {
                     ],
                   ),
                 ),
-            if (status == TreatmentStatus.active) ...[
+            if (status == TreatmentStatus.active && !widget.readOnly) ...[
               const SizedBox(height: 16),
               if (!_stopping)
                 OutlinedButton.icon(

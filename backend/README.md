@@ -195,6 +195,37 @@ Les annuaires sont publics ; le reste exige un jeton. Un prestataire est identif
 Les réservations de ce module sont dans `serviceBookings`. Elles ne créent pas encore de rendez-vous dans l'agenda du
 module Rendez-vous (`appointments`).
 
+### Module Santé et dossier médical
+
+Le carnet de santé et les traitements d'un animal ne sont accessibles qu'à son propriétaire (règles de
+`firestore.rules`, appliquées avec le jeton de l'utilisateur). Le carnet d'un animal **archivé** se lit, mais toute
+écriture renvoie `409`. Les dates sont des textes ISO 8601.
+
+| Méthode | Route | Rôle |
+|---|---|---|
+| GET | `/api/health/summary` | Synthèse de tous mes animaux en un appel (onglet Santé, tableau du jour, Accueil) : pour chaque animal, vaccins dont le rappel n'est pas fait, dernière visite ou examen, allergies, traitements en cours avec heures de prise et prises notées. Pas de photo. Gardée 30 s par utilisateur, vidée à chaque écriture santé |
+| GET | `/api/pets/{petId}/health/entries` | Soins du carnet, les plus récents d'abord |
+| GET | `/api/pets/{petId}/health/entries/{id}` | Un soin |
+| POST | `/api/pets/{petId}/health/entries` | Ajoute un soin : `type` (`visite`, `vaccin`, `examen`, `allergie`, `note`), `title`, `date`, `description`, `practitioner`, `cost`, `weightKg`, `weightDeltaKg` ; vaccin : `vaccineName`, `batchNumber`, `nextReminderAt` (obligatoire, après `date`) ; visite : `nextReminderAt` facultatif (prochain contrôle). `attachments` : 3 fichiers au maximum `{name, mimeType, data}` (PDF ou image en base64, 900 Ko chacun), écrits dans le même commit |
+| PATCH | `/api/pets/{petId}/health/entries/{id}/reminder-done` | Le rappel vaccinal est déjà fait (204) |
+| GET | `/api/pets/{petId}/health/entries/{id}/files/{index}` | Pièce jointe `{name, mimeType, data}` |
+| DELETE | `/api/pets/{petId}/health/entries/{id}` | Supprime un soin et ses pièces jointes (204) |
+| GET | `/api/pets/{petId}/health/treatments` | Traitements, les plus récents d'abord |
+| GET | `/api/pets/{petId}/health/treatments/{id}` | Un traitement |
+| POST | `/api/pets/{petId}/health/treatments` | Ajoute un traitement : `category`, `name`, `subtitle`, `form` (`comprime`, `gouttes`, `injection`, `pipette`, `autre`), `practitioner`, `posology` (texte du vétérinaire), `startDate`, `endDate`, `doseTimes` (`["08:00","20:00"]`), `renewalAt`, `scheduleNote` |
+| POST | `/api/pets/{petId}/health/treatments/{id}/doses` | Note une prise : maintenant, ou `at` (heure du créneau coché). Pas dans le futur, pendant le traitement ; `409` si déjà notée ou si le traitement est arrêté. Une prise notée ne s'annule pas (les règles n'acceptent qu'un ajout) |
+| POST | `/api/pets/{petId}/health/treatments/{id}/stop` | Arrête le traitement : `reason` obligatoire (`409` s'il est déjà arrêté ou terminé) |
+
+Exemple :
+
+```bash
+curl -H "Authorization: Bearer $TOKEN" http://localhost:3000/api/health/summary
+
+curl -X POST -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
+  -d '{"type":"vaccin","title":"Rage","date":"2026-11-04T09:00:00Z","vaccineName":"Rabisin","nextReminderAt":"2027-11-04T00:00:00Z"}' \
+  http://localhost:3000/api/pets/<petId>/health/entries
+```
+
 Erreurs : JSON `{"error": "message en français"}` avec le code HTTP `400` (champ invalide), `401` (jeton manquant
 ou expiré), `403` (refusé par les règles), `404`, `409` (état incompatible : profil déjà créé, animal archivé…).
 

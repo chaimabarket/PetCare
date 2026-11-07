@@ -28,6 +28,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get navPets => 'Mes animaux';
 
   @override
+  String get navHealth => 'Santé';
+
+  @override
   String get navCommunity => 'Communauté';
 
   @override
@@ -1019,4 +1022,203 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get petsArchiveChecksBody =>
       'La vérification des rendez-vous à venir et des annonces ouvertes sera bientôt disponible.';
+
+  @override
+  String get healthTabVisitorTitle =>
+      'Connectez-vous pour suivre la santé de vos animaux';
+
+  @override
+  String get healthTabVisitorBody =>
+      'Le carnet de santé est privé : il est lié à votre compte.';
+
+  @override
+  String get healthTabSignIn => 'Se connecter';
+
+  @override
+  String get healthTabEmptyTitle => 'Aucun animal pour l\'instant';
+
+  @override
+  String get healthTabEmptyBody =>
+      'Le carnet de santé se tient depuis la fiche d\'un animal. Ajoutez d\'abord votre compagnon.';
+
+  @override
+  String get healthTabAddPet => 'Ajouter un animal';
+
+  @override
+  String get healthTabMyPets => 'Mes animaux';
+
+  @override
+  String healthTabArchived(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count animaux archivés',
+      one: '1 animal archivé',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get healthTabReadOnly => 'Carnet en lecture seule';
+
+  @override
+  String get healthTabVaccineOverdue => 'Vaccin en retard';
+
+  @override
+  String get healthTabVaccineSoon => 'Vaccin bientôt';
+
+  @override
+  String get healthTabVaccineUpToDate => 'Vaccins à jour';
+
+  @override
+  String get healthTabVaccineNone => 'Aucun rappel prévu';
+
+  @override
+  String healthTabVaccineDue(String name, String date) {
+    return '$name : $date';
+  }
+
+  @override
+  String healthTabTreatments(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count traitements en cours',
+      one: '1 traitement en cours',
+      zero: 'Aucun traitement en cours',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String healthTabDosesToday(int done, int total) {
+    return 'Prises du jour : $done/$total';
+  }
+
+  @override
+  String healthTabLastVisit(String date) {
+    return 'Dernière visite : $date';
+  }
+
+  @override
+  String healthTabAllergy(String name) {
+    return 'Allergie : $name';
+  }
+
+  @override
+  String get healthTabLoadError =>
+      'Impossible de charger la santé de vos animaux.';
+
+  @override
+  String get healthTabRetry => 'Réessayer';
+
+  @override
+  String get healthArchivedBanner =>
+      'Animal archivé : son carnet est en lecture seule. Restaurez-le depuis « Mes animaux » pour le modifier.';
+
+  @override
+  String get healthTodayTitle => 'Aujourd\'hui';
+
+  @override
+  String get healthTodayDoses => 'Prises du jour';
+
+  @override
+  String get healthTodayNoDoses => 'Aucune prise prévue aujourd\'hui.';
+
+  @override
+  String get healthTodayUpcoming => 'À venir';
+
+  @override
+  String get healthTodayDone => 'Faite';
+
+  @override
+  String get healthTodayConfirmTitle => 'Noter cette prise ?';
+
+  @override
+  String healthTodayConfirmBody(String pet, String treatment, String time) {
+    return '$pet · $treatment, prise de $time. Une prise notée ne peut pas être annulée.';
+  }
+
+  @override
+  String get healthTodayConfirm => 'Noter la prise';
+
+  @override
+  String get healthTodayCancel => 'Annuler';
+
+  @override
+  String get healthTodayDoseSaved => 'Prise notée.';
+
+  @override
+  String get healthTodayVaccines => 'Vaccins à surveiller';
+
+  @override
+  String get healthTodayNoVaccines =>
+      'Aucun vaccin en retard ni prévu dans les 30 prochains jours.';
+
+  @override
+  String healthTodayOverdueSince(String date) {
+    return 'En retard depuis le $date';
+  }
+
+  @override
+  String healthTodayDueOn(String date) {
+    return 'Prévu le $date';
+  }
+
+  @override
+  String get healthScanButton => 'Scanner une vignette ou une ordonnance';
+
+  @override
+  String get healthScanHint =>
+      'Photo nette et bien éclairée. Le texte est lu sur le téléphone, sans connexion.';
+
+  @override
+  String get healthScanFromCamera => 'Prendre une photo';
+
+  @override
+  String get healthScanFromGallery => 'Choisir dans la galerie';
+
+  @override
+  String get healthScanReading => 'Lecture du texte…';
+
+  @override
+  String get healthScanNothing =>
+      'Aucune information utilisable n\'a été lue. Saisissez les champs à la main.';
+
+  @override
+  String get healthScanError =>
+      'La lecture a échoué. Réessayez avec une photo plus nette.';
+
+  @override
+  String healthScanReview(String fields) {
+    return 'Pré-rempli par le scan : $fields. Vérifiez et corrigez avant d\'enregistrer.';
+  }
+
+  @override
+  String get healthScanFieldVaccine => 'vaccin';
+
+  @override
+  String get healthScanFieldMedicine => 'médicament';
+
+  @override
+  String get healthScanFieldDate => 'date';
+
+  @override
+  String get healthScanFieldNextDate => 'prochain rappel';
+
+  @override
+  String get healthScanFieldBatch => 'numéro de lot';
+
+  @override
+  String get healthScanFieldPractitioner => 'vétérinaire';
+
+  @override
+  String healthScanMedicineHint(String name) {
+    return '« $name » ressemble à un médicament : ajoutez-le depuis « Traitements ».';
+  }
+
+  @override
+  String healthScanVaccineHint(String name) {
+    return '« $name » ressemble à un vaccin : enregistrez-le comme soin « Vaccin » dans le carnet.';
+  }
 }

@@ -12,6 +12,7 @@ const { appointmentsRouter, remindersRouter } = require('./appointments/routes')
 const { createAppointmentsRepository } = require('./appointments/repository');
 const { createAppointmentsService, createRemindersService } = require('./appointments/service');
 const { petsRouter } = require('./pets/routes');
+const { healthRouter, healthSummaryRouter } = require('./health/routes');
 const { createPetsRepository } = require('./pets/repository');
 const { createPetsService } = require('./pets/service');
 const { providersRouter, bookingsRouter, categoriesRouter } = require('./services/routes');
@@ -37,7 +38,9 @@ function createApp() {
   const appointmentsRepository = createAppointmentsRepository();
   app.use('/api/appointments', appointmentsRouter(createAppointmentsService(appointmentsRepository, notify)));
   app.use('/api/reminders', remindersRouter(createRemindersService(appointmentsRepository)));
+  app.use('/api/pets/:petId/health', healthRouter());
   app.use('/api/pets', petsRouter(createPetsService(createPetsRepository(), notify)));
+  app.use('/api/health', healthSummaryRouter());
   const servicesService = createServicesService(createServicesRepository());
   app.use('/api/services/categories', categoriesRouter(servicesService));
   app.use('/api/services/providers', providersRouter(servicesService));
