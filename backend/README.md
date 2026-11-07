@@ -4,6 +4,32 @@ Serveur Node.js (Express) qui donne accès au profil et aux notifications de l'u
 Il lit et écrit dans Firestore **avec le jeton de l'utilisateur** : les règles de `firestore.rules`
 s'appliquent à chaque appel et le serveur ne détient aucune clé secrète.
 
+## Architecture : routes / service / dépôt
+
+Chaque module (`users`, `adoption`, `appointments`, `pets`, `services`) est découpé en trois couches. Une couche
+n'appelle que celle du dessous :
+
+```
+requête HTTP  →  routes.js  →  service.js  →  repository.js  →  Firestore
+ (Express)       (HTTP)        (règles métier)   (accès aux données)
+```
+
+| Couche | Fichier | Rôle | Ne fait jamais |
+|---|---|---|---|
+| **Routes** | `routes.js` | Lit la requête (paramètres, corps, utilisateur), appelle le service, renvoie la réponse et le code HTTP | de règle métier, d'accès à Firestore |
+| **Service** | `service.js` | Les règles : qui peut faire quoi, dans quel état, validation, calcul du score, notifications | d'Express (`req`, `res`), de chemin Firestore |
+| **Dépôt** | `repository.js` | Seul à connaître les collections et leurs chemins : lire, chercher, écrire | de décision métier |
+
+Fichiers à côté : `validation.js` (contrôle des données reçues), `enums.js` (valeurs fixes) et, selon le module,
+`rules.js`, `filters.js` ou `compatibility.js` (fonctions pures de calcul).
+
+Le service reçoit son dépôt en paramètre (`createXService(repository)`) et `app.js` assemble le tout. On peut donc
+tester les règles avec un **faux dépôt en mémoire**, sans Firebase : voir `test/*.service.test.js`.
+
+Ajouter une fonctionnalité : une méthode dans le dépôt si elle lit ou écrit des données, une méthode dans le service pour
+la règle, une route qui l'appelle, puis un test du service. Le jeton de l'utilisateur est transmis du début à la fin, donc
+les règles de `firestore.rules` s'appliquent toujours.
+
 ## Lancer
 
 ```bash
