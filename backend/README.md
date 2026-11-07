@@ -6,7 +6,7 @@ s'appliquent à chaque appel et le serveur ne détient aucune clé secrète.
 
 ## Architecture : routes / service / dépôt
 
-Chaque module (`users`, `adoption`, `appointments`, `pets`, `services`) est découpé en trois couches. Une couche
+Chaque module (`users`, `adoption`, `appointments`, `pets`, `health`, `services`) est découpé en trois couches. Une couche
 n'appelle que celle du dessous :
 
 ```

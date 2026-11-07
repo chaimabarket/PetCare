@@ -5,7 +5,7 @@ const { createApp } = require('../src/app');
 const {
   entryFields, treatmentFields, attachments, doseTime, stopReason,
 } = require('../src/health/validation');
-const { petSummary, invalidateSummary } = require('../src/health/routes');
+const { petSummary, invalidateSummary } = require('../src/health/service');
 
 const UID = 'user-1';
 const DAY = 86400000;
