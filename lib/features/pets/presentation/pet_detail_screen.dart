@@ -8,11 +8,13 @@ import '../../../l10n/app_localizations.dart';
 import '../data/pet.dart';
 import '../data/pet_media.dart';
 import '../data/pet_repository.dart';
+import '../data/weight_alert.dart';
 import 'pet_form_screen.dart';
 import 'pet_format.dart';
 import 'pet_style.dart';
 import 'widgets/archive_pet_dialog.dart';
 import 'widgets/pet_photo.dart';
+import 'widgets/weight_alert_banner.dart';
 import 'widgets/weight_chart.dart';
 
 /// Largeur à partir de laquelle la fiche passe en deux colonnes (web, tablette).
@@ -673,6 +675,12 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
   }
 
   Widget _weightCard(AppLocalizations l, Pet pet) {
+    final alert = analyzeWeights(
+      entries: _weights,
+      species: pet.species.code,
+      birthDate: pet.birthDate,
+      archived: pet.isArchived,
+    );
     final last = _weights.firstOrNull;
     final previous = _weights.length > 1 ? _weights[1] : null;
     final chartEntries = _weights.take(6).toList().reversed.toList();
@@ -754,6 +762,10 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
               ],
             ),
           ),
+          if (alert != null) ...[
+            const SizedBox(height: 12),
+            WeightAlertBanner(pet: pet, alert: alert),
+          ],
           if (chartEntries.isNotEmpty) ...[
             const SizedBox(height: 16),
             WeightChart(entries: chartEntries),

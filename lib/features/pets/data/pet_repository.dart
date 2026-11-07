@@ -8,6 +8,7 @@ import '../../../core/api/api_client.dart';
 import '../../../core/api/polling.dart';
 import 'pet.dart';
 import 'pet_media.dart';
+import 'weight_alert.dart';
 
 /// Nombre maximum de photos par animal (FR-06).
 const maxPetPhotos = 5;
@@ -136,8 +137,9 @@ class PetRepository {
         every: _photoRefresh,
       );
 
-  /// Pesées, la plus récente d'abord.
-  Stream<List<WeightEntry>> watchWeights(String petId, {int? limit}) => poll(() => _read(
+  /// Pesées, la plus récente d'abord. [every] espace les rafraîchissements (quota Firestore).
+  Stream<List<WeightEntry>> watchWeights(String petId, {int? limit, Duration every = const Duration(seconds: 8)}) =>
+      poll(every: every, () => _read(
         () async => [
           for (final item in await _api.get('/api/pets/$petId/weights${limit == null ? '' : '?limit=$limit'}') as List<dynamic>)
             WeightEntry.fromJson(item as Map<String, dynamic>),
@@ -258,6 +260,7 @@ class PetRepository {
           }
           if (weightKg != null) _setTodayWeight(batch, petId, weightKg);
           await batch.commit();
+          if (weightKg != null) await _notifyWeightAlert(petId);
         },
       );
 
@@ -320,6 +323,7 @@ class PetRepository {
           return true;
         });
         if (!created) throw const DuplicateWeightException();
+        await _notifyWeightAlert(petId);
       },
     );
   }
@@ -327,11 +331,49 @@ class PetRepository {
   /// Corrige le poids ou la note d'une pesée ; son jour ne change pas.
   Future<void> updateWeight(String petId, String entryId, {required double weightKg, String? note}) => _write(
         () => _api.put('/api/pets/$petId/weights/$entryId', {'weightKg': weightKg, 'note': note}),
-        () => _weights(petId).doc(entryId).update({
-              'weightKg': weightKg,
-              'note': note == null || note.trim().isEmpty ? null : note.trim(),
-            }),
+        () async {
+          await _weights(petId).doc(entryId).update({
+            'weightKg': weightKg,
+            'note': note == null || note.trim().isEmpty ? null : note.trim(),
+          });
+          await _notifyWeightAlert(petId);
+        },
       );
+
+  /// Serveur éteint : même analyse que le backend juste après une pesée, et même notification immédiate.
+  ///
+  /// L'identifiant de la notification ne dépend que de l'épisode : si elle existe déjà, Firestore refuse de la
+  /// réécrire (seul `read` est modifiable) et rien n'est envoyé en double. Un échec ne bloque jamais la pesée.
+  Future<void> _notifyWeightAlert(String petId) async {
+    try {
+      final doc = await _pets.doc(petId).get();
+      if (!doc.exists) return;
+      final pet = Pet.fromFirestore(doc);
+      final weights = await _weights(petId).orderBy('measuredOn', descending: true).limit(60).get();
+      final alert = analyzeWeights(
+        entries: weights.docs.map(WeightEntry.fromFirestore).toList(),
+        species: pet.species.code,
+        birthDate: pet.birthDate,
+        archived: pet.isArchived,
+      );
+      if (alert == null) return;
+      final message = weightAlertMessage(alert, pet.name);
+      await _firestore
+          .collection('users')
+          .doc(pet.ownerId)
+          .collection('notifications')
+          .doc(weightAlertNotificationId(petId, alert))
+          .set({
+        'title': message.title,
+        'body': message.body,
+        'category': 'sante',
+        'read': false,
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+    } on FirebaseException {
+      // Épisode déjà notifié (réécriture refusée par les règles) ou lecture impossible : ignoré volontairement.
+    }
+  }
 
   Future<void> deleteWeight(String petId, String entryId) => _write(
         () => _api.delete('/api/pets/$petId/weights/$entryId'),

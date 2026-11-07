@@ -122,6 +122,24 @@ restaure, mais toute autre modification renvoie `409`.
 
 Pour une espèce `other`, `breed` est obligatoire et contient l'animal saisi librement (ours, tigre, tortue…).
 
+**Alerte de poids.** Après chaque pesée ajoutée ou corrigée (et une fiche modifiée avec un poids), le serveur compare
+la dernière pesée aux pesées des 90 jours précédents (`src/pets/weight_alert.js`). Une variation anormale crée tout de
+suite une notification `sante` dans `users/{uid}/notifications/poids-{petId}-{règle}-{pesée de référence}` : un même
+épisode n'est notifié qu'une fois, un épisode plus grave l'est à nouveau. Aucune nouvelle règle Firestore.
+
+| Règle | Seuil | Niveau | Base |
+|---|---|---|---|
+| `extreme` | variation ≥ 30 % en 7 jours (« vérifiez la pesée ») | consulter | repère PetCare |
+| `loss-10` | perte ≥ 10 % en 90 jours | consulter | VCA (perte > 10 % cliniquement significative) |
+| `rapid-loss` | perte ≥ 5 % en 7 jours (≥ 3 % pour lapin, rongeur, oiseau) | consulter | repère PetCare |
+| `gain-20` | prise ≥ 20 % en 90 jours, adulte | consulter | repère PetCare |
+| `loss-5` | perte ≥ 5 % en 30 jours | surveiller | repère PetCare |
+| `gain-10` | prise ≥ 10 % en 90 jours, adulte | surveiller | AAHA / iCatCare (1 point de score corporel ≈ 10 %) |
+
+Pas d'analyse avec moins de 2 pesées, pour un animal archivé, ou si la dernière pesée a plus de 30 jours. Une prise de
+poids n'est jamais signalée avant 1 an (croissance). Ce sont des repères d'alerte, pas un diagnostic. Les mêmes cas
+sont testés côté serveur et côté Flutter (`test/fixtures/weight_alert_cases.json`).
+
 Firestore garde les photos d'animaux en octets (`bytesValue`) ; l'API les échange en base64.
 
 Le blocage des animaux archivés est appliqué par l'API : les écritures directes à Firestore (serveur éteint) ne
