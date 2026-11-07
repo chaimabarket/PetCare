@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'adoption_enums.dart';
+import 'adoption_listing.dart' show toDate;
 import 'compatibility.dart';
 
 /// Réponses du questionnaire d'adoption (4 étapes du formulaire).
@@ -128,10 +129,16 @@ class AdoptionApplication {
     this.updatedAt,
   });
 
-  factory AdoptionApplication.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? const {};
+  factory AdoptionApplication.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      AdoptionApplication.fromData(doc.id, doc.data() ?? const {});
+
+  /// Candidature renvoyée par l'API REST : mêmes champs, les dates sont des textes ISO.
+  factory AdoptionApplication.fromJson(Map<String, dynamic> json) =>
+      AdoptionApplication.fromData(json['id'] as String? ?? '', json);
+
+  factory AdoptionApplication.fromData(String id, Map<String, dynamic> data) {
     return AdoptionApplication(
-      id: doc.id,
+      id: id,
       listingId: data['listingId'] as String? ?? '',
       listingName: data['listingName'] as String? ?? '',
       listingSpecies: Species.fromFirestore(data['listingSpecies'] as String?),
@@ -147,8 +154,8 @@ class AdoptionApplication {
       ],
       status: ApplicationStatus.fromFirestore(data['status'] as String?),
       refusalReason: data['refusalReason'] as String?,
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
-      updatedAt: (data['updatedAt'] as Timestamp?)?.toDate(),
+      createdAt: toDate(data['createdAt']),
+      updatedAt: toDate(data['updatedAt']),
     );
   }
 

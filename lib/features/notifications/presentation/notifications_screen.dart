@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/api/api_client.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/relative_time.dart';
 import '../data/app_notification.dart';
@@ -49,8 +50,9 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
         builder: (context, snapshot) {
           if (snapshot.hasError) {
             debugPrint('NotificationsScreen: ${snapshot.error}');
-            final denied = snapshot.error is FirebaseException &&
-                (snapshot.error! as FirebaseException).code == 'permission-denied';
+            final denied = (snapshot.error is FirebaseException &&
+                    (snapshot.error! as FirebaseException).code == 'permission-denied') ||
+                (snapshot.error is ApiException && (snapshot.error! as ApiException).statusCode == 403);
             return _Message(
               icon: denied ? Icons.lock_outline : Icons.cloud_off,
               title: 'Notifications indisponibles',

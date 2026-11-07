@@ -1,5 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../../health/data/health_entry.dart';
+import '../../health/data/treatment.dart';
+
 /// Animal de l'utilisateur, lu dans `pets/{id}` (module 1), pour personnaliser les réponses.
 class AssistantPet {
   const AssistantPet({
@@ -119,12 +122,65 @@ class AssistantPetRepository {
     }
   }
 
-  /// Résumé du carnet de santé (module 2 : vaccins, traitements, allergies, visites).
-  ///
-  /// Module 2 : renvoyer ici quelques lignes courtes, par exemple
-  /// « Vaccin rage : 12/03/2026 », « Allergie : poulet », « Traitement en cours : … ».
-  /// Elles sont ajoutées automatiquement au contexte de l'assistant.
-  Future<List<String>> fetchHealthSummary(String petId) async => const [];
+  /// Résumé du carnet de santé (module 2), ajouté au contexte de l'assistant.
+  Future<List<String>> fetchHealthSummary(String petId) async {
+    try {
+      final pet = _firestore.collection('pets').doc(petId);
+      final results = await Future.wait([pet.collection('healthEntries').get(), pet.collection('treatments').get()]);
+      return buildHealthSummary(
+        entries: results[0].docs.map(HealthEntry.fromFirestore).toList(),
+        treatments: results[1].docs.map(Treatment.fromFirestore).toList(),
+      );
+    } on FirebaseException {
+      return const [];
+    }
+  }
+}
+
+/// Lignes courtes du carnet : allergies, dernier vaccin de chaque type, traitements en cours, dernière visite.
+List<String> buildHealthSummary({
+  required List<HealthEntry> entries,
+  required List<Treatment> treatments,
+  DateTime? now,
+}) {
+  final today = now ?? DateTime.now();
+  String day(DateTime d) =>
+      '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
+  final sorted = [...entries]..sort((a, b) => b.date.compareTo(a.date));
+
+  final allergies = [
+    for (final e in sorted)
+      if (e.type == HealthEntryType.allergy) 'Allergie : ${e.title}',
+  ];
+
+  final seenVaccines = <String>{};
+  final vaccines = <String>[];
+  for (final e in sorted.where((e) => e.type == HealthEntryType.vaccine)) {
+    final name = (e.vaccineName?.trim().isNotEmpty ?? false) ? e.vaccineName!.trim() : e.title;
+    if (!seenVaccines.add(name.toLowerCase())) continue;
+    final next = e.nextReminderAt;
+    final reminder = next == null || e.reminderDone
+        ? ''
+        : next.isBefore(today)
+            ? ', rappel en retard depuis le ${day(next)}'
+            : ', prochain rappel le ${day(next)}';
+    vaccines.add('Vaccin $name : fait le ${day(e.date)}$reminder');
+  }
+
+  final ongoing = [
+    for (final t in treatments)
+      if (t.statusAt(today) == TreatmentStatus.active)
+        'Traitement en cours : ${t.name} (${t.posology}) jusqu\'au ${day(t.endDate)}',
+  ];
+
+  final lastVisit = sorted.where((e) => e.type == HealthEntryType.visit).firstOrNull;
+
+  return [
+    ...allergies,
+    ...vaccines,
+    ...ongoing,
+    if (lastVisit != null) 'Dernière visite : ${lastVisit.title} le ${day(lastVisit.date)}',
+  ].take(10).toList();
 }
 
 /// Bloc « ANIMAL SÉLECTIONNÉ » envoyé avec chaque question : jamais de donnée sur le propriétaire.

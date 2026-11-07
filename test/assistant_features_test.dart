@@ -5,6 +5,8 @@ import 'package:projet_flutter/features/assistant/data/assistant_message.dart';
 import 'package:projet_flutter/features/assistant/data/assistant_pet.dart';
 import 'package:projet_flutter/features/assistant/data/assistant_prompt.dart';
 import 'package:projet_flutter/features/assistant/presentation/widgets/reminder_sheet.dart';
+import 'package:projet_flutter/features/health/data/health_entry.dart';
+import 'package:projet_flutter/features/health/data/treatment.dart';
 
 final now = DateTime(2026, 10, 30);
 
@@ -118,6 +120,46 @@ void main() {
       expect(back.reminders.single.title, 'Vaccin');
       expect(back.rating, AnswerRating.up);
       expect(back.id, 'm1');
+    });
+  });
+
+  group('buildHealthSummary', () {
+    test('allergies, latest vaccine per name, ongoing treatments and last visit', () {
+      final lines = buildHealthSummary(
+        now: now,
+        entries: [
+          HealthEntry(id: 'a', type: HealthEntryType.allergy, title: 'Poulet', date: DateTime(2025, 1, 1)),
+          HealthEntry(
+              id: 'v1', type: HealthEntryType.vaccine, title: 'Rage', vaccineName: 'Rage',
+              date: DateTime(2025, 3, 1), nextReminderAt: DateTime(2026, 3, 1)),
+          HealthEntry(
+              id: 'v2', type: HealthEntryType.vaccine, title: 'Rage', vaccineName: 'Rage',
+              date: DateTime(2026, 3, 2), nextReminderAt: DateTime(2027, 3, 2)),
+          HealthEntry(
+              id: 'v3', type: HealthEntryType.vaccine, title: 'CHPPi', vaccineName: 'CHPPi',
+              date: DateTime(2025, 6, 1), nextReminderAt: DateTime(2026, 6, 1)),
+          HealthEntry(id: 'x', type: HealthEntryType.visit, title: 'Bilan annuel', date: DateTime(2026, 9, 10)),
+        ],
+        treatments: [
+          Treatment(
+              id: 't1', category: 'Antiparasitaire', name: 'Milbemax', posology: '1 comprimé',
+              startDate: DateTime(2026, 10, 1), endDate: DateTime(2026, 11, 15)),
+          Treatment(
+              id: 't2', category: 'Antibiotique', name: 'Fini', posology: '2/j',
+              startDate: DateTime(2026, 1, 1), endDate: DateTime(2026, 1, 10)),
+        ],
+      );
+      expect(lines, [
+        'Allergie : Poulet',
+        'Vaccin Rage : fait le 02/03/2026, prochain rappel le 02/03/2027',
+        'Vaccin CHPPi : fait le 01/06/2025, rappel en retard depuis le 01/06/2026',
+        "Traitement en cours : Milbemax (1 comprimé) jusqu'au 15/11/2026",
+        'Dernière visite : Bilan annuel le 10/09/2026',
+      ]);
+    });
+
+    test('empty health record gives no lines', () {
+      expect(buildHealthSummary(entries: const [], treatments: const [], now: now), isEmpty);
     });
   });
 }

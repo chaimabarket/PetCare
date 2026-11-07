@@ -11,6 +11,11 @@ service cloud.firestore {
       return signedIn() && request.auth.uid == userId;
     }
 
+    function isAdmin() {
+      return signedIn()
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
     // Module Utilisateurs : chacun lit et modifie uniquement son propre profil.
     match /users/{userId} {
       allow read: if isOwner(userId);
@@ -87,128 +92,12 @@ service cloud.firestore {
             && (request.resource.data.rating == null || request.resource.data.rating in ['up', 'down']);
         }
       }
-    }
 
-    // Module Profils des animaux : chaque fiche, ses photos et ses pesées sont privées à son propriétaire.
-    match /pets/{petId} {
-      // Les écritures en lot (fiche + photos + pesée) sont vérifiées sur l'état après écriture.
-      function petOwnerAfter() {
-        return signedIn()
-          && getAfter(/databases/$(database)/documents/pets/$(petId)).data.ownerId == request.auth.uid;
+      // Module Santé : fiches santé enregistrées (marque-pages), privées.
+      match /healthBookmarks/{sheetId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId) && request.resource.data.keys().hasOnly(['createdAt']);
       }
-
-      function petOwner() {
-        return signedIn()
-          && get(/databases/$(database)/documents/pets/$(petId)).data.ownerId == request.auth.uid;
-      }
-
-      function validPet(d) {
-        return d.keys().hasOnly(['ownerId', 'name', 'species', 'sex', 'breed', 'birthDate',
-            'birthDateEstimated', 'chipNumber', 'sterilized', 'notes', 'status', 'archivedReason',
-            'favorite', 'contacts', 'createdAt', 'updatedAt'])
-          && d.name is string && d.name.size() >= 2 && d.name.size() <= 80
-          && d.species in ['dog', 'cat', 'rabbit', 'rodent', 'bird', 'other']
-          && d.sex in ['male', 'female']
-          && d.status in ['active', 'archived']
-          && (d.breed == null || (d.breed is string && d.breed.size() <= 80))
-          && (d.notes == null || (d.notes is string && d.notes.size() <= 500))
-          && (d.chipNumber == null || (d.chipNumber is string && d.chipNumber.matches('^[0-9]{15}$')))
-          && (d.birthDate == null || d.birthDate <= request.time)
-          && d.contacts is list && d.contacts.size() <= 5;
-      }
-
-      allow read: if signedIn() && resource.data.ownerId == request.auth.uid;
-      allow create: if signedIn()
-        && request.resource.data.ownerId == request.auth.uid
-        && request.resource.data.status == 'active'
-        && validPet(request.resource.data);
-      allow update: if signedIn()
-        && resource.data.ownerId == request.auth.uid
-        && request.resource.data.ownerId == resource.data.ownerId
-        && validPet(request.resource.data);
-      // Pas de suppression physique depuis l'application : l'animal est archivé (RG-06, RG-07).
-      allow delete: if false;
-
-      // Galerie privée : 5 photos maximum (contrôlé par l'application), images compressées.
-      match /photos/{photoId} {
-        allow read: if petOwner();
-        allow delete: if petOwnerAfter();
-        allow create, update: if petOwnerAfter()
-          && request.resource.data.keys().hasOnly(['data', 'sortOrder', 'createdAt'])
-          && request.resource.data.data is bytes
-          && request.resource.data.sortOrder is int
-          && request.resource.data.sortOrder >= 0 && request.resource.data.sortOrder <= 4;
-      }
-
-      // Pesées : une par jour (identifiant AAAA-MM-JJ), poids entre 0 et 500 kg, date non future.
-      match /weights/{entryId} {
-        allow read: if petOwner();
-        allow delete: if petOwnerAfter();
-        allow create, update: if petOwnerAfter()
-          && request.resource.data.keys().hasOnly(['measuredOn', 'weightKg', 'note', 'createdAt'])
-          && request.resource.data.weightKg is number
-          && request.resource.data.weightKg > 0 && request.resource.data.weightKg <= 500
-          && request.resource.data.measuredOn <= request.time;
-      }
-    }
-
-    // Module 3 : Rendez-vous et rappels.
-    // Un rendez-vous est lisible par son propriétaire (client) et, pour une réservation, par le prestataire.
-    function isParticipant(data) {
-      return signedIn()
-        && (request.auth.uid == data.ownerId || request.auth.uid == data.get('providerId', null));
-    }
-
-    match /appointments/{appointmentId} {
-      allow read: if isParticipant(resource.data);
-
-      // Le client crée pour lui-même un rendez-vous futur ; un rendez-vous personnel démarre
-      // « confirmé », une réservation « en attente » du prestataire (RG-13, RG-16).
-      allow create: if signedIn()
-        && request.resource.data.ownerId == request.auth.uid
-        && request.resource.data.version == 1
-        && request.resource.data.startsAt is timestamp
-        && request.resource.data.endsAt is timestamp
-        && request.resource.data.startsAt > request.time
-        && request.resource.data.endsAt > request.resource.data.startsAt
-        && request.resource.data.title is string
-        && request.resource.data.title.size() > 0
-        && request.resource.data.title.size() <= 120
-        && request.resource.data.petName is string
-        && request.resource.data.petName.size() > 0
-        && ((request.resource.data.providerId == null && request.resource.data.status == 'confirmed')
-          || (request.resource.data.providerId != null && request.resource.data.status == 'planned'));
-
-      // Seul un rendez-vous actif change ; terminé et annulé sont définitifs (RG-20).
-      // Chaque modification augmente la version : une version obsolète est refusée.
-      // Le client et le prestataire ne peuvent pas changer à qui appartient le rendez-vous,
-      // et seul le prestataire confirme une réservation (RG-17).
-      allow update: if isParticipant(resource.data)
-        && resource.data.status in ['planned', 'confirmed']
-        && request.resource.data.status in ['planned', 'confirmed', 'completed', 'cancelled']
-        && request.resource.data.version == resource.data.version + 1
-        && request.resource.data.ownerId == resource.data.ownerId
-        && request.resource.data.get('providerId', null) == resource.data.get('providerId', null)
-        && !(resource.data.get('providerId', null) != null
-          && resource.data.status == 'planned'
-          && request.resource.data.status == 'confirmed'
-          && request.auth.uid != resource.data.providerId);
-
-      // L'historique est conservé : pas de suppression.
-      allow delete: if false;
-    }
-
-    // Rappels de soins personnels : visibles et modifiables uniquement par leur propriétaire.
-    match /reminders/{reminderId} {
-      allow read, delete: if signedIn() && resource.data.ownerId == request.auth.uid;
-      allow create: if signedIn()
-        && request.resource.data.ownerId == request.auth.uid
-        && request.resource.data.title is string
-        && request.resource.data.title.size() > 0
-        && request.resource.data.dueAt is timestamp;
-      allow update: if signedIn()
-        && resource.data.ownerId == request.auth.uid
-        && request.resource.data.ownerId == resource.data.ownerId;
     }
 
     // ------------------------------------------------------------ Module Adoption
@@ -320,6 +209,319 @@ service cloud.firestore {
     match /reports/{reportId} {
       allow create: if signedIn() && request.resource.data.reporterId == request.auth.uid;
       allow read: if signedIn() && userRole() == 'admin';
+    }
+
+    // Module Profils des animaux : chaque fiche, ses photos et ses pesées sont privées à son propriétaire.
+    match /pets/{petId} {
+      // Les écritures en lot (fiche + photos + pesée) sont vérifiées sur l'état après écriture.
+      function petOwnerAfter() {
+        return signedIn()
+          && getAfter(/databases/$(database)/documents/pets/$(petId)).data.ownerId == request.auth.uid;
+      }
+
+      function petOwner() {
+        return signedIn()
+          && get(/databases/$(database)/documents/pets/$(petId)).data.ownerId == request.auth.uid;
+      }
+
+      // Module 2 : le carnet d'un animal archivé se lit, mais ne se modifie plus (même règle que l'API, 409).
+      // Le get() est le même que celui de petOwner() : Firestore ne le facture qu'une fois par requête.
+      function petOwnerActive() {
+        return petOwner()
+          && get(/databases/$(database)/documents/pets/$(petId)).data.status == 'active';
+      }
+
+      function validPet(d) {
+        return d.keys().hasOnly(['ownerId', 'name', 'species', 'sex', 'breed', 'birthDate',
+            'birthDateEstimated', 'chipNumber', 'sterilized', 'notes', 'status', 'archivedReason',
+            'favorite', 'contacts', 'createdAt', 'updatedAt'])
+          && d.name is string && d.name.size() >= 2 && d.name.size() <= 80
+          && d.species in ['dog', 'cat', 'rabbit', 'rodent', 'bird', 'other']
+          && d.sex in ['male', 'female']
+          && d.status in ['active', 'archived']
+          && (d.breed == null || (d.breed is string && d.breed.size() <= 80))
+          && (d.notes == null || (d.notes is string && d.notes.size() <= 500))
+          && (d.chipNumber == null || (d.chipNumber is string && d.chipNumber.matches('^[0-9]{15}$')))
+          && (d.birthDate == null || d.birthDate <= request.time)
+          && d.contacts is list && d.contacts.size() <= 5;
+      }
+
+      allow read: if signedIn() && resource.data.ownerId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.status == 'active'
+        && validPet(request.resource.data);
+      allow update: if signedIn()
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId
+        && validPet(request.resource.data);
+      // Pas de suppression physique depuis l'application : l'animal est archivé (RG-06, RG-07).
+      allow delete: if false;
+
+      // Galerie privée : 5 photos maximum (contrôlé par l'application), images compressées.
+      match /photos/{photoId} {
+        allow read: if petOwner();
+        allow delete: if petOwnerAfter();
+        allow create, update: if petOwnerAfter()
+          && request.resource.data.keys().hasOnly(['data', 'sortOrder', 'createdAt'])
+          && request.resource.data.data is bytes
+          && request.resource.data.data.size() <= 750000
+          && request.resource.data.sortOrder is int
+          && request.resource.data.sortOrder >= 0 && request.resource.data.sortOrder <= 4;
+      }
+
+      // Pesées : une par jour (identifiant AAAA-MM-JJ), poids entre 0 et 500 kg, date non future.
+      match /weights/{entryId} {
+        allow read: if petOwner();
+        allow delete: if petOwnerAfter();
+        allow create, update: if petOwnerAfter()
+          && request.resource.data.keys().hasOnly(['measuredOn', 'weightKg', 'note', 'createdAt'])
+          && request.resource.data.weightKg is number
+          && request.resource.data.weightKg > 0 && request.resource.data.weightKg <= 500
+          && request.resource.data.measuredOn <= request.time;
+      }
+
+      // Module 2 (Santé) : carnet de santé et traitements, privés au propriétaire de l'animal.
+      // Ces sous-collections ne suivent pas une copie de la fiche vers un adoptant.
+      function optString(d, field, max) {
+        return d.get(field, null) == null || (d[field] is string && d[field].size() <= max);
+      }
+
+      function validHealthEntry(d) {
+        return d.keys().hasOnly(['ownerId', 'type', 'title', 'date', 'description', 'practitioner', 'cost',
+            'vaccineName', 'batchNumber', 'nextReminderAt', 'reminderDone', 'weightKg', 'weightDeltaKg',
+            'attachments', 'createdAt'])
+          && d.ownerId == request.auth.uid
+          && d.type in ['visite', 'vaccin', 'examen', 'allergie', 'note']
+          && d.title is string && d.title.size() > 0 && d.title.size() <= 120
+          // Pas de soin daté dans le futur (une heure de marge pour l'horloge du téléphone).
+          && d.date is timestamp && d.date <= request.time + duration.value(1, 'h')
+          && optString(d, 'description', 1000)
+          && optString(d, 'practitioner', 120)
+          && optString(d, 'vaccineName', 120)
+          && optString(d, 'batchNumber', 60)
+          && (d.get('cost', null) == null || (d.cost is number && d.cost >= 0))
+          && (d.get('nextReminderAt', null) == null || (d.nextReminderAt is timestamp && d.nextReminderAt > d.date))
+          // Un vaccin a toujours un nom et une date de prochain rappel.
+          && (d.type != 'vaccin' || (d.get('vaccineName', null) != null && d.get('nextReminderAt', null) != null))
+          && d.attachments is list && d.attachments.size() <= 3;
+      }
+
+      match /healthEntries/{entryId} {
+        allow read: if petOwner();
+        allow delete: if petOwnerActive();
+        allow create: if petOwnerActive() && validHealthEntry(request.resource.data);
+        // Seul le bouton « rappel déjà fait » modifie un soin enregistré.
+        allow update: if petOwnerActive()
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reminderDone'])
+          && request.resource.data.reminderDone is bool;
+
+        // Pièces jointes (ordonnance, vignette) : octets, 3 au maximum par soin.
+        match /files/{fileId} {
+          allow read: if petOwner();
+          allow delete: if petOwnerActive();
+          allow create: if petOwnerActive()
+            && fileId in ['0', '1', '2']
+            && request.resource.data.keys().hasOnly(['name', 'mimeType', 'data'])
+            && request.resource.data.name is string && request.resource.data.name.size() <= 200
+            && request.resource.data.mimeType in ['application/pdf', 'image/jpeg', 'image/png', 'image/heic', 'image/webp']
+            && request.resource.data.data is bytes
+            && request.resource.data.data.size() <= 921600;
+        }
+      }
+
+      function validTreatment(d) {
+        return d.keys().hasOnly(['ownerId', 'category', 'name', 'subtitle', 'form', 'practitioner', 'posology',
+            'startDate', 'endDate', 'doseTimes', 'doses', 'stoppedAt', 'stopReason', 'renewalAt',
+            'scheduleNote', 'createdAt'])
+          && d.ownerId == request.auth.uid
+          && d.category is string && d.category.size() > 0 && d.category.size() <= 40
+          && d.name is string && d.name.size() > 0 && d.name.size() <= 120
+          && d.posology is string && d.posology.size() > 0 && d.posology.size() <= 500
+          && d.form in ['comprime', 'gouttes', 'injection', 'pipette', 'autre']
+          && optString(d, 'subtitle', 120)
+          && optString(d, 'practitioner', 120)
+          && optString(d, 'stopReason', 300)
+          && optString(d, 'scheduleNote', 120)
+          && d.startDate is timestamp && d.endDate is timestamp && d.endDate >= d.startDate
+          && d.doseTimes is list && d.doseTimes.size() <= 8
+          && d.doses is list;
+      }
+
+      match /treatments/{treatmentId} {
+        allow read: if petOwner();
+        allow delete: if petOwnerActive();
+        allow create: if petOwnerActive()
+          && validTreatment(request.resource.data)
+          && request.resource.data.doses.size() == 0
+          && request.resource.data.get('stoppedAt', null) == null;
+        // Noter une prise, ou arrêter un traitement (une seule fois, avec une raison).
+        allow update: if petOwnerActive() && validTreatment(request.resource.data) && (
+          (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['doses'])
+            && request.resource.data.doses.size() == resource.data.doses.size() + 1
+            && resource.data.get('stoppedAt', null) == null)
+          || (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['stoppedAt', 'stopReason'])
+            && resource.data.get('stoppedAt', null) == null
+            && request.resource.data.stoppedAt == request.time
+            && request.resource.data.get('stopReason', null) != null)
+        );
+      }
+    }
+
+    // Module 2 : fiches santé publiques, publiées par l'administrateur.
+    match /healthSheets/{sheetId} {
+      allow read: if true;
+      allow write: if signedIn() && userRole() == 'admin';
+    }
+
+    // Module 3 : Rendez-vous et rappels.
+    // Un rendez-vous est lisible par son propriétaire (client) et, pour une réservation, par le prestataire.
+    function isParticipant(data) {
+      return signedIn()
+        && (request.auth.uid == data.ownerId || request.auth.uid == data.get('providerId', null));
+    }
+
+    match /appointments/{appointmentId} {
+      allow read: if isParticipant(resource.data);
+
+      // Le client crée pour lui-même un rendez-vous futur ; un rendez-vous personnel démarre
+      // « confirmé », une réservation « en attente » du prestataire (RG-13, RG-16).
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.version == 1
+        && request.resource.data.startsAt is timestamp
+        && request.resource.data.endsAt is timestamp
+        && request.resource.data.startsAt > request.time
+        && request.resource.data.endsAt > request.resource.data.startsAt
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 120
+        && request.resource.data.petName is string
+        && request.resource.data.petName.size() > 0
+        && ((request.resource.data.providerId == null && request.resource.data.status == 'confirmed')
+          || (request.resource.data.providerId != null && request.resource.data.status == 'planned'));
+
+      // Seul un rendez-vous actif change ; terminé et annulé sont définitifs (RG-20).
+      // Chaque modification augmente la version : une version obsolète est refusée.
+      // Le client et le prestataire ne peuvent pas changer à qui appartient le rendez-vous,
+      // et seul le prestataire confirme une réservation (RG-17).
+      allow update: if isParticipant(resource.data)
+        && resource.data.status in ['planned', 'confirmed']
+        && request.resource.data.status in ['planned', 'confirmed', 'completed', 'cancelled']
+        && request.resource.data.version == resource.data.version + 1
+        && request.resource.data.ownerId == resource.data.ownerId
+        && request.resource.data.get('providerId', null) == resource.data.get('providerId', null)
+        && !(resource.data.get('providerId', null) != null
+          && resource.data.status == 'planned'
+          && request.resource.data.status == 'confirmed'
+          && request.auth.uid != resource.data.providerId);
+
+      // L'historique est conservé : pas de suppression.
+      allow delete: if false;
+    }
+
+    // Rappels de soins personnels : visibles et modifiables uniquement par leur propriétaire.
+    match /reminders/{reminderId} {
+      allow read, delete: if signedIn() && resource.data.ownerId == request.auth.uid;
+      allow create: if signedIn()
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.dueAt is timestamp;
+      allow update: if signedIn()
+        && resource.data.ownerId == request.auth.uid
+        && request.resource.data.ownerId == resource.data.ownerId;
+    }
+
+    // Module Services: providers publish only after an administrator validates their profile.
+    match /serviceProviders/{providerId} {
+      allow read: if resource.data.status == 'published' || isOwner(providerId) || isAdmin();
+      allow create: if isOwner(providerId)
+        && request.resource.data.ownerId == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.keys().hasOnly([
+          'ownerId', 'name', 'category', 'city', 'description', 'phone', 'email',
+          'status', 'photoUrl', 'address', 'updatedAt'
+        ]);
+      allow update: if isAdmin()
+        || (isOwner(providerId)
+          && request.resource.data.ownerId == resource.data.ownerId
+          && (request.resource.data.status == resource.data.status
+            || (resource.data.status == 'rejected' && request.resource.data.status == 'pending'))
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'name', 'category', 'city', 'description', 'phone', 'email', 'photoUrl', 'address', 'status', 'updatedAt'
+          ]));
+      allow delete: if isAdmin();
+
+      match /services/{serviceId} {
+        function ownsProvider() {
+          return isOwner(providerId);
+        }
+
+        allow read: if (get(/databases/$(database)/documents/serviceProviders/$(providerId)).data.status == 'published'
+            && resource.data.status == 'published')
+          || ownsProvider() || isAdmin();
+        allow create: if ownsProvider()
+          && request.resource.data.providerId == providerId
+          && request.resource.data.status in ['published', 'archived']
+          && request.resource.data.keys().hasOnly([
+            'providerId', 'name', 'category', 'durationMinutes', 'price', 'status', 'description', 'updatedAt'
+          ]);
+        allow update: if isAdmin()
+          || (ownsProvider()
+            && request.resource.data.providerId == resource.data.providerId
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+              'name', 'category', 'durationMinutes', 'price', 'status', 'description', 'updatedAt'
+            ]));
+        allow delete: if ownsProvider() || isAdmin();
+      }
+
+      match /availability/{dayId} {
+        allow read: if get(/databases/$(database)/documents/serviceProviders/$(providerId)).data.status == 'published'
+          || isOwner(providerId) || isAdmin();
+        allow create, update: if isOwner(providerId)
+          && request.resource.data.keys().hasOnly(['enabled', 'start', 'end', 'ranges', 'updatedAt']);
+        allow delete: if isOwner(providerId) || isAdmin();
+      }
+    }
+
+    // Catégories de l'annuaire : lues par tout le monde, gérées par l'administrateur.
+    match /serviceCategories/{categoryId} {
+      allow read: if true;
+      allow create, update: if isAdmin()
+        && request.resource.data.keys().hasOnly(['name', 'icon', 'order', 'updatedAt'])
+        && request.resource.data.name is string
+        && request.resource.data.name.size() >= 2
+        && request.resource.data.name.size() <= 40
+        && request.resource.data.icon is string
+        && request.resource.data.order is int;
+      allow delete: if isAdmin();
+    }
+
+    // Booking details are private to the customer and provider; providers cannot create bookings.
+    match /serviceBookings/{bookingId} {
+      allow read: if signedIn()
+        && (resource.data.clientUid == request.auth.uid
+          || resource.data.providerUid == request.auth.uid
+          || isAdmin());
+      allow create: if signedIn()
+        && request.resource.data.clientUid == request.auth.uid
+        && request.resource.data.status == 'pending'
+        && request.resource.data.dateTime > request.time
+        && request.resource.data.keys().hasOnly([
+          'providerUid', 'providerName', 'clientUid', 'clientName', 'serviceId', 'serviceName',
+          'animalName', 'dateTime', 'notes', 'status', 'createdAt'
+        ])
+        && get(/databases/$(database)/documents/serviceProviders/$(request.resource.data.providerUid)).data.status == 'published'
+        && get(/databases/$(database)/documents/serviceProviders/$(request.resource.data.providerUid)/services/$(request.resource.data.serviceId)).data.status == 'published';
+      allow update: if signedIn()
+        && resource.data.status == 'pending'
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'updatedAt'])
+        && ((resource.data.providerUid == request.auth.uid
+            && request.resource.data.status in ['confirmed', 'declined'])
+          || (resource.data.clientUid == request.auth.uid
+            && request.resource.data.status == 'cancelled'));
+      allow delete: if false;
     }
 
     // Tout le reste reste fermé tant que les autres modules n'ont pas ajouté leurs règles.

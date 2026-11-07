@@ -6,6 +6,20 @@ Application mobile Flutter de **PetCare Community** : gérer ses animaux, trouve
 
 Guide pas à pas (installation, émulateur ou téléphone, APK) : [docs/LANCER_SUR_MOBILE.md](docs/LANCER_SUR_MOBILE.md).
 
+### Vue téléphone dans VS Code, sans installation Android
+
+1. Ouvrir ce dossier (`PetCare`) dans VS Code et installer les extensions recommandées.
+2. Dans **Exécuter et déboguer**, choisir **PetCare - Phone Preview**, puis appuyer sur **F5**.
+3. Attendre que Flutter affiche l'adresse `http://localhost:7357`.
+4. Ouvrir la palette (**Ctrl+Maj+P**) et lancer **Mobile Viewer: Open Preview**.
+5. Saisir `http://localhost:7357` dans Mobile Viewer, puis choisir **Pixel 7** ou un autre téléphone.
+
+Cette vue affiche la version web de Flutter dans un cadre de téléphone ; elle ne simule pas Android.
+Utiliser le bouton de rechargement de Mobile Viewer pour actualiser la vue. **Maj+F5** arrête le serveur
+lancé avec F5. Les points d'arrêt Dart ne sont pas activés dans cette configuration de prévisualisation.
+
+### Sur un appareil Android
+
 Prérequis : Flutter (canal stable), un émulateur Android ou un téléphone en mode développeur.
 
 ```bash
@@ -20,6 +34,12 @@ Pour générer l'APK de démonstration :
 ```bash
 flutter build apk --release
 ```
+
+## API REST (Utilisateurs, Adoption, Profils des animaux)
+
+Le profil, les notifications, l'adoption et les animaux passent par une API REST Node.js dans [backend/](backend/README.md) :
+`cd backend && npm install && npm start`, puis lancer l'application. Si le serveur est éteint,
+l'application utilise Firestore directement.
 
 ## Backend : Firebase
 
@@ -41,8 +61,38 @@ lib/
     profile/       Mon profil, modification du profil
     notifications/ notifications dans l'application
     home/          Accueil et barre de navigation (4 onglets)
+    pets/          Mes animaux, fiche animal, ajout / modification, archivage
     appointments/  agenda, rendez-vous, rappels (module 3)
+    health/        carnet de santé, traitements, fiches santé (module 2)
 ```
+
+## Langues (français / anglais)
+
+L'utilisateur choisit la langue avec le bouton 🌐 de l'en-tête ; le choix est mémorisé sur l'appareil (`LocaleController`). Les textes sont dans `lib/l10n/app_fr.arb` (modèle) et `lib/l10n/app_en.arb`, générés par `flutter gen-l10n` (automatique avec `flutter pub get` / `flutter run`).
+
+Pour traduire un écran : ajouter la clé dans les deux fichiers `.arb`, puis
+
+```dart
+final l = AppLocalizations.of(context);
+Text(l.maCle)
+```
+
+## Module Profils des animaux (branche `animals`)
+
+Maquettes utilisées : `designs/animals/` (copie des écrans Stitch du module 1).
+
+- Liste « Mes animaux » (actifs / archivés, recherche, tri), état vide, fiche animal, formulaire d'ajout et de modification, archivage.
+- Fiche `pets/{petId}` : `ownerId`, `name`, `species`, `sex`, `breed`, `birthDate`, `birthDateEstimated`, `chipNumber`, `sterilized`, `notes`, `status` (`active` / `archived`), `favorite`, `contacts`.
+- Photos `pets/{petId}/photos/{id}` : image compressée stockée dans Firestore (plan Spark, pas de Cloud Storage), 5 au maximum, `sortOrder` 0 = photo principale.
+- Pesées `pets/{petId}/weights/{AAAA-MM-JJ}` : une par jour, le poids courant est la pesée la plus récente.
+
+Lire les animaux de l'utilisateur depuis un autre module (santé, rendez-vous, adoption…) :
+
+```dart
+PetRepository().watchMine(uid) // Stream<List<Pet>>, filtrer sur !pet.isArchived pour les actifs
+```
+
+Pour bloquer l'archivage tant qu'un rendez-vous ou une annonce est ouvert, passer des `ArchiveBlocker` à `showArchivePetDialog` (voir `pet_detail_screen.dart`, méthode `_archive`).
 
 ## Module Utilisateurs (branche `Users`)
 
@@ -93,6 +143,68 @@ Collections Firestore :
 | `reports/{id}` | signalements pour l'administrateur |
 
 Pour le module 1 : `AdoptionRepository.confirmAdoption` est l'endroit où copier la fiche de l'animal vers l'adoptant (`adopterId`) ; le carnet de santé n'est pas transmis.
+
+## Module Santé et dossier médical (branche `health_record`)
+
+Écrans (maquettes Stitch, dossier `designs/stitch_petcare_flutter`) :
+
+| Écran | Maquette | Route |
+| --- | --- | --- |
+| Carnet de santé (historique filtrable, prochain rappel vaccinal, urgences) | `carnet_de_sant_milo` | `AppRoutes.healthRecord` (argument : id de l'animal) |
+| Ajouter un soin médical (visite, vaccin, examen, allergie, note, pièces jointes) | `ajouter_un_soin_m_dical_milo` | `AppRoutes.healthEntryForm` (id de l'animal) |
+| Traitements (en cours / terminés / arrêtés, prises notées) | `traitements_milo` | `AppRoutes.treatments` (id de l'animal) |
+| Nouveau traitement | pas de maquette, mêmes composants que « Ajouter un soin » | `AppRoutes.treatmentForm` (id de l'animal) |
+| Fiches Santé & Conseils (recherche, catégories, marque-pages) | `fiches_sant_pr_vention_petcare_community_2` | `AppRoutes.healthSheets` |
+| Détail d'une fiche | pas de maquette, consigne 2.5 de STITCH_PROMPTS.md | `AppRoutes.healthSheetDetail` (`HealthSheet`) |
+
+Onglet **Santé** (3e onglet de la barre du bas, `HealthTabScreen`) : une carte par animal actif (prochain vaccin à jour,
+bientôt ou en retard, traitements en cours et prises du jour, dernière visite, allergies), les animaux qui demandent une
+action en premier ; les animaux archivés dans une section repliée, carnet en lecture seule. Tout vient d'un seul appel
+`GET /api/health/summary`, relu toutes les 60 s et aussitôt après une modification. Les numéros d'onglet sont dans
+`lib/core/navigation/main_tabs.dart` (`MainTab`).
+
+`HealthRepository` passe par l'API REST (`backend/src/health/`, voir `backend/README.md`) et, si le serveur est éteint,
+directement par Firestore. Le carnet d'un animal archivé ne se modifie plus : l'API renvoie `409` et les règles
+(`petOwnerActive`) refusent aussi l'écriture directe.
+
+En haut de l'onglet, le **tableau du jour** liste les prises de tous les animaux à cocher (une prise notée ne
+s'annule pas) et les vaccins en retard ou des 30 prochains jours.
+
+**Export PDF** du carnet (bouton ⤓ : enregistrer ; bouton de partage : feuille de partage du téléphone), avec `pdf`
+et `printing` : profil, vaccins et rappels, visites et examens, allergies, traitements en cours et passés. Aucune
+coordonnée : les e-mails et numéros écrits dans le texte libre sont masqués. Police Inter embarquée
+(`assets/fonts/`, licence OFL).
+
+**Scan d'ordonnance ou de vignette** (« Ajouter un soin », « Nouveau traitement ») : photo, texte lu sur le téléphone
+par Google ML Kit (`google_mlkit_text_recognition`, hors ligne, sans quota), puis `parsePrescriptionText`
+pré-remplit nom du vaccin ou du médicament, date, numéro de lot et vétérinaire. Jamais de posologie ni de diagnostic ;
+rien n'est enregistré sans vérification. Bouton affiché seulement sur Android et iOS (pas de ML Kit sur le web ni
+sur ordinateur).
+
+L'Accueil affiche la carte « Vaccins & traitements » (prochains rappels et prises, accès au carnet de chaque animal
+et aux fiches santé), lue dans la même synthèse. Le vaccin peut créer une alerte dans les rappels du module 3 (« Créer une alerte dans l'agenda ») ;
+« Prendre RDV rappel » ouvre le formulaire de rendez-vous du module 3.
+
+Données Firestore (privées au propriétaire de l'animal, voir `firestore.rules`) :
+
+| Collection | Contenu |
+|---|---|
+| `pets/{petId}/healthEntries/{id}` | `type` (`visite`, `vaccin`, `examen`, `allergie`, `note`), `title`, `date`, `description`, `practitioner`, `cost`, `vaccineName`, `batchNumber`, `nextReminderAt`, `reminderDone`, `weightKg`, `attachments` |
+| `pets/{petId}/healthEntries/{id}/files/{0-2}` | pièces jointes en octets (PDF ou photo, 900 Ko max, pas de Firebase Storage) |
+| `pets/{petId}/treatments/{id}` | `category`, `name`, `form`, `posology` (texte du vétérinaire), `startDate`, `endDate`, `doseTimes`, `doses`, `stoppedAt`, `stopReason`, `renewalAt` |
+| `healthSheets/{id}` | fiches publiques, écrites par l'administrateur (`title`, `summary`, `category`, `species`, `sections`, `source`, `imageUrl`, `featured`, `published`) ; 5 fiches de départ sont intégrées à l'application |
+| `users/{uid}/healthBookmarks/{sheetId}` | fiches enregistrées |
+
+Le carnet et les traitements sont des sous-collections de la fiche : une copie de la fiche vers l'adoptant
+(`AdoptionRepository.confirmAdoption`) ne transmet donc pas le carnet de santé.
+
+### Pour les autres modules
+
+Module 1 (Profils) — carte « Carnet de santé » de la fiche animal :
+
+```dart
+Navigator.of(context).pushNamed(AppRoutes.healthRecord, arguments: pet.id);
+```
 
 ## Module Rendez-vous et rappels (branche `rendez-vous`)
 

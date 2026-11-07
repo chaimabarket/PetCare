@@ -5,6 +5,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'adoption_enums.dart';
 
+/// Date venue de Firestore (`Timestamp`) ou de l'API REST (texte ISO).
+DateTime? toDate(Object? value) {
+  if (value is Timestamp) return value.toDate();
+  if (value is String) return DateTime.tryParse(value)?.toLocal();
+  return null;
+}
+
 /// Annonce d'adoption, stockée dans `adoptions/{id}`.
 ///
 /// La photo de couverture est copiée dans le document pour afficher le fil sans requête
@@ -43,11 +50,16 @@ class AdoptionListing {
     this.adoptedAt,
   });
 
-  factory AdoptionListing.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
-    final data = doc.data() ?? const {};
+  factory AdoptionListing.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) =>
+      AdoptionListing.fromData(doc.id, doc.data() ?? const {});
+
+  /// Annonce renvoyée par l'API REST : mêmes champs, les dates sont des textes ISO.
+  factory AdoptionListing.fromJson(Map<String, dynamic> json) => AdoptionListing.fromData(json['id'] as String? ?? '', json);
+
+  factory AdoptionListing.fromData(String id, Map<String, dynamic> data) {
     final cover = data['cover'] as String?;
     return AdoptionListing(
-      id: doc.id,
+      id: id,
       publisherId: data['publisherId'] as String? ?? '',
       publisherName: data['publisherName'] as String? ?? '',
       publisherIsShelter: data['publisherIsShelter'] as bool? ?? false,
@@ -55,7 +67,7 @@ class AdoptionListing {
       species: Species.fromFirestore(data['species'] as String?),
       breed: data['breed'] as String? ?? '',
       sex: Sex.fromFirestore(data['sex'] as String?),
-      birthDate: (data['birthDate'] as Timestamp?)?.toDate() ?? DateTime.now(),
+      birthDate: toDate(data['birthDate']) ?? DateTime.now(),
       size: PetSize.fromFirestore(data['size'] as String?),
       city: data['city'] as String? ?? '',
       title: data['title'] as String? ?? '',
@@ -77,8 +89,8 @@ class AdoptionListing {
       acceptedApplicationId: data['acceptedApplicationId'] as String?,
       adopterId: data['adopterId'] as String?,
       adopterName: data['adopterName'] as String?,
-      createdAt: (data['createdAt'] as Timestamp?)?.toDate(),
-      adoptedAt: (data['adoptedAt'] as Timestamp?)?.toDate(),
+      createdAt: toDate(data['createdAt']),
+      adoptedAt: toDate(data['adoptedAt']),
     );
   }
 
@@ -212,6 +224,30 @@ class ListingDraft {
 
   /// Photos compressées (JPEG), la première sert de couverture.
   List<Uint8List> photos;
+
+  /// Corps de `POST /api/adoptions` ; [publish] faux enregistre un brouillon.
+  Map<String, dynamic> toApiJson({required bool publish, bool withPhotos = true}) => {
+        'name': name.trim(),
+        'species': species.firestoreValue,
+        'breed': breed.trim(),
+        'sex': sex.firestoreValue,
+        'birthDate': birthDate.toUtc().toIso8601String(),
+        'size': size.firestoreValue,
+        'city': city.trim(),
+        'title': title.trim(),
+        'story': story.trim(),
+        'needs': needs.trim(),
+        'conditions': conditions.trim(),
+        'badges': [for (final b in badges) b.firestoreValue],
+        'goodWithKids': goodWithKids,
+        'goodWithCats': goodWithCats,
+        'goodWithDogs': goodWithDogs,
+        'needsGarden': needsGarden,
+        'energy': energy.firestoreValue,
+        'okAloneHours': okAloneHours,
+        'photos': [for (final p in photos) base64Encode(p)],
+        'publish': publish,
+      };
 
   Map<String, dynamic> toFirestore() => {
         'name': name.trim(),

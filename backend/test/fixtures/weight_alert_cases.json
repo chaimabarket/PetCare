@@ -1,0 +1,159 @@
+{
+  "_comment": "Cas partagés par backend/test/weight_alert.test.js et test/weight_alert_test.dart : les deux analyses doivent donner le même résultat.",
+  "now": "2026-11-04T12:00:00.000Z",
+  "cases": [
+    {
+      "name": "chien : perte rapide de 6 % en 7 jours",
+      "species": "dog",
+      "birthDate": "2020-01-01T00:00:00.000Z",
+      "petName": "Milo",
+      "entries": [
+        { "id": "2026-10-28", "measuredOn": "2026-10-28T00:00:00.000Z", "weightKg": 10.0 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 9.4 }
+      ],
+      "expected": { "rule": "rapid-loss", "kind": "loss", "level": "consult", "percent": 6, "days": 7, "referenceId": "2026-10-28" },
+      "message": {
+        "title": "Poids de Milo : consultez un vétérinaire",
+        "body": "Milo a perdu 6 % en 7 jours (10 kg → 9,4 kg). Prenez rendez-vous avec un vétérinaire. Ce n'est pas un diagnostic."
+      }
+    },
+    {
+      "name": "chien : perte lente de 11 % en 80 jours",
+      "species": "dog",
+      "birthDate": "2020-01-01T00:00:00.000Z",
+      "entries": [
+        { "id": "2026-08-16", "measuredOn": "2026-08-16T00:00:00.000Z", "weightKg": 20.0 },
+        { "id": "2026-09-20", "measuredOn": "2026-09-20T00:00:00.000Z", "weightKg": 19.0 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 17.8 }
+      ],
+      "expected": { "rule": "loss-10", "kind": "loss", "level": "consult", "percent": 11, "days": 80, "referenceId": "2026-08-16" }
+    },
+    {
+      "name": "chat : perte modérée de 5,5 % en 20 jours",
+      "species": "cat",
+      "birthDate": "2019-05-10T00:00:00.000Z",
+      "petName": "Nala",
+      "entries": [
+        { "id": "2026-10-15", "measuredOn": "2026-10-15T00:00:00.000Z", "weightKg": 4.0 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 3.78 }
+      ],
+      "expected": { "rule": "loss-5", "kind": "loss", "level": "watch", "percent": 5.5, "days": 20, "referenceId": "2026-10-15" },
+      "message": {
+        "title": "Poids de Nala à surveiller",
+        "body": "Nala a perdu 5,5 % en 20 jours (4 kg → 3,78 kg). Surveillez son poids et parlez-en à votre vétérinaire. Ce n'est pas un diagnostic."
+      }
+    },
+    {
+      "name": "lapin : 3,5 % en 5 jours suffit (petit animal)",
+      "species": "rabbit",
+      "birthDate": null,
+      "entries": [
+        { "id": "2026-10-30", "measuredOn": "2026-10-30T00:00:00.000Z", "weightKg": 2.0 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 1.93 }
+      ],
+      "expected": { "rule": "rapid-loss", "kind": "loss", "level": "consult", "percent": 3.5, "days": 5, "referenceId": "2026-10-30" }
+    },
+    {
+      "name": "chien : 3,5 % en 5 jours ne déclenche rien",
+      "species": "dog",
+      "birthDate": "2020-01-01T00:00:00.000Z",
+      "entries": [
+        { "id": "2026-10-30", "measuredOn": "2026-10-30T00:00:00.000Z", "weightKg": 10.0 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 9.65 }
+      ],
+      "expected": null
+    },
+    {
+      "name": "chien adulte : prise de 12 % en 60 jours",
+      "species": "dog",
+      "birthDate": "2020-01-01T00:00:00.000Z",
+      "petName": "Rocky",
+      "entries": [
+        { "id": "2026-09-05", "measuredOn": "2026-09-05T00:00:00.000Z", "weightKg": 10.0 },
+        { "id": "2026-10-05", "measuredOn": "2026-10-05T00:00:00.000Z", "weightKg": 10.5 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 11.2 }
+      ],
+      "expected": { "rule": "gain-10", "kind": "gain", "level": "watch", "percent": 12, "days": 60, "referenceId": "2026-09-05" },
+      "message": {
+        "title": "Poids de Rocky à surveiller",
+        "body": "Rocky a pris 12 % en 60 jours (10 kg → 11,2 kg). Surveillez son poids et parlez-en à votre vétérinaire. Ce n'est pas un diagnostic."
+      }
+    },
+    {
+      "name": "chiot : une forte prise de poids est de la croissance",
+      "species": "dog",
+      "birthDate": "2026-06-01T00:00:00.000Z",
+      "entries": [
+        { "id": "2026-10-28", "measuredOn": "2026-10-28T00:00:00.000Z", "weightKg": 5.0 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 7.0 }
+      ],
+      "expected": null
+    },
+    {
+      "name": "chiot : une perte de 10 % alerte quand même",
+      "species": "dog",
+      "birthDate": "2026-06-01T00:00:00.000Z",
+      "entries": [
+        { "id": "2026-10-28", "measuredOn": "2026-10-28T00:00:00.000Z", "weightKg": 5.0 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 4.5 }
+      ],
+      "expected": { "rule": "loss-10", "kind": "loss", "level": "consult", "percent": 10, "days": 7, "referenceId": "2026-10-28" }
+    },
+    {
+      "name": "variation extrême : vérifier la saisie",
+      "species": "dog",
+      "birthDate": "2020-01-01T00:00:00.000Z",
+      "petName": "Milo",
+      "entries": [
+        { "id": "2026-11-01", "measuredOn": "2026-11-01T00:00:00.000Z", "weightKg": 30.0 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 12.0 }
+      ],
+      "expected": { "rule": "extreme", "kind": "check", "level": "consult", "percent": 60, "days": 3, "referenceId": "2026-11-01" },
+      "message": {
+        "title": "Poids de Milo : consultez un vétérinaire",
+        "body": "Le poids de Milo a varié de 60 % en 3 jours (30 kg → 12 kg) : vérifiez la pesée. Prenez rendez-vous avec un vétérinaire. Ce n'est pas un diagnostic."
+      }
+    },
+    {
+      "name": "retour au poids habituel : pas d'alerte",
+      "species": "dog",
+      "birthDate": "2020-01-01T00:00:00.000Z",
+      "entries": [
+        { "id": "2026-09-05", "measuredOn": "2026-09-05T00:00:00.000Z", "weightKg": 10.0 },
+        { "id": "2026-10-05", "measuredOn": "2026-10-05T00:00:00.000Z", "weightKg": 8.8 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 10.0 }
+      ],
+      "expected": null
+    },
+    {
+      "name": "une seule pesée : pas d'analyse",
+      "species": "cat",
+      "birthDate": null,
+      "entries": [
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 4.0 }
+      ],
+      "expected": null
+    },
+    {
+      "name": "animal archivé : pas d'analyse",
+      "species": "dog",
+      "birthDate": "2020-01-01T00:00:00.000Z",
+      "status": "archived",
+      "entries": [
+        { "id": "2026-10-28", "measuredOn": "2026-10-28T00:00:00.000Z", "weightKg": 10.0 },
+        { "id": "2026-11-04", "measuredOn": "2026-11-04T00:00:00.000Z", "weightKg": 9.0 }
+      ],
+      "expected": null
+    },
+    {
+      "name": "dernière pesée trop ancienne : pas d'alerte",
+      "species": "dog",
+      "birthDate": "2020-01-01T00:00:00.000Z",
+      "entries": [
+        { "id": "2026-09-01", "measuredOn": "2026-09-01T00:00:00.000Z", "weightKg": 10.0 },
+        { "id": "2026-09-25", "measuredOn": "2026-09-25T00:00:00.000Z", "weightKg": 8.0 }
+      ],
+      "expected": null
+    }
+  ]
+}

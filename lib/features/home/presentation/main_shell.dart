@@ -1,17 +1,22 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+import '../../../core/navigation/main_tabs.dart';
 import '../../../core/routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/widgets/coming_soon_screen.dart';
+import '../../../core/widgets/language_button.dart';
+import '../../../l10n/app_localizations.dart';
 import '../../community/presentation/community_screen.dart';
+import '../../health/presentation/health_tab_screen.dart';
 import '../../notifications/data/notification_service.dart';
+import '../../pets/presentation/my_pets_screen.dart';
 import '../../profile/data/profile_repository.dart';
 import '../../profile/data/user_profile.dart';
 import '../../profile/presentation/widgets/user_avatar.dart';
+import '../../services/presentation/service_directory_screen.dart';
 import 'home_screen.dart';
 
-/// Structure principale après connexion (ou en visiteur) : en-tête + 4 onglets du cahier des charges.
+/// Structure principale après connexion (ou en visiteur) : en-tête + 5 onglets (voir [MainTab]).
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
 
@@ -22,29 +27,24 @@ class MainShell extends StatefulWidget {
 class _MainShellState extends State<MainShell> {
   int _index = 0;
 
-  static const _tabs = [
-    (label: 'Accueil', icon: Icons.home_outlined, activeIcon: Icons.home),
-    (label: 'Mes animaux', icon: Icons.pets_outlined, activeIcon: Icons.pets),
-    (label: 'Communauté', icon: Icons.volunteer_activism_outlined, activeIcon: Icons.volunteer_activism),
-    (label: 'Services', icon: Icons.medical_services_outlined, activeIcon: Icons.medical_services),
-  ];
-
   void _selectTab(int index) => setState(() => _index = index);
 
   @override
   Widget build(BuildContext context) {
+    final tabs = mainTabs(AppLocalizations.of(context));
     return Scaffold(
-      appBar: _Header(title: _tabs[_index].label),
+      appBar: _Header(title: tabs[_index].label),
       body: IndexedStack(
         index: _index,
         children: [
           HomeScreen(onOpenTab: _selectTab),
-          // Module 1 (Profils des animaux) : remplacer par l'écran « Mes animaux ».
-          const ComingSoonScreen(title: 'Mes animaux', embedded: true),
+          const MyPetsScreen(),
+          // Module 2 : santé de tous les animaux et tableau du jour.
+          HealthTabScreen(onOpenTab: _selectTab),
           // Modules 4 et 5 : écran « Communauté » (Adoption, Perdus & trouvés, Happy Tails).
           const CommunityScreen(),
-          // Module 6 (Services) : remplacer par l'annuaire des prestataires.
-          const ComingSoonScreen(title: 'Services', embedded: true),
+          // Module 6 : annuaire des prestataires.
+          const ServicesScreen(),
         ],
       ),
       // Assistant IA, sur l'Accueil (maquette Stitch M1).
@@ -71,7 +71,7 @@ class _MainShellState extends State<MainShell> {
           ),
         ),
         destinations: [
-          for (final tab in _tabs)
+          for (final tab in tabs)
             NavigationDestination(
               icon: Icon(tab.icon, color: const Color(0xFF3E4947)),
               selectedIcon: Icon(tab.activeIcon, color: AppColors.teal),
@@ -95,6 +95,7 @@ class _Header extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final l = AppLocalizations.of(context);
 
     return AppBar(
       toolbarHeight: 64,
@@ -118,6 +119,7 @@ class _Header extends StatelessWidget implements PreferredSizeWidget {
         ],
       ),
       actions: [
+        const LanguageButton(),
         if (user != null) _NotificationBell(uid: user.uid),
         Padding(
           padding: const EdgeInsets.only(right: 12, left: 4),
@@ -125,7 +127,7 @@ class _Header extends StatelessWidget implements PreferredSizeWidget {
               ? TextButton(
                   onPressed: () => Navigator.of(context).pushNamed(AppRoutes.login),
                   style: TextButton.styleFrom(foregroundColor: AppColors.teal),
-                  child: const Text('Se connecter', style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: Text(l.shellSignIn, style: const TextStyle(fontWeight: FontWeight.w600)),
                 )
               : _ProfileButton(uid: user.uid),
         ),
@@ -152,8 +154,9 @@ class _NotificationBellState extends State<_NotificationBell> {
       stream: _unreadStream,
       builder: (context, snapshot) {
         final unread = snapshot.data ?? 0;
+        final l = AppLocalizations.of(context);
         return IconButton(
-          tooltip: unread > 0 ? 'Notifications ($unread non lues)' : 'Notifications',
+          tooltip: unread > 0 ? l.shellNotificationsUnread(unread) : l.shellNotifications,
           onPressed: () => Navigator.of(context).pushNamed(AppRoutes.notifications),
           icon: Badge(
             isLabelVisible: unread > 0,
@@ -190,7 +193,7 @@ class _ProfileButtonState extends State<_ProfileButton> {
           radius: 24,
           child: Semantics(
             button: true,
-            label: 'Mon profil',
+            label: AppLocalizations.of(context).shellMyProfile,
             child: initials.isEmpty
                 ? const CircleAvatar(
                     radius: 18,

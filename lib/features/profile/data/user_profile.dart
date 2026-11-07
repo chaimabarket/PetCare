@@ -27,6 +27,17 @@ class UserProfile {
     );
   }
 
+  /// Profil renvoyé par l'API REST (`GET /api/users/me`).
+  factory UserProfile.fromJson(Map<String, dynamic> json) => UserProfile(
+        uid: json['uid'] as String? ?? '',
+        fullName: json['fullName'] as String? ?? '',
+        email: json['email'] as String? ?? '',
+        city: json['city'] as String? ?? '',
+        phone: json['phone'] as String?,
+        role: UserRole.fromFirestore(json['role'] as String?),
+        createdAt: DateTime.tryParse(json['createdAt'] as String? ?? ''),
+      );
+
   final String uid;
   final String fullName;
   final String email;
