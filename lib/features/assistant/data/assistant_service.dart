@@ -4,8 +4,12 @@ import 'package:flutter/foundation.dart';
 
 import '../../adoption/data/adoption_enums.dart';
 import '../../adoption/data/adoption_listing.dart';
+import 'assistant_actions.dart';
 import 'assistant_message.dart';
 import 'assistant_prompt.dart';
+
+/// Réponse en cours : texte cumulé et actions demandées par le modèle.
+typedef AssistantReply = ({String text, List<FunctionCall> calls});
 
 /// Erreur affichable telle quelle dans la conversation.
 class AssistantException implements Exception {
@@ -29,6 +33,14 @@ class AssistantService {
     model: kAssistantModel,
     systemInstruction: Content.system(kAssistantSystemPrompt),
     generationConfig: GenerationConfig(temperature: 0.4, maxOutputTokens: 700),
+  );
+
+  /// Même modèle avec les fonctions d'enregistrement : il prépare l'action, l'utilisateur la confirme.
+  late final GenerativeModel _actionModel = FirebaseAI.googleAI().generativeModel(
+    model: kAssistantModel,
+    systemInstruction: Content.system('$kAssistantSystemPrompt\n$kAssistantActionsPrompt'),
+    generationConfig: GenerationConfig(temperature: 0.2, maxOutputTokens: 700),
+    tools: assistantTools,
   );
 
   late final GenerativeModel _writer = FirebaseAI.googleAI().generativeModel(
@@ -67,33 +79,39 @@ class AssistantService {
     }
   }
 
-  /// Envoie la question avec les derniers messages ; renvoie la réponse au fur et à mesure (texte cumulé).
+  /// Envoie la question avec les derniers messages ; renvoie la réponse au fur et à mesure.
   ///
-  /// [context] (date du jour, animal sélectionné, annonces) est ajouté à la question sans être affiché.
-  Stream<String> reply({
+  /// [context] (date du jour, animaux, annonces) est ajouté à la question sans être affiché.
+  /// [withActions] donne au modèle les fonctions d'enregistrement (utilisateur connecté).
+  Stream<AssistantReply> reply({
     required List<AssistantMessage> history,
     required String question,
     required String context,
+    bool withActions = false,
   }) async* {
-    final previous = history.where((m) => !m.isError && m.text.isNotEmpty).toList();
+    final previous = history.where((m) => !m.isError && m.historyText.isNotEmpty).toList();
     final recent = previous.skip(previous.length > kAssistantHistoryLength ? previous.length - kAssistantHistoryLength : 0);
     final contents = [
-      for (final m in recent) m.fromUser ? Content.text(m.text) : Content.model([TextPart(m.text)]),
+      for (final m in recent) m.fromUser ? Content.text(m.text) : Content.model([TextPart(m.historyText)]),
       Content.text('$context\n\nQUESTION : $question'),
     ];
 
     final buffer = StringBuffer();
+    final calls = <FunctionCall>[];
     try {
-      await for (final chunk in _model.generateContentStream(contents)) {
+      final model = withActions ? _actionModel : _model;
+      await for (final chunk in model.generateContentStream(contents)) {
+        calls.addAll(chunk.functionCalls);
         final text = chunk.text;
-        if (text == null || text.isEmpty) continue;
-        buffer.write(text);
-        yield buffer.toString();
+        if (text != null && text.isNotEmpty) buffer.write(text);
+        if ((text != null && text.isNotEmpty) || chunk.functionCalls.isNotEmpty) {
+          yield (text: buffer.toString(), calls: List.unmodifiable(calls));
+        }
       }
     } catch (e) {
       throw _mapError(e);
     }
-    if (buffer.isEmpty) {
+    if (buffer.isEmpty && calls.isEmpty) {
       throw const AssistantException('Je ne peux pas répondre à cette question. Essayez de la reformuler.');
     }
   }

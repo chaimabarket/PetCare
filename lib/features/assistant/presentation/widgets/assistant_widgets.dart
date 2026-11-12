@@ -187,6 +187,7 @@ class AssistantBubble extends StatelessWidget {
     this.onRate,
     this.onRetry,
     this.writing = false,
+    this.actionCards = const [],
   });
 
   final AssistantMessage message;
@@ -198,6 +199,9 @@ class AssistantBubble extends StatelessWidget {
   final ValueChanged<AnswerRating?>? onRate;
   final VoidCallback? onRetry;
   final bool writing;
+
+  /// Cartes de confirmation des actions préparées par l'assistant.
+  final List<Widget> actionCards;
 
   @override
   Widget build(BuildContext context) {
@@ -236,6 +240,10 @@ class AssistantBubble extends StatelessWidget {
                     ),
                   ),
                 ),
+                for (final card in actionCards) ...[
+                  const SizedBox(height: 8),
+                  card,
+                ],
                 for (final r in message.reminders) ...[
                   const SizedBox(height: 8),
                   _ReminderButton(

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import 'assistant_actions.dart';
 import 'assistant_message.dart';
 import 'assistant_prompt.dart';
 
@@ -78,6 +79,10 @@ class AssistantChatRepository {
 
   Future<void> rate(String uid, String chatId, String messageId, AnswerRating? rating) =>
       _messages(uid, chatId).doc(messageId).update({'rating': rating?.firestoreValue});
+
+  /// Garde l'état des actions (confirmée, annulée) pour la réouverture de la conversation.
+  Future<void> updateActions(String uid, String chatId, String messageId, List<AssistantAction> actions) =>
+      _messages(uid, chatId).doc(messageId).update({'actions': [for (final a in actions) a.toMap()]});
 
   Future<void> deleteChat(String uid, String chatId) async {
     final messages = await _messages(uid, chatId).get();

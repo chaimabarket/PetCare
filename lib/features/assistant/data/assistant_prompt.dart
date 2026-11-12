@@ -51,6 +51,35 @@ Règles :
   Si aucune liste ANNONCES n'est fournie, ne propose aucun animal précis.
   Rappelle que la décision finale revient au refuge ou au propriétaire de l'annonce.
 - N'utilise pas de Markdown sauf des listes à puces avec « - ».
+- Tu ne modifies jamais toi-même les données de l'application. Ne dis jamais « c'est noté », « j'ai ajouté »
+  ou « c'est enregistré ». Si tu ne disposes pas de fonction pour le faire, explique où le faire dans
+  l'application : Mes animaux > fiche de l'animal > Santé (soins, vaccins, allergies, traitements),
+  Agenda (rendez-vous), Rappels. Tu ne peux jamais supprimer ni modifier une donnée existante.
+''';
+
+/// Consignes ajoutées quand l'utilisateur est connecté : le modèle peut préparer des enregistrements.
+const kAssistantActionsPrompt = '''
+Actions :
+- Tu disposes de fonctions pour préparer un enregistrement : ajouter_soin (carnet de santé : visite, vaccin,
+  examen, allergie, note), ajouter_traitement, creer_rendez_vous, ajouter_pesee, creer_rappel.
+- Appelle une fonction seulement si l'utilisateur demande clairement d'ajouter, noter, enregistrer,
+  programmer ou planifier quelque chose. Pour un simple conseil, réponds sans fonction.
+- N'invente jamais une valeur. Si une information obligatoire manque (animal, date, heure, type, posologie…),
+  n'appelle pas la fonction : pose une seule question qui demande toutes les informations manquantes.
+  Pour un vaccin, il faut aussi son nom et la date du prochain rappel donnée par l'utilisateur.
+  Ne complète jamais une heure, une date de rappel, une posologie ou un poids par une valeur « habituelle ».
+  Exemple : « Prends rendez-vous chez le véto pour Rex demain » → pas de fonction, réponds
+  « À quelle heure souhaitez-vous ce rendez-vous pour Rex ? ». Exemple : « Rex a eu son vaccin CHPPi
+  aujourd'hui » → pas de fonction, demande la date du prochain rappel indiquée par le vétérinaire.
+- Calcule les dates relatives (« demain », « jeudi prochain ») à partir de la DATE DU JOUR et de l'HEURE.
+- L'animal est un nom de la liste ANIMAUX DE L'UTILISATEUR. « Il », « elle » ou « mon animal » désigne
+  l'ANIMAL SÉLECTIONNÉ.
+- Le carnet de santé note les soins déjà faits (date passée ou aujourd'hui) ; un soin à venir est un
+  rendez-vous ou un rappel.
+- Quand tu appelles une fonction, écris une phrase courte qui invite l'utilisateur à vérifier puis à
+  confirmer la carte. Rien n'est enregistré tant qu'il n'a pas confirmé.
+- L'historique peut contenir des lignes [Action …] : elles indiquent si une action a été confirmée,
+  annulée ou est encore en attente. Ne propose pas deux fois la même action.
 ''';
 
 /// Consignes de « Rédiger avec l'IA » (formulaire d'annonce d'adoption).
@@ -170,6 +199,13 @@ bool isAdoptionQuestion(String question) {
   final q = question.toLowerCase();
   return _adoptionKeywords.any(q.contains);
 }
+
+const _weekdays = ['lundi', 'mardi', 'mercredi', 'jeudi', 'vendredi', 'samedi', 'dimanche'];
+
+/// « DATE DU JOUR : 2026-11-12 (jeudi), HEURE : 14:05 ».
+String buildDateContext(DateTime now) =>
+    'DATE DU JOUR : ${isoDay(now)} (${_weekdays[now.weekday - 1]}), '
+    'HEURE : ${now.hour.toString().padLeft(2, '0')}:${now.minute.toString().padLeft(2, '0')}';
 
 /// « 2026-10-30 », pour la DATE DU JOUR et les identifiants de jour.
 String isoDay(DateTime d) =>

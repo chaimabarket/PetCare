@@ -9,6 +9,8 @@ import '../../adoption/data/adoption_listing.dart';
 import '../../adoption/data/adoption_repository.dart';
 import '../../adoption/presentation/widgets/adoption_widgets.dart';
 import '../data/answer_parser.dart';
+import '../data/assistant_action_runner.dart';
+import '../data/assistant_actions.dart';
 import '../data/assistant_chat_repository.dart';
 import '../data/assistant_message.dart';
 import '../data/assistant_pet.dart';
@@ -16,6 +18,7 @@ import '../data/assistant_prompt.dart';
 import '../data/assistant_service.dart';
 import '../data/listing_context.dart';
 import 'assistant_history_screen.dart';
+import 'widgets/action_card.dart';
 import 'widgets/assistant_widgets.dart';
 import 'widgets/reminder_sheet.dart';
 
@@ -39,6 +42,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
   final _service = AssistantService();
   final _chatRepository = AssistantChatRepository();
   final _petRepository = AssistantPetRepository();
+  final _actionRunner = AssistantActionRunner();
   final _input = TextEditingController();
   final _scroll = ScrollController();
   final _user = FirebaseAuth.instance.currentUser;
@@ -51,6 +55,10 @@ class _AssistantScreenState extends State<AssistantScreen> {
   /// Rappels déjà créés, par index de message.
   final _createdReminders = <int, Set<String>>{};
 
+  /// Actions en cours d'enregistrement et erreurs, par « message:action ».
+  final _savingActions = <String>{};
+  final _actionErrors = <String, String>{};
+
   StreamSubscription<List<AssistantPet>>? _petsSubscription;
   List<AssistantPet> _pets = const [];
   AssistantPet? _pet;
@@ -61,12 +69,13 @@ class _AssistantScreenState extends State<AssistantScreen> {
   /// Conversation enregistrée (`null` tant qu'aucune question n'a été posée, et pour un visiteur).
   String? _chatId;
 
-  StreamSubscription<String>? _subscription;
+  StreamSubscription<AssistantReply>? _subscription;
   bool _busy = false;
   bool _loadingChat = false;
 
   /// Réponse en cours d'écriture (texte brut, avec les tags).
   String? _streaming;
+  List<({String name, Map<String, Object?> args})> _streamingCalls = const [];
   Set<String> _streamingIds = const {};
   AssistantPet? _streamingPet;
   String _pendingQuestion = '';
@@ -127,7 +136,12 @@ class _AssistantScreenState extends State<AssistantScreen> {
       if (user != null) await _service.countMessage(user.uid);
 
       final now = DateTime.now();
-      final context = StringBuffer('DATE DU JOUR : ${isoDay(now)}');
+      final context = StringBuffer(buildDateContext(now));
+      if (user != null) {
+        context
+          ..write('\n\n')
+          ..write(buildPetsListContext(_pets));
+      }
       if (pet != null) {
         final results = await Future.wait([
           _petRepository.fetchLatestWeight(pet.id),
@@ -159,13 +173,19 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
       setState(() {
         _streaming = '';
+        _streamingCalls = const [];
         _streamingIds = knownIds;
         _streamingPet = pet;
         _pendingQuestion = question;
       });
-      _subscription = _service.reply(history: history, question: question, context: context.toString()).listen(
-        (raw) {
-          setState(() => _streaming = raw);
+      _subscription = _service
+          .reply(history: history, question: question, context: context.toString(), withActions: user != null)
+          .listen(
+        (reply) {
+          setState(() {
+            _streaming = reply.text;
+            _streamingCalls = [for (final c in reply.calls) (name: c.name, args: c.args)];
+          });
           _scrollToEnd();
         },
         onError: (Object e) => _finish(error: e),
@@ -181,12 +201,23 @@ class _AssistantScreenState extends State<AssistantScreen> {
   void _finish({Object? error}) {
     if (!mounted) return;
     final raw = _streaming ?? '';
+    final (actions, problems) = _actionsFromCalls(_streamingCalls);
     AssistantMessage? answer;
+    var answerIndex = -1;
     setState(() {
-      if (raw.trim().isNotEmpty) {
+      if (raw.trim().isNotEmpty || actions.isNotEmpty || problems.isNotEmpty) {
         final parsed = parseAnswer(raw, _streamingIds, allowReminders: _streamingPet != null);
-        answer = AssistantMessage.assistant(parsed.text, listingIds: parsed.listingIds, reminders: parsed.reminders);
+        // Une action incomplète ou invalide devient une question : l'utilisateur répond, le modèle réessaie.
+        var text = [if (problems.isEmpty) parsed.text, ...problems].where((t) => t.isNotEmpty).join('\n\n');
+        if (text.isEmpty) text = 'Voici ce que je peux enregistrer. Vérifiez puis confirmez :';
+        answer = AssistantMessage.assistant(
+          text,
+          listingIds: parsed.listingIds,
+          reminders: parsed.reminders,
+          actions: actions,
+        );
         _messages.add(answer!);
+        answerIndex = _messages.length - 1;
       }
       if (error != null) {
         final message = error is AssistantException
@@ -195,15 +226,33 @@ class _AssistantScreenState extends State<AssistantScreen> {
         _messages.add(AssistantMessage.assistant(message, isError: true));
       }
       _streaming = null;
+      _streamingCalls = const [];
       _subscription = null;
       _busy = false;
     });
     _scrollToEnd();
-    if (answer != null) _saveExchange(_pendingQuestion, answer!, _streamingPet);
+    if (answer != null) _saveExchange(_pendingQuestion, answer!, answerIndex, _streamingPet);
+  }
+
+  /// Actions valides (une carte chacune) et phrases pour celles qui sont incomplètes ou invalides.
+  (List<AssistantAction>, List<String>) _actionsFromCalls(List<({String name, Map<String, Object?> args})> calls) {
+    final actions = <AssistantAction>[];
+    final problems = <String>[];
+    for (final call in calls.take(3)) {
+      final action = AssistantAction.fromCall(call.name, call.args);
+      if (action == null) continue;
+      final check = checkAction(action, _pets);
+      if (check.ok) {
+        actions.add(action);
+      } else {
+        problems.add(check.problemText(action));
+      }
+    }
+    return (actions, problems);
   }
 
   /// Enregistre la question et la réponse dans l'historique (utilisateur connecté).
-  Future<void> _saveExchange(String question, AssistantMessage answer, AssistantPet? pet) async {
+  Future<void> _saveExchange(String question, AssistantMessage answer, int index, AssistantPet? pet) async {
     final user = _user;
     if (user == null) return;
     try {
@@ -212,8 +261,13 @@ class _AssistantScreenState extends State<AssistantScreen> {
       await _chatRepository.addMessage(user.uid, chatId, AssistantMessage.user(question), petId: pet?.id, petName: pet?.name);
       final answerId =
           await _chatRepository.addMessage(user.uid, chatId, answer, petId: pet?.id, petName: pet?.name);
-      final index = _messages.indexOf(answer);
-      if (mounted && index >= 0) setState(() => _messages[index] = _messages[index].copyWith(id: answerId));
+      if (!mounted || _chatId != chatId || index < 0 || index >= _messages.length) return;
+      final current = _messages[index];
+      setState(() => _messages[index] = current.copyWith(id: answerId));
+      // Une action confirmée avant la fin de l'enregistrement : son nouvel état est gardé aussi.
+      if (current.actions.any((a) => a.status != AssistantActionStatus.pending)) {
+        await _chatRepository.updateActions(user.uid, chatId, answerId, current.actions);
+      }
     } catch (e) {
       // L'historique n'est pas bloquant : la conversation continue.
       debugPrint('AssistantScreen: historique non enregistré : $e');
@@ -262,12 +316,55 @@ class _AssistantScreenState extends State<AssistantScreen> {
       ));
   }
 
+  /// « Confirmer » : nouvelle vérification (l'heure a pu passer), puis enregistrement par les dépôts habituels.
+  Future<void> _confirmAction(int index, int actionIndex) async {
+    final key = '$index:$actionIndex';
+    final action = _messages[index].actions[actionIndex];
+    final check = checkAction(action, _pets);
+    if (!check.ok) {
+      setState(() => _actionErrors[key] = check.problemText(action));
+      return;
+    }
+    setState(() {
+      _savingActions.add(key);
+      _actionErrors.remove(key);
+    });
+    try {
+      await _actionRunner.run(action, check.pet!);
+      if (!mounted) return;
+      _setActionStatus(index, actionIndex, AssistantActionStatus.done);
+    } catch (e) {
+      if (mounted) setState(() => _actionErrors[key] = '$e'.replaceFirst('Exception: ', ''));
+    } finally {
+      if (mounted) setState(() => _savingActions.remove(key));
+    }
+  }
+
+  void _setActionStatus(int index, int actionIndex, AssistantActionStatus status) {
+    final message = _messages[index];
+    final actions = [
+      for (final (j, a) in message.actions.indexed) j == actionIndex ? a.withStatus(status) : a,
+    ];
+    setState(() {
+      _messages[index] = message.copyWith(actions: actions);
+      _actionErrors.remove('$index:$actionIndex');
+    });
+    final user = _user;
+    final chatId = _chatId;
+    if (user == null || chatId == null || message.id == null) return;
+    _chatRepository.updateActions(user.uid, chatId, message.id!, actions).catchError((Object e) {
+      debugPrint('AssistantScreen: état de l\'action non enregistré : $e');
+    });
+  }
+
   // ------------------------------------------------------------------ Historique
 
   void _newConversation() {
     setState(() {
       _messages.clear();
       _createdReminders.clear();
+      _savingActions.clear();
+      _actionErrors.clear();
       _chatId = null;
     });
   }
@@ -305,6 +402,8 @@ class _AssistantScreenState extends State<AssistantScreen> {
           ..clear()
           ..addAll(messages);
         _createdReminders.clear();
+        _savingActions.clear();
+        _actionErrors.clear();
         _chatId = chatId;
         final petId = chat?.petId;
         _pet = petId == null ? null : _pets.where((p) => p.id == petId).firstOrNull;
@@ -459,6 +558,17 @@ class _AssistantScreenState extends State<AssistantScreen> {
                   onCreateReminder: _signedIn ? (r) => _createReminder(i, r) : null,
                   onRate: m.isError ? null : (rating) => _rate(i, rating),
                   onRetry: m.isError && i == _messages.length - 1 && !_busy ? _retry : null,
+                  actionCards: [
+                    for (final (j, a) in m.actions.indexed)
+                      ActionCard(
+                        action: a,
+                        petId: checkAction(a, _pets).pet?.id,
+                        saving: _savingActions.contains('$i:$j'),
+                        error: _actionErrors['$i:$j'],
+                        onConfirm: () => _confirmAction(i, j),
+                        onCancel: () => _setActionStatus(i, j, AssistantActionStatus.cancelled),
+                      ),
+                  ],
                 ),
         if (_busy && (partial == null || partial.text.isEmpty)) const TypingIndicator(),
         if (partial != null && partial.text.isNotEmpty)
