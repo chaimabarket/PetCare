@@ -57,6 +57,47 @@ service cloud.firestore {
         allow read, write: if isOwner(userId);
       }
 
+      // Assistant IA : compteur de messages du jour (+1 à chaque message, 30 maximum).
+      match /assistantUsage/{day} {
+        allow read: if isOwner(userId);
+        allow create: if isOwner(userId)
+          && request.resource.data.keys().hasOnly(['count', 'updatedAt'])
+          && request.resource.data.count == 1
+          && request.resource.data.updatedAt == request.time;
+        allow update: if isOwner(userId)
+          && request.resource.data.keys().hasOnly(['count', 'updatedAt'])
+          && request.resource.data.count == resource.data.count + 1
+          && request.resource.data.count <= 30
+          && request.resource.data.updatedAt == request.time;
+      }
+
+      // Assistant IA : historique privé des conversations.
+      match /assistantChats/{chatId} {
+        allow read, delete: if isOwner(userId);
+        allow create, update: if isOwner(userId)
+          && request.resource.data.keys().hasOnly(['title', 'petId', 'petName', 'createdAt', 'updatedAt'])
+          && request.resource.data.title is string
+          && request.resource.data.title.size() <= 60;
+
+        match /messages/{messageId} {
+          allow read, delete: if isOwner(userId);
+          allow create: if isOwner(userId)
+            && request.resource.data.keys().hasOnly(['role', 'text', 'listingIds', 'reminders', 'actions', 'rating', 'createdAt'])
+            && request.resource.data.role in ['user', 'model']
+            && request.resource.data.text is string
+            && request.resource.data.text.size() <= 4000
+            && (request.resource.data.get('actions', null) == null
+              || (request.resource.data.actions is list && request.resource.data.actions.size() <= 3));
+          // Seuls l'avis 👍 / 👎 et l'état des actions proposées (confirmée, annulée) peuvent changer.
+          // Les actions elles-mêmes sont enregistrées par les règles de pets, appointments et reminders.
+          allow update: if isOwner(userId)
+            && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['rating', 'actions'])
+            && (request.resource.data.get('rating', null) == null || request.resource.data.rating in ['up', 'down'])
+            && (request.resource.data.get('actions', null) == null
+              || (request.resource.data.actions is list && request.resource.data.actions.size() <= 3));
+        }
+      }
+
       // Module Santé : fiches santé enregistrées (marque-pages), privées.
       match /healthBookmarks/{sheetId} {
         allow read, delete: if isOwner(userId);

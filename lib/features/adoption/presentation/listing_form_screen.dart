@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart' show kDebugMode;
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import '../../assistant/presentation/widgets/listing_writer_sheet.dart';
 import '../../auth/presentation/widgets/auth_feedback.dart';
 import '../../profile/data/profile_repository.dart';
 import '../data/adoption_enums.dart';
@@ -108,6 +109,20 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
       helpText: 'Date de naissance (approximative)',
     );
     if (picked != null) setState(() => _draft.birthDate = picked);
+  }
+
+  /// Assistant IA : propose une description à partir des champs déjà remplis.
+  Future<void> _writeWithAi() async {
+    if (_name.text.trim().isEmpty) {
+      showAdoptionMessage(context, "Indiquez d'abord le nom de l'animal.");
+      return;
+    }
+    _draft
+      ..name = _name.text
+      ..breed = _breed.text
+      ..story = _story.text;
+    final text = await showListingWriterSheet(context, _draft);
+    if (text != null && mounted) setState(() => _story.text = text);
   }
 
   Future<void> _save({required bool publish}) async {
@@ -309,6 +324,14 @@ class _ListingFormScreenState extends State<ListingFormScreen> {
                   textCapitalization: TextCapitalization.sentences,
                   decoration: const InputDecoration(labelText: 'Son histoire & tempérament *', alignLabelWithHint: true),
                   validator: (v) => (v == null || v.trim().length < 20) ? 'Racontez son histoire en quelques phrases.' : null,
+                ),
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: OutlinedButton.icon(
+                    onPressed: _writeWithAi,
+                    icon: const Text('✨'),
+                    label: const Text("Rédiger avec l'IA"),
+                  ),
                 ),
               ],
             ),
