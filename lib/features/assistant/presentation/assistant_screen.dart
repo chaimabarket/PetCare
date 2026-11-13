@@ -69,6 +69,9 @@ class _AssistantScreenState extends State<AssistantScreen> {
   /// Conversation enregistrée (`null` tant qu'aucune question n'a été posée, et pour un visiteur).
   String? _chatId;
 
+  /// Change à chaque nouvelle conversation : un enregistrement en cours ne s'applique qu'à la sienne.
+  int _conversationKey = 0;
+
   StreamSubscription<AssistantReply>? _subscription;
   bool _busy = false;
   bool _loadingChat = false;
@@ -256,8 +259,11 @@ class _AssistantScreenState extends State<AssistantScreen> {
     final user = _user;
     if (user == null) return;
     try {
-      _chatId ??= await _chatRepository.createChat(user.uid, firstQuestion: question, petId: pet?.id, petName: pet?.name);
-      final chatId = _chatId!;
+      final conversation = _conversationKey;
+      final chatId = _chatId ??
+          await _chatRepository.createChat(user.uid, firstQuestion: question, petId: pet?.id, petName: pet?.name);
+      if (conversation != _conversationKey) return;
+      _chatId = chatId;
       await _chatRepository.addMessage(user.uid, chatId, AssistantMessage.user(question), petId: pet?.id, petName: pet?.name);
       final answerId =
           await _chatRepository.addMessage(user.uid, chatId, answer, petId: pet?.id, petName: pet?.name);
@@ -361,12 +367,25 @@ class _AssistantScreenState extends State<AssistantScreen> {
 
   void _newConversation() {
     setState(() {
+      _conversationKey++;
       _messages.clear();
       _createdReminders.clear();
       _savingActions.clear();
       _actionErrors.clear();
       _chatId = null;
     });
+  }
+
+  /// Une conversation porte sur un seul animal : en changer démarre une nouvelle conversation
+  /// (sauf si la conversation actuelle est encore vide).
+  void _selectPet(AssistantPet? pet) {
+    if (pet?.id == _pet?.id) return;
+    final hadMessages = _messages.isNotEmpty;
+    if (hadMessages) _newConversation();
+    setState(() => _pet = pet);
+    if (hadMessages) {
+      showAdoptionMessage(context, pet == null ? 'Nouvelle conversation générale' : 'Nouvelle conversation sur ${pet.name}');
+    }
   }
 
   Future<void> _openHistory() async {
@@ -404,6 +423,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
         _createdReminders.clear();
         _savingActions.clear();
         _actionErrors.clear();
+        _conversationKey++;
         _chatId = chatId;
         final petId = chat?.petId;
         _pet = petId == null ? null : _pets.where((p) => p.id == petId).firstOrNull;
@@ -477,7 +497,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
               pets: _pets,
               selected: _pet,
               enabled: !_busy,
-              onSelected: (pet) => setState(() => _pet = pet),
+              onSelected: _selectPet,
             ),
           Expanded(
             child: _loadingChat
