@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../../core/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../pets/presentation/pet_detail_screen.dart';
+import '../../../services/presentation/service_directory_screen.dart';
 import '../../data/assistant_actions.dart';
 
 /// Carte de confirmation d'une action préparée par l'assistant : rien n'est enregistré avant « Confirmer ».
@@ -30,6 +31,7 @@ class ActionCard extends StatelessWidget {
         AssistantActionType.healthEntry => Icons.medical_information_outlined,
         AssistantActionType.treatment => Icons.medication_outlined,
         AssistantActionType.appointment => Icons.event_available_outlined,
+        AssistantActionType.serviceBooking => Icons.storefront_outlined,
         AssistantActionType.weight => Icons.monitor_weight_outlined,
         AssistantActionType.reminder => Icons.alarm_add,
       };
@@ -48,6 +50,10 @@ class ActionCard extends StatelessWidget {
         navigator.pushNamed(AppRoutes.agenda);
       case AssistantActionType.reminder:
         navigator.pushNamed(AppRoutes.reminders);
+      case AssistantActionType.serviceBooking:
+        navigator.push(MaterialPageRoute<void>(
+          builder: (_) => Scaffold(appBar: AppBar(title: const Text('Services')), body: const ServicesScreen()),
+        ));
       default:
         break;
     }
@@ -77,7 +83,9 @@ class ActionCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   switch (status) {
-                    AssistantActionStatus.done => '${action.type.label} · enregistré',
+                    AssistantActionStatus.done => action.type == AssistantActionType.serviceBooking
+                        ? '${action.type.label} · demande envoyée'
+                        : '${action.type.label} · enregistré',
                     AssistantActionStatus.cancelled => '${action.type.label} · annulé',
                     AssistantActionStatus.pending => '${action.type.label} ?',
                   },
@@ -115,6 +123,11 @@ class ActionCard extends StatelessWidget {
                 TextButton(onPressed: saving ? null : onCancel, child: const Text('Annuler')),
                 const SizedBox(width: 4),
                 FilledButton.icon(
+                  // Le thème donne aux FilledButton toute la largeur : impossible dans une Row.
+                  style: FilledButton.styleFrom(
+                    minimumSize: const Size(0, 40),
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
                   onPressed: saving ? null : onConfirm,
                   icon: saving
                       ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))

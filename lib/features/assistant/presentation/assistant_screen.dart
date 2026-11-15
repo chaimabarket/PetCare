@@ -17,6 +17,7 @@ import '../data/assistant_pet.dart';
 import '../data/assistant_prompt.dart';
 import '../data/assistant_service.dart';
 import '../data/listing_context.dart';
+import '../data/service_catalog.dart';
 import 'assistant_history_screen.dart';
 import 'widgets/action_card.dart';
 import 'widgets/assistant_widgets.dart';
@@ -80,6 +81,9 @@ class _AssistantScreenState extends State<AssistantScreen> {
   String? _streaming;
   List<({String name, Map<String, Object?> args})> _streamingCalls = const [];
   Set<String> _streamingIds = const {};
+
+  /// Prestations jointes à la question en cours (réservation d'un service).
+  List<CatalogService> _catalog = const [];
   AssistantPet? _streamingPet;
   String _pendingQuestion = '';
 
@@ -137,6 +141,14 @@ class _AssistantScreenState extends State<AssistantScreen> {
     try {
       final user = _user;
       if (user != null) await _service.countMessage(user.uid);
+      // Question envoyée avant le chargement des animaux : on les attend (sinon « aucun animal »).
+      if (user != null && _pets.isEmpty) {
+        try {
+          _pets = await _petRepository.watchPets(user.uid).first.timeout(const Duration(seconds: 10));
+        } catch (e) {
+          debugPrint('AssistantScreen: animaux indisponibles : $e');
+        }
+      }
 
       final now = DateTime.now();
       final context = StringBuffer(buildDateContext(now));
@@ -169,6 +181,19 @@ class _AssistantScreenState extends State<AssistantScreen> {
         } catch (e) {
           // Sans les annonces, l'assistant répond quand même (sans proposer d'animal).
           debugPrint('AssistantScreen: annonces indisponibles : $e');
+        }
+      }
+      // Réservation : la question ou les derniers messages parlent d'un service (« et lundi 10h ? » suit souvent).
+      _catalog = const [];
+      final recent = history.skip(history.length > 4 ? history.length - 4 : 0).map((m) => m.text);
+      if (isServiceQuestion([...recent, question].join('\n'))) {
+        try {
+          _catalog = await loadServiceCatalog();
+          context
+            ..write('\n\n')
+            ..write(buildServiceContext(_catalog));
+        } catch (e) {
+          debugPrint('AssistantScreen: services indisponibles : $e');
         }
       }
       // Écran fermé ou « Arrêter » pendant la préparation.
@@ -204,12 +229,13 @@ class _AssistantScreenState extends State<AssistantScreen> {
   void _finish({Object? error}) {
     if (!mounted) return;
     final raw = _streaming ?? '';
-    final (actions, problems) = _actionsFromCalls(_streamingCalls);
+    final parsed = parseAnswer(raw, _streamingIds, allowReminders: _streamingPet != null);
+    // Le modèle écrit parfois l'action en texte au lieu d'appeler la fonction : même carte, mêmes contrôles.
+    final (actions, problems) = _actionsFromCalls(_streamingCalls.isEmpty ? parsed.textCalls : _streamingCalls);
     AssistantMessage? answer;
     var answerIndex = -1;
     setState(() {
       if (raw.trim().isNotEmpty || actions.isNotEmpty || problems.isNotEmpty) {
-        final parsed = parseAnswer(raw, _streamingIds, allowReminders: _streamingPet != null);
         // Une action incomplète ou invalide devient une question : l'utilisateur répond, le modèle réessaie.
         var text = [if (problems.isEmpty) parsed.text, ...problems].where((t) => t.isNotEmpty).join('\n\n');
         if (text.isEmpty) text = 'Voici ce que je peux enregistrer. Vérifiez puis confirmez :';
@@ -238,18 +264,26 @@ class _AssistantScreenState extends State<AssistantScreen> {
   }
 
   /// Actions valides (une carte chacune) et phrases pour celles qui sont incomplètes ou invalides.
+  /// Une réservation reprend la prestation du catalogue, puis son créneau est vérifié comme dans le formulaire.
   (List<AssistantAction>, List<String>) _actionsFromCalls(List<({String name, Map<String, Object?> args})> calls) {
     final actions = <AssistantAction>[];
     final problems = <String>[];
     for (final call in calls.take(3)) {
-      final action = AssistantAction.fromCall(call.name, call.args);
-      if (action == null) continue;
+      final parsed = AssistantAction.fromCall(call.name, call.args);
+      if (parsed == null) continue;
+      final action = withServiceDetails(parsed, _catalog);
       final check = checkAction(action, _pets);
-      if (check.ok) {
-        actions.add(action);
-      } else {
+      if (!check.ok) {
         problems.add(check.problemText(action));
+        continue;
       }
+      final service = action.type == AssistantActionType.serviceBooking ? findService(action, _catalog) : null;
+      final slot = service == null ? null : bookingProblem(action, service);
+      if (slot != null) {
+        problems.add(slot);
+        continue;
+      }
+      actions.add(action);
     }
     return (actions, problems);
   }

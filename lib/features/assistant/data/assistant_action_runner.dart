@@ -8,8 +8,10 @@ import '../../health/data/health_entry.dart';
 import '../../health/data/health_repository.dart';
 import '../../health/data/treatment.dart';
 import '../../pets/data/pet_repository.dart';
+import '../../services/data/service_repository.dart';
 import 'assistant_actions.dart';
 import 'assistant_pet.dart';
+import 'service_catalog.dart';
 
 /// Enregistre une action confirmée avec les mêmes dépôts (et donc les mêmes règles) que les formulaires.
 class AssistantActionRunner {
@@ -18,15 +20,18 @@ class AssistantActionRunner {
     PetRepository? pets,
     AppointmentRepository? appointments,
     ReminderRepository? reminders,
+    ServiceRepository? services,
   })  : _health = health ?? HealthRepository(),
         _pets = pets ?? PetRepository(),
         _appointments = appointments ?? AppointmentRepository(),
-        _reminders = reminders ?? ReminderRepository();
+        _reminders = reminders ?? ReminderRepository(),
+        _services = services ?? ServiceRepository();
 
   final HealthRepository _health;
   final PetRepository _pets;
   final AppointmentRepository _appointments;
   final ReminderRepository _reminders;
+  final ServiceRepository _services;
 
   static const _note = "Ajouté depuis l'assistant PetCare";
 
@@ -42,13 +47,15 @@ class AssistantActionRunner {
       throw Exception(e.message);
     } on PetException catch (e) {
       throw Exception(e.message);
+    } on ServiceException catch (e) {
+      throw Exception(e.message);
     } catch (e) {
       debugPrint('AssistantActionRunner: $e');
       throw Exception("L'enregistrement a échoué. Vérifiez votre connexion et réessayez.");
     }
   }
 
-  Future<void> _run(AssistantAction a, AssistantPet pet) {
+  Future<void> _run(AssistantAction a, AssistantPet pet) async {
     String? opt(String key) => a.text(key).isEmpty ? null : a.text(key);
 
     switch (a.type) {
@@ -79,7 +86,7 @@ class AssistantActionRunner {
           form: TreatmentForm.fromFirestore(opt('forme')),
         );
       case AssistantActionType.appointment:
-        return _appointments.createPersonal(
+        await _appointments.createPersonal(
           petId: pet.id,
           petName: pet.name,
           petBreed: pet.breed,
@@ -90,6 +97,20 @@ class AssistantActionRunner {
           place: AppointmentPlace.other,
           location: a.text('lieu'),
           notes: _note,
+        );
+        return;
+      case AssistantActionType.serviceBooking:
+        // Même dépôt que le formulaire de réservation : le prestataire reçoit la demande et l'accepte ou la refuse.
+        final service = findService(a, await loadServiceCatalog(_services));
+        if (service == null) throw const ServiceException("Cette prestation n'est plus proposée.");
+        final problem = bookingProblem(a, service);
+        if (problem != null) throw ServiceException(problem);
+        return _services.createBooking(
+          provider: service.provider,
+          service: service.service,
+          animalName: pet.name,
+          dateTime: a.startsAt!,
+          notes: a.text('notes'),
         );
       case AssistantActionType.weight:
         return _pets.addWeight(

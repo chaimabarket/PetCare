@@ -277,7 +277,7 @@ class BookingRequestScreen extends StatefulWidget {
 }
 
 class _BookingRequestScreenState extends State<BookingRequestScreen> {
-  static const _times = ['09:00', '10:30', '12:00', '14:00', '15:30', '17:00'];
+  static const _times = kBookingTimes;
   static const _weekdays = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
   static const _months = [
     'janvier',
@@ -497,29 +497,11 @@ class _BookingRequestScreenState extends State<BookingRequestScreen> {
     ).isBefore(DateTime.now());
   }
 
+  /// Même règle que l'assistant (service_models.dart).
   bool _availabilityAllowsTime(
     String time,
     Map<String, dynamic>? availability,
-  ) {
-    if (availability?['enabled'] != true) return false;
-    final slotStart =
-        int.parse(time.substring(0, 2)) * 60 + int.parse(time.substring(3));
-    final slotEnd = slotStart + widget.service.durationMinutes;
-    final rawRanges = availability?['ranges'];
-    final ranges = rawRanges is List ? rawRanges : [availability];
-    return ranges.whereType<Map>().any((range) {
-      final start = range['start'];
-      final end = range['end'];
-      if (start is! String || end is! String) return false;
-      final startParts = start.split(':');
-      final endParts = end.split(':');
-      if (startParts.length != 2 || endParts.length != 2) return false;
-      final startMinutes =
-          int.parse(startParts[0]) * 60 + int.parse(startParts[1]);
-      final endMinutes = int.parse(endParts[0]) * 60 + int.parse(endParts[1]);
-      return slotStart >= startMinutes && slotEnd <= endMinutes;
-    });
-  }
+  ) => availabilityAllows(availability, time, widget.service.durationMinutes);
 
   Future<void> _submit() async {
     if (_animalController.text.trim().isEmpty) {

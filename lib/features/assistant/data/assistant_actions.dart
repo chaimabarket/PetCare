@@ -10,6 +10,7 @@ enum AssistantActionType {
   healthEntry('ajouter_soin', 'Ajouter au carnet de santé', 'ajouter ce soin au carnet'),
   treatment('ajouter_traitement', 'Ajouter un traitement', 'ajouter ce traitement'),
   appointment('creer_rendez_vous', 'Créer un rendez-vous', 'créer ce rendez-vous'),
+  serviceBooking('reserver_service', 'Réserver un service', 'réserver ce service'),
   weight('ajouter_pesee', 'Ajouter une pesée', 'ajouter cette pesée'),
   reminder('creer_rappel', 'Créer un rappel', 'créer ce rappel');
 
@@ -30,7 +31,17 @@ enum _Kind { text, date, time, number, choice }
 
 /// Champ d'une action : sert à décrire la fonction au modèle, à repérer ce qui manque et à afficher la carte.
 class _Field {
-  const _Field(this.key, this.label, this.description, {this.kind = _Kind.text, this.required = true, this.options});
+  const _Field(this.key, this.label, this.description,
+      {this.kind = _Kind.text, this.required = true, this.options, this.hidden = false})
+      : internal = false;
+
+  /// Champ rempli par l'application à partir de la prestation choisie (jamais par le modèle).
+  const _Field.internal(this.key, this.label, {this.kind = _Kind.text})
+      : description = '',
+        required = false,
+        options = null,
+        hidden = false,
+        internal = true;
 
   final String key;
   final String label;
@@ -38,7 +49,17 @@ class _Field {
   final _Kind kind;
   final bool required;
   final List<String>? options;
+
+  /// Pas affiché sur la carte (identifiant).
+  final bool hidden;
+  final bool internal;
 }
+
+/// Champs que le modèle peut remplir (décrits à Gemini, dans cet ordre).
+List<_Field> _modelFields(AssistantActionType type) => [for (final f in _fields[type]!) if (!f.internal) f];
+
+/// Clés que le modèle peut remplir, dans l'ordre (sert aussi aux actions écrites en texte).
+List<String> modelFieldKeys(AssistantActionType type) => [for (final f in _modelFields(type)) f.key];
 
 const _animal = _Field('animal', 'Animal', "Nom de l'animal, tel qu'il apparaît dans ANIMAUX DE L'UTILISATEUR.");
 
@@ -83,6 +104,26 @@ final _fields = <AssistantActionType, List<_Field>>{
     const _Field('duree_minutes', 'Durée', 'Durée en minutes (30 par défaut).', kind: _Kind.number, required: false),
     const _Field('lieu', 'Lieu', 'Adresse, clinique ou lieu du rendez-vous.', required: false),
   ],
+  AssistantActionType.serviceBooking: [
+    const _Field.internal('prestataire', 'Prestataire'),
+    const _Field.internal('prestation', 'Prestation'),
+    _animal,
+    const _Field('service_id', 'Prestation',
+        "Identifiant exact (id=…) d'une prestation de la liste PRESTATIONS. N'invente jamais d'identifiant. "
+        "Si plusieurs prestations conviennent, n'appelle pas la fonction : demande laquelle choisir.",
+        hidden: true),
+    const _Field('date', 'Date',
+        "Date souhaitée (AAAA-MM-JJ), dans le futur, donnée par l'utilisateur (« lundi » est accepté).",
+        kind: _Kind.date),
+    const _Field('heure', 'Heure',
+        "Heure de début (HH:MM, sur 24 h), parmi les créneaux indiqués dans PRESTATIONS. "
+        "Si l'utilisateur ne l'a pas donnée, n'appelle pas la fonction et demande-la.",
+        kind: _Kind.time),
+    const _Field.internal('duree', 'Durée', kind: _Kind.number),
+    const _Field.internal('prix', 'Prix', kind: _Kind.number),
+    const _Field.internal('adresse', 'Adresse'),
+    const _Field('notes', 'Notes', "Information utile pour le prestataire, donnée par l'utilisateur.", required: false),
+  ],
   AssistantActionType.weight: [
     _animal,
     const _Field('poids_kg', 'Poids', 'Poids en kilogrammes.', kind: _Kind.number),
@@ -102,6 +143,9 @@ const _functionDescriptions = {
       'Prépare une entrée du carnet de santé (visite, vaccin, examen, allergie ou note) pour un animal de l\'utilisateur.',
   AssistantActionType.treatment: 'Prépare un traitement médicamenteux prescrit pour un animal de l\'utilisateur.',
   AssistantActionType.appointment: 'Prépare un rendez-vous personnel (vétérinaire, toilettage…) pour un animal.',
+  AssistantActionType.serviceBooking:
+      'Prépare une demande de réservation chez un prestataire PetCare (vétérinaire, toiletteur, pension…) pour une '
+          "prestation de la liste PRESTATIONS. Le prestataire l'accepte ou la refuse ensuite.",
   AssistantActionType.weight: 'Prépare une pesée pour un animal de l\'utilisateur.',
   AssistantActionType.reminder: 'Prépare un rappel de soin à une date donnée pour un animal de l\'utilisateur.',
 };
@@ -119,8 +163,8 @@ final assistantTools = [
       FunctionDeclaration(
         type.functionName,
         _functionDescriptions[type]!,
-        parameters: {for (final f in _fields[type]!) f.key: _schemaOf(f)},
-        optionalParameters: [for (final f in _fields[type]!) if (!f.required) f.key],
+        parameters: {for (final f in _modelFields(type)) f.key: _schemaOf(f)},
+        optionalParameters: [for (final f in _modelFields(type)) if (!f.required) f.key],
       ),
   ]),
 ];
@@ -133,7 +177,8 @@ class AssistantAction {
   static AssistantAction? fromCall(String name, Map<String, Object?> args) {
     final type = AssistantActionType.byName(name);
     if (type == null) return null;
-    final known = {for (final f in _fields[type]!) f.key};
+    // Les champs remplis par l'application (prix, prestataire…) ne viennent jamais du modèle.
+    final known = {for (final f in _modelFields(type)) f.key};
     return AssistantAction(type: type, args: {
       for (final MapEntry(:key, :value) in args.entries)
         if (known.contains(key) && value != null && '$value'.trim().isNotEmpty) key: value is num ? value : '$value'.trim(),
@@ -185,6 +230,9 @@ class AssistantAction {
 
   AssistantAction withStatus(AssistantActionStatus status) => AssistantAction(type: type, args: args, status: status);
 
+  AssistantAction withArgs(Map<String, Object?> extra) =>
+      AssistantAction(type: type, args: {...args, ...extra}, status: status);
+
   Map<String, dynamic> toMap() => {'type': type.functionName, 'args': args, 'status': status.name};
 }
 
@@ -235,7 +283,7 @@ ActionCheck checkAction(AssistantAction a, List<AssistantPet> pets, {DateTime? n
 
   for (final f in fields) {
     final value = a.text(f.key);
-    if (value.isEmpty) continue;
+    if (value.isEmpty || f.internal) continue;
     final valid = switch (f.kind) {
       _Kind.date => a.date(f.key) != null,
       _Kind.time => a.startsAt != null,
@@ -263,6 +311,12 @@ ActionCheck checkAction(AssistantAction a, List<AssistantPet> pets, {DateTime? n
       if (!a.startsAt!.isAfter(today)) error = 'Le rendez-vous doit être dans le futur. Quelle date et quelle heure ?';
       final minutes = a.number('duree_minutes');
       if (minutes != null && (minutes < 5 || minutes > 24 * 60)) error = 'La durée doit être entre 5 minutes et 24 heures.';
+    case AssistantActionType.serviceBooking:
+      if (a.text('prestation').isEmpty) {
+        error = 'Je ne trouve pas cette prestation parmi les services PetCare. Laquelle souhaitez-vous réserver ?';
+      } else if (!a.startsAt!.isAfter(today)) {
+        error = 'La réservation doit être dans le futur. Quelle date et quelle heure ?';
+      }
     case AssistantActionType.weight:
       final kg = a.number('poids_kg')!;
       final date = a.date('date') ?? startOfDay;
@@ -273,6 +327,10 @@ ActionCheck checkAction(AssistantAction a, List<AssistantPet> pets, {DateTime? n
   }
   return ActionCheck(pet: pet, error: error);
 }
+
+/// « 45 DT », « 12,5 DT », « Gratuit ».
+String _price(double price) =>
+    price == 0 ? 'Gratuit' : '${price == price.roundToDouble() ? price.toInt() : price.toString().replaceAll('.', ',')} DT';
 
 String _day(DateTime d) => '${d.day.toString().padLeft(2, '0')}/${d.month.toString().padLeft(2, '0')}/${d.year}';
 
@@ -288,13 +346,15 @@ String _choiceLabel(String key, String value) => switch (key) {
 /// Lignes « libellé : valeur » de la carte de confirmation.
 List<(String, String)> describeAction(AssistantAction a) => [
       for (final f in _fields[a.type]!)
-        if (a.text(f.key).isNotEmpty)
+        if (!f.hidden && a.text(f.key).isNotEmpty)
           (
             f.label,
             switch (f.kind) {
               _Kind.date => a.date(f.key) == null ? a.text(f.key) : _day(a.date(f.key)!),
               _Kind.number when f.key == 'poids_kg' => '${a.text(f.key)} kg',
               _Kind.number when f.key == 'duree_minutes' => '${a.text(f.key)} min',
+              _Kind.number when f.key == 'duree' => '${a.text(f.key)} min',
+              _Kind.number when f.key == 'prix' => _price(a.number('prix') ?? 0),
               _Kind.choice => _choiceLabel(f.key, a.text(f.key)),
               _ => a.text(f.key),
             }
