@@ -1,4 +1,4 @@
-# PetCare Community : documentation du projet
+# PetCare Community : réflexion et choix du projet
 
 Ce document décrit l'ensemble du projet PetCare tel qu'il est sur la branche `main` (commit `38bb330`, novembre
 2026) : objectif, architecture, modules, données, API, choix techniques et place de l'IA. Chaque module a son propre
@@ -228,6 +228,50 @@ Erreurs : JSON `{"error": "message en français"}`, avec `400`, `401`, `403`, `4
 | **Alerte de poids par règles**, sans IA générative | Résultat fiable, explicable et sourcé (VCA, WSAVA, AAHA), sans coût ni clé |
 | **Une branche par module**, fusion dans `main` par pull request | Chacun avance sans bloquer les autres ; `main` reste la version de référence |
 | **Français et anglais** | Bouton de langue dans l'en-tête ; le français est la langue de référence |
+
+### 7.1 Pourquoi Firebase
+
+| Besoin du projet | Ce que Firebase apporte | Alternative écartée |
+|---|---|---|
+| Comptes sécurisés (inscription, connexion, mot de passe oublié) | **Authentication** gère les mots de passe, les e-mails de réinitialisation et les jetons signés | Coder soi-même le stockage des mots de passe et les jetons JWT : plus long et risqué |
+| Base de données sans serveur à installer ni à maintenir | **Cloud Firestore**, hébergée par Google, disponible tout de suite pour toute l'équipe | MySQL ou PostgreSQL : il faut un serveur hébergé, des sauvegardes, des migrations de schéma |
+| Données qui suivent les écrans | Documents et **sous-collections** : un animal avec ses photos, ses pesées, son carnet et ses traitements | Modèle relationnel : nombreuses jointures pour afficher une seule fiche |
+| Sécurité des données privées | **Règles de sécurité** vérifiées par Google à chaque lecture et écriture, même si l'API a un défaut | Contrôles uniquement dans le code du serveur |
+| Application utilisable sans backend | SDK Flutter officiel (`cloud_firestore`) : accès direct en repli quand le serveur est éteint | Base accessible seulement par l'API |
+| IA dans l'application | **Firebase AI Logic** donne accès à Gemini sans clé d'API dans l'application | Appeler une API d'IA depuis un serveur qui garde une clé secrète |
+| Budget nul | **Plan Spark gratuit** : Authentication, Firestore et AI Logic inclus | Services payants dès le départ |
+| Travail en équipe | Un seul projet `petcare-communit` partagé, console web pour voir et corriger les données | Une base locale par développeur, à synchroniser |
+
+Firebase a aussi ses contraintes : pas de Cloud Storage sur Spark, un quota de lectures limité, et un fonctionnement
+NoSQL où les requêtes doivent être prévues à l'avance. Nous en avons tenu compte : les photos sont stockées dans
+Firestore, les lectures sont regroupées et suspendues en arrière-plan, et les identifiants sont choisis pour éviter
+des requêtes (`{annonce}_{uid}`, pesée identifiée par sa date).
+
+### 7.2 Pourquoi une architecture feature-first
+
+Le code Flutter est organisé **par fonctionnalité** (`lib/features/pets/`, `health/`, `adoption/`…), et non par type
+de fichier (un dossier `screens/`, un dossier `models/`, un dossier `services/` pour toute l'application). Chaque
+fonctionnalité contient ses propres couches :
+
+```
+lib/features/<module>/
+  data/           modèles et dépôt (repository) : seul endroit qui parle à l'API et à Firestore
+  presentation/   écrans et widgets : n'utilisent que le dépôt, jamais l'API ni Firestore directement
+lib/core/         ce qui est partagé : ApiClient, poll(), thème, routes, langue
+```
+
+| Raison | Concrètement dans PetCare |
+|---|---|
+| **Un module = un dossier = un membre de l'équipe** | Chacun travaille sur sa branche et dans son dossier : très peu de conflits lors des fusions dans `main` |
+| **Tout ce qui concerne une fonctionnalité est au même endroit** | Pour comprendre ou modifier l'adoption, on ouvre `lib/features/adoption/` et `backend/src/adoption/`, rien d'autre |
+| **Séparation des couches à l'intérieur de chaque module** | Les écrans ne connaissent ni l'API ni Firestore : le passage API REST d'abord, Firestore en secours, s'est fait dans les dépôts sans réécrire les écrans |
+| **Dépendances claires entre modules** | Un module en utilise un autre par son dépôt public (`PetRepository().watchMine`, `NotificationService().send`) ; le partagé est dans `lib/core/` |
+| **Ajouter un module sans toucher aux autres** | L'assistant IA a été ajouté dans `lib/features/assistant/` avec ses écrans et ses dépôts, en réutilisant ceux des autres modules |
+| **Même découpage côté serveur** | `backend/src/<module>/` avec `routes.js → service.js → repository.js` : la même carte mentale de l'application au serveur |
+| **Testable** | La logique de chaque module (score, règles des rendez-vous, alerte de poids) est dans des fonctions pures, testées sans interface ni Firebase |
+
+Une organisation par type de fichier aurait mélangé les six modules dans les mêmes dossiers. Chaque fusion aurait
+touché les mêmes répertoires, et retrouver le code d'une fonctionnalité aurait demandé de parcourir tout le projet.
 
 ---
 

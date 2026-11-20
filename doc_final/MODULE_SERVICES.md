@@ -1,7 +1,7 @@
 # Module 6 : Services (onglet Services)
 
 Ce document décrit le module Services tel qu'il est dans `main` (novembre 2026). Vue d'ensemble du projet :
-[PROJET_PETCARE.md](PROJET_PETCARE.md).
+[reflexion.md](reflexion.md).
 
 ---
 

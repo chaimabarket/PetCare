@@ -1,7 +1,7 @@
 # Assistant IA PetCare
 
 Ce document décrit l'assistant IA de PetCare tel qu'il est dans `main` (novembre 2026), venu de la branche
-`chatbot`. La place de l'IA dans tout le projet est résumée dans [PROJET_PETCARE.md](PROJET_PETCARE.md#8-utilisation-de-lia).
+`chatbot`. La place de l'IA dans tout le projet est résumée dans [reflexion.md](reflexion.md#8-utilisation-de-lia).
 
 ---
 

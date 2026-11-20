@@ -1,7 +1,7 @@
 # Module 3 : Rendez-vous et rappels
 
 Ce document décrit le module Rendez-vous et rappels tel qu'il est dans `main` (novembre 2026). Vue d'ensemble du
-projet : [PROJET_PETCARE.md](PROJET_PETCARE.md).
+projet : [reflexion.md](reflexion.md).
 
 ---
 

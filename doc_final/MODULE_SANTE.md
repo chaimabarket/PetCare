@@ -1,7 +1,7 @@
 # Module 2 : Santé et dossier médical
 
 Ce document décrit le module Santé tel qu'il est dans `main` (novembre 2026) : fonctionnalités, architecture,
-données, API et règles. Vue d'ensemble du projet : [PROJET_PETCARE.md](PROJET_PETCARE.md).
+données, API et règles. Vue d'ensemble du projet : [reflexion.md](reflexion.md).
 
 ---
 

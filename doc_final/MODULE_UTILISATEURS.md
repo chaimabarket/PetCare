@@ -2,7 +2,7 @@
 
 Ce document décrit le socle commun de PetCare : les comptes et les rôles, le profil, les notifications dans
 l'application et l'écran d'Accueil. Il est à jour avec `main` (novembre 2026). Vue d'ensemble du projet :
-[PROJET_PETCARE.md](PROJET_PETCARE.md).
+[reflexion.md](reflexion.md).
 
 ---
 

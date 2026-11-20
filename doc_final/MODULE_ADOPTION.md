@@ -1,7 +1,7 @@
 # Module 5 : Adoption (onglet Communauté)
 
 Ce document décrit le module Adoption tel qu'il est dans `main` (novembre 2026). Vue d'ensemble du projet :
-[PROJET_PETCARE.md](PROJET_PETCARE.md).
+[reflexion.md](reflexion.md).
 
 ---
 

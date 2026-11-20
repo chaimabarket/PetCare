@@ -2,7 +2,7 @@
 
 Ce document décrit le module « Mes animaux » de PetCare : ce qu'il fait, comment il est construit, et pourquoi il
 est construit ainsi. Il est à jour avec `main` (commit `38bb330`, novembre 2026). Vue d'ensemble du projet :
-[PROJET_PETCARE.md](PROJET_PETCARE.md).
+[reflexion.md](reflexion.md).
 
 Branches du module :
 
