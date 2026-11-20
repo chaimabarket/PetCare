@@ -1,8 +1,9 @@
 # PetCare Community : documentation du projet
 
-Ce document décrit l'ensemble du projet PetCare tel qu'il est sur la branche `main` (commit `7c10e4c`, novembre
-2026) : objectif, architecture, modules, données, API, choix techniques et décisions. Le détail du module Profils des
-animaux est dans [MODULE_ANIMAUX.md](MODULE_ANIMAUX.md), et l'installation dans [LANCER_SUR_MOBILE.md](LANCER_SUR_MOBILE.md).
+Ce document décrit l'ensemble du projet PetCare tel qu'il est sur la branche `main` (commit `38bb330`, novembre
+2026) : objectif, architecture, modules, données, API, choix techniques et place de l'IA. Chaque module a son propre
+document détaillé (section 4). L'installation est expliquée dans [LANCER_SUR_MOBILE.md](LANCER_SUR_MOBILE.md), et les
+comptes de démonstration dans [DONNEES_DEMO.md](DONNEES_DEMO.md).
 
 ---
 
@@ -10,29 +11,30 @@ animaux est dans [MODULE_ANIMAUX.md](MODULE_ANIMAUX.md), et l'installation dans 
 
 PetCare Community est une application mobile pour les propriétaires d'animaux en Tunisie. Elle permet de :
 
-- tenir la fiche de ses animaux, leur poids et leur carnet de santé ;
+- tenir la fiche de ses animaux et suivre leur poids, avec une alerte en cas de variation anormale ;
+- tenir leur carnet de santé (vaccins, visites, traitements) ;
 - gérer ses rendez-vous et ses rappels de soins ;
 - trouver des professionnels (vétérinaires, toiletteurs, pensions…) et réserver une prestation ;
-- adopter un animal ou publier une annonce d'adoption ;
-- partager des histoires d'adoption (Happy Tails).
+- adopter un animal ou publier une annonce d'adoption, et partager des histoires d'adoption (Happy Tails) ;
+- poser ses questions à un assistant IA qui connaît ses animaux.
 
 Le cahier des charges est dans `PetCare_Flutter_Version_Equipe.docx`, les maquettes Stitch dans `maquettes/` et
 `designs/`.
 
-### Équipe et modules
+### Modules et branches
 
-| Module | Contenu | Branche d'origine |
+| Module | Contenu | Branches d'origine |
 |---|---|---|
-| Utilisateurs | Inscription, connexion, rôles, profil, notifications | `Users` |
-| 1. Profils des animaux | Mes animaux, fiche, photos, poids, archivage | `animals` |
-| 2. Santé | Carnet de santé, traitements, fiches santé | `health_record` |
+| Utilisateurs | Inscription, connexion, rôles, profil, notifications, Accueil | `Users` |
+| 1. Profils des animaux | Fiches, photos, poids, alerte de poids, archivage | `animals`, `alerte` |
+| 2. Santé | Carnet de santé, traitements, tableau du jour, PDF, scan, fiches santé | `health_record`, `health-features` |
 | 3. Rendez-vous et rappels | Agenda, rendez-vous, rappels de soins | `rendez-vous`, `rendez-vous-api` |
 | 4. Perdus & trouvés | Pas encore développé (« Bientôt disponible ») | – |
 | 5. Adoption | Annonces, candidatures, score de compatibilité, Happy Tails | `Adoption`, `adoption-api` |
-| 6. Services | Annuaire des professionnels, prestations, disponibilités, réservations | `services` |
+| 6. Services | Annuaire, prestations, disponibilités, validation, réservations | `services` |
+| Assistant IA | Assistant Gemini, actions à confirmer, rédaction d'annonce | `chatbot` |
 
-Branches en cours, pas encore dans `main` : `chatbot` (assistant IA Gemini) et `alerte` (alerte intelligente de
-poids, module 1).
+Toutes ces branches sont fusionnées dans `main`.
 
 ---
 
@@ -43,10 +45,13 @@ poids, module 1).
 | Application | Flutter (Dart 3.13), cible principale Android |
 | Authentification | Firebase Authentication (e-mail et mot de passe) |
 | Base de données | Cloud Firestore, projet `petcare-communit`, plan gratuit Spark |
-| Backend | Node.js 18+ et Express (`backend/`) |
+| Backend | Node.js 18+ et Express (`backend/`), sans autre dépendance |
 | Sécurité des données | `firestore.rules` |
+| IA générative | Gemini par Firebase AI Logic (`firebase_ai`) |
+| Reconnaissance de texte | Google ML Kit sur le téléphone (`google_mlkit_text_recognition`) |
+| PDF | `pdf` et `printing` |
 | Langues | Français et anglais (`flutter_localizations`, fichiers `.arb`) |
-| Paquets principaux | `firebase_core`, `firebase_auth`, `cloud_firestore`, `http`, `image_picker`, `file_picker`, `shared_preferences`, `url_launcher`, `google_fonts`, `material_symbols_icons` |
+| Autres paquets | `http`, `image_picker`, `file_picker`, `shared_preferences`, `url_launcher`, `google_fonts`, `material_symbols_icons` |
 
 ---
 
@@ -56,152 +61,109 @@ poids, module 1).
 flowchart LR
   subgraph App["Application Flutter"]
     Screens["Écrans<br/>lib/features/*/presentation"]
-    Repos["Repositories<br/>lib/features/*/data"]
+    Repos["Dépôts (repositories)<br/>lib/features/*/data"]
     Api["ApiClient + poll()<br/>lib/core/api"]
+    Kit["ML Kit<br/>(sur le téléphone)"]
   end
   subgraph Server["Backend Node.js / Express"]
-    Routes["Routes par module<br/>backend/src/*"]
+    Routes["routes.js"] --> Service["service.js<br/>règles métier"] --> Repo["repository.js"]
     FsRest["firestore.js<br/>(API REST Firestore)"]
   end
   Auth["Firebase Authentication"]
   DB[("Cloud Firestore<br/>+ firestore.rules")]
+  AI["Gemini<br/>Firebase AI Logic"]
 
   Screens --> Repos
+  Screens --> Kit
   Repos --> Api
   Repos -. "serveur injoignable" .-> DB
   Repos -- "connexion" --> Auth
+  Repos -- "assistant" --> AI
   Api -- "HTTP + jeton Firebase" --> Routes
   Routes -- "vérifie le jeton" --> Auth
-  Routes --> FsRest
+  Repo --> FsRest
   FsRest -- "jeton de l'utilisateur" --> DB
 ```
 
 ### Principes communs à tous les modules
 
 1. **Organisation par fonctionnalité.** Chaque module a son dossier `lib/features/<module>/` avec `data/`
-   (modèles, repository) et `presentation/` (écrans, widgets). `lib/core/` contient ce qui est partagé.
-2. **API REST d'abord, Firestore en secours.** Les repositories appellent le backend avec `ApiClient`. Si le serveur
+   (modèles, dépôt) et `presentation/` (écrans, widgets). `lib/core/` contient ce qui est partagé.
+2. **API REST d'abord, Firestore en secours.** Les dépôts appellent le backend avec `ApiClient`. Si le serveur
    ne répond pas, ils font la même opération directement dans Firestore : l'application reste utilisable sans
    backend.
-3. **Un backend sans clé secrète.** Le serveur vérifie le jeton Firebase de l'utilisateur, puis appelle l'API REST de
+3. **Backend en trois couches.** Dans chaque module du serveur, `routes.js` (HTTP) appelle `service.js` (règles
+   métier), qui appelle `repository.js` (accès aux données). Le service reçoit son dépôt en paramètre : on le teste
+   avec un faux dépôt en mémoire, sans Firebase.
+4. **Un backend sans clé secrète.** Le serveur vérifie le jeton Firebase de l'utilisateur, puis appelle l'API REST de
    Firestore avec ce même jeton. Les règles de `firestore.rules` s'appliquent donc toujours, par l'API comme en accès
    direct.
-4. **Mise à jour des écrans par interrogation.** L'API ne pousse pas les changements : `poll()` (`lib/core/api/polling.dart`)
-   relit les données à intervalle régulier (8 secondes par défaut) et tout de suite après une modification
-   (`notifyApiDataChanged()`). Un même flux peut être écouté plusieurs fois.
-5. **Pas de Cloud Storage.** Le plan Spark ne le permet pas : photos et pièces jointes sont stockées dans Firestore
-   (base64 pour l'adoption, octets pour les animaux et la santé), une par document, sous la limite de 1 Mo.
+5. **Mise à jour des écrans par interrogation.** L'API ne pousse pas les changements : `poll()` relit les données à
+   intervalle régulier et tout de suite après une modification (`notifyApiDataChanged()`). La lecture s'arrête quand
+   l'application passe en arrière-plan, et les requêtes identiques envoyées en même temps sont regroupées.
+6. **Pas de Cloud Storage.** Le plan Spark ne le permet pas : photos et pièces jointes sont stockées dans Firestore
+   (base64 ou octets), sous la limite de 1 Mo par document.
 
 ### Organisation du code
 
 ```
 lib/
   main.dart, firebase_options.dart
-  core/
-    api/           ApiClient (HTTP + jeton), poll() et notifyApiDataChanged()
-    locale/        LocaleController (langue choisie, mémorisée sur l'appareil)
-    routes.dart    AppRoutes : routes nommées de toute l'application
-    theme/         couleurs et thème
-    utils/, widgets/  dates relatives, bouton de langue, écran « Bientôt disponible »
+  core/          api/ (ApiClient, poll), locale/, navigation/ (onglets), routes.dart, theme/, utils/, widgets/
   features/
-    auth/          connexion, inscription, mot de passe oublié, rôles
-    profile/       Mon profil, modification du profil
-    notifications/ notifications dans l'application
-    home/          Accueil et barre de navigation
+    auth/, profile/, notifications/, home/     module Utilisateurs et Accueil
     pets/          module 1 : Profils des animaux
     health/        module 2 : Santé
     appointments/  module 3 : Rendez-vous et rappels
-    community/     onglet Communauté (Adoption, Perdus & trouvés, Happy Tails)
+    community/     onglet Communauté (Adoption, Happy Tails, Perdus & trouvés)
     adoption/      module 5 : Adoption
     services/      module 6 : Services
-  l10n/            textes français et anglais
+    assistant/     assistant IA
+  l10n/          textes français et anglais
 
 backend/
-  src/server.js, app.js      démarrage et montage des routes
-  src/auth.js                vérification du jeton Firebase
-  src/firestore.js           accès à Firestore par son API REST
-  src/validation.js          validation commune (profil)
-  src/adoption/, appointments/, pets/, services/   un dossier par module
-  scripts/                   données de démonstration
-  test/                      tests (node --test)
+  src/server.js, app.js     démarrage et assemblage des modules
+  src/auth.js               vérification du jeton Firebase
+  src/firestore.js          accès à Firestore par son API REST
+  src/notifier.js           notifications envoyées par le serveur
+  src/users/, pets/, health/, appointments/, adoption/, services/   routes → service → dépôt
+  scripts/                  données de démonstration
+  test/                     tests (node --test)
 
-test/                        tests Flutter
-firestore.rules              règles de sécurité Firestore
+test/            tests Flutter
+docs/            documentation
+firestore.rules  règles de sécurité Firestore
 ```
 
 ### Navigation
 
-Barre du bas à 4 onglets : **Accueil**, **Mes animaux**, **Communauté**, **Services**. L'en-tête contient le choix de
-langue, la cloche des notifications et l'accès au profil. Les autres écrans s'ouvrent par les routes nommées de
-`AppRoutes`.
+Barre du bas à 5 onglets : **Accueil**, **Mes animaux**, **Santé**, **Communauté**, **Services**. L'en-tête contient
+le choix de la langue, la cloche des notifications et l'accès au profil. Les autres écrans s'ouvrent par les routes
+nommées de `AppRoutes`.
 
 ---
 
-## 4. Modules
+## 4. Documentation par module
 
-### Utilisateurs
+| Module | Document | En bref |
+|---|---|---|
+| Utilisateurs et Accueil | [MODULE_UTILISATEURS.md](MODULE_UTILISATEURS.md) | Rôles (propriétaire, prestataire, refuge, admin), profil, notifications, Accueil, visiteur |
+| 1. Profils des animaux | [MODULE_ANIMAUX.md](MODULE_ANIMAUX.md) | Fiches, galerie, pesées et courbe, **alerte de poids** (règles sourcées), archivage, espèce libre |
+| 2. Santé | [MODULE_SANTE.md](MODULE_SANTE.md) (historique : [SANTE_RECAPITULATIF.md](SANTE_RECAPITULATIF.md)) | Onglet Santé, tableau du jour, carnet, vaccins, traitements, PDF, scan d'ordonnance, fiches santé |
+| 3. Rendez-vous et rappels | [MODULE_RENDEZ_VOUS.md](MODULE_RENDEZ_VOUS.md) | Agenda, statuts et règles RG-12 à RG-21, report avec historique, versions, rappels |
+| 4. Perdus & trouvés | – | Pas encore développé |
+| 5. Adoption | [MODULE_ADOPTION.md](MODULE_ADOPTION.md) | Fil filtré, annonces, candidature en 4 étapes, **score de compatibilité**, réservation, adoption, Happy Tails |
+| 6. Services | [MODULE_SERVICES.md](MODULE_SERVICES.md) | Annuaire, espace prestataire, validation par l'administrateur, réservations |
+| Assistant IA | [MODULE_ASSISTANT_IA.md](MODULE_ASSISTANT_IA.md) | Gemini, contexte de l'animal, actions à confirmer, garde-fous santé |
+| Démonstration | [DONNEES_DEMO.md](DONNEES_DEMO.md) | Comptes, données et scénario de démonstration |
+| Installation | [LANCER_SUR_MOBILE.md](LANCER_SUR_MOBILE.md) | Outils, émulateur ou téléphone, APK |
 
-- Inscription avec choix du rôle : **propriétaire**, **prestataire** ou **refuge**. Le rôle **administrateur** n'est
-  jamais proposé : il est attribué à la main dans la console Firebase.
-- Connexion, mot de passe oublié, mode visiteur.
-- Profil `users/{uid}` : nom, e-mail, ville, téléphone, rôle. Le rôle et l'e-mail ne changent pas après l'inscription.
-- Notifications `users/{uid}/notifications` : catégories Santé & Soins, Rendez-vous, Adoptions, Communauté, Messages.
-  N'importe quel utilisateur connecté peut en envoyer une ; seul le destinataire la lit et la marque comme lue.
-
-### Accueil
-
-Salutation, raccourci vers ses animaux, prochains rendez-vous, vaccins et traitements à venir, rappels de soins,
-raccourcis Adoption et Perdus & trouvés.
-
-### 1. Profils des animaux
-
-Liste des animaux actifs et archivés, fiche, formulaire d'ajout et de modification, galerie de 5 photos, pesées avec
-courbe et correction, notes, contacts de confiance, favori, partage, archivage et restauration, espèce libre (« Autre »),
-bouton Conseils réservé à l'assistant IA. La collection `pets` sert aussi aux modules Santé et Rendez-vous.
-Détails : [MODULE_ANIMAUX.md](MODULE_ANIMAUX.md).
-
-### 2. Santé
-
-- Carnet de santé de chaque animal : visites, vaccins, examens, allergies, notes, avec jusqu'à 3 pièces jointes
-  (PDF ou photo, 900 Ko au plus).
-- Prochain rappel vaccinal ; un vaccin peut créer un rappel du module 3 ou ouvrir le formulaire de rendez-vous.
-- Traitements : en cours, terminés ou arrêtés, prises notées.
-- Fiches Santé & Conseils publiques (écrites par l'administrateur, 5 fiches de départ intégrées), avec marque-pages.
-- Le carnet est une sous-collection de la fiche : il n'est pas transmis lors d'une adoption.
-- Accès direct à Firestore (pas encore d'API REST pour ce module).
-
-### 3. Rendez-vous et rappels
-
-- Agenda (semaine et mois, filtres par animal et statut), détail, nouveau rendez-vous, report.
-- Statuts : en attente, confirmé, terminé, annulé. Un rendez-vous personnel démarre confirmé, une réservation auprès
-  d'un professionnel démarre en attente et c'est le prestataire qui la confirme.
-- Règles : report et annulation seulement avant le début, « Terminé » seulement après la fin, pas deux rendez-vous
-  actifs qui se chevauchent pour un même animal, version obsolète refusée (deux personnes qui modifient en même temps).
-- Rappels de soins créés à la main.
-
-### 5. Adoption (onglet Communauté)
-
-- Fil d'adoption avec recherche et filtres (espèce, âge, sexe, taille, ville, badges, « Adopte-moi »), favoris.
-- Annonce : photos, badges de personnalité, compatibilités, besoins, conditions ; brouillon, publication, archivage.
-- Candidature en 4 étapes (logement, foyer, mode de vie, récapitulatif), avec un **score de compatibilité** calculé à
-  l'identique par le serveur et par l'application.
-- Suivi : Envoyée → En étude → Acceptée → Adoptée. Une seule candidature acceptée à la fois ; l'annonce passe Réservée
-  puis Adoptée, et les autres candidats sont refusés et notifiés.
-- Happy Tails : histoire Avant / Après de l'adoptant, avec des « j'aime » ; signalements pour l'administrateur.
-- Seuls les propriétaires et les refuges publient des annonces.
-
-### 6. Services (onglet Services)
-
-- Annuaire des professionnels publiés, avec recherche, filtre par catégorie et par ville.
-- Catégories gérées par l'administrateur (Vétérinaires, Toiletteurs, Promeneurs, Pensions, Boutiques…).
-- Un prestataire crée son profil, qui est **validé ou refusé par l'administrateur** avant d'apparaître.
-- Prestations (durée de 5 minutes à 24 heures, prix), disponibilités par jour de la semaine.
-- Réservations : demande du client, puis confirmation ou refus du prestataire ; le client peut annuler une demande en
-  attente.
-
-### 4. Perdus & trouvés
-
-Pas encore développé : la carte de l'onglet Communauté et le raccourci de l'Accueil affichent « Bientôt disponible ».
+Les modules sont reliés entre eux :
+- la collection `pets` (module 1) sert à la santé, aux rendez-vous, aux services et à l'assistant ;
+- un vaccin (module 2) peut créer un rappel ou un rendez-vous (module 3) ;
+- l'adoption, les services et l'alerte de poids envoient des notifications (module Utilisateurs) ;
+- l'assistant prépare des soins, traitements, pesées, rendez-vous, rappels et réservations avec les dépôts des
+  modules concernés.
 
 ---
 
@@ -209,77 +171,120 @@ Pas encore développé : la carte de l'onglet Communauté et le raccourci de l'A
 
 | Collection | Module | Contenu |
 |---|---|---|
-| `users/{uid}` | Utilisateurs | Profil et rôle |
-| `users/{uid}/notifications` | Utilisateurs | Notifications |
+| `users/{uid}`, `.../notifications` | Utilisateurs | Profil et rôle, notifications |
 | `users/{uid}/adoptionFavorites`, `likedHappyTails`, `healthBookmarks` | Adoption, Santé | Favoris, « j'aime », marque-pages |
-| `pets/{petId}` | 1 | Fiche de l'animal |
-| `pets/{petId}/photos`, `weights` | 1 | Photos (octets) et pesées (une par jour) |
+| `users/{uid}/assistantUsage`, `assistantChats/.../messages` | Assistant | Compteur du jour, historique des conversations |
+| `pets/{petId}`, `.../photos`, `.../weights` | 1 | Fiche, photos (octets), pesées (une par jour) |
 | `pets/{petId}/healthEntries`, `.../files`, `treatments` | 2 | Carnet de santé, pièces jointes, traitements |
 | `healthSheets` | 2 | Fiches santé publiques |
 | `appointments`, `reminders` | 3 | Rendez-vous et rappels |
-| `adoptions`, `adoptions/{id}/photos` | 5 | Annonces et photos (base64) |
-| `adoptionApplications` | 5 | Candidatures (`{annonce}_{uid}` : une par personne et par annonce) |
-| `happyTails`, `reports` | 5 | Histoires d'adoption, signalements |
-| `serviceCategories`, `serviceProviders`, `.../services`, `.../availability`, `serviceBookings` | 6 | Annuaire, prestations, disponibilités, réservations |
+| `adoptions`, `.../photos`, `adoptionApplications`, `happyTails`, `reports` | 5 | Annonces, candidatures, histoires, signalements |
+| `serviceCategories`, `serviceProviders`, `.../services`, `.../availability`, `serviceBookings` | 6 | Annuaire, prestations, horaires, réservations |
 
-Règles (`firestore.rules`) : chaque module déclare les règles de ses collections. Par défaut, tout ce qui n'est pas
-déclaré est fermé. Les données privées (animaux, carnet de santé, rendez-vous, rappels) ne sont lisibles que par leur
-propriétaire ; les champs autorisés sont listés un par un et les valeurs vérifiées (longueurs, statuts, dates). Après
-un changement : `firebase deploy --only firestore:rules`.
+Règles (`firestore.rules`) : tout ce qui n'est pas déclaré est fermé. Les données privées (animaux, carnet,
+rendez-vous, rappels, historique de l'assistant) ne sont lisibles que par leur propriétaire. Les champs autorisés sont
+listés un par un, et les valeurs et les transitions de statut sont vérifiées. Après un changement :
+`firebase deploy --only firestore:rules`.
 
 ---
 
 ## 6. API REST (backend)
 
-Toutes les routes, sauf `/api/health` et la lecture publique des annonces d'adoption, exigent
+Toutes les routes, sauf `/api/health` et les lectures publiques (fil d'adoption, annuaire), exigent
 `Authorization: Bearer <jeton Firebase>`. La liste complète est dans [backend/README.md](../backend/README.md).
 
 | Préfixe | Module | Routes principales |
 |---|---|---|
 | `/api/health` | – | Le serveur répond |
-| `/api/users/me` | Utilisateurs | Créer, lire, modifier son profil ; notifications (liste, non lues, marquer comme lue) |
-| `/api/adoptions`, `/api/applications` | Adoption | Fil filtré, annonces, photos, favoris, candidatures (score calculé par le serveur) |
-| `/api/appointments`, `/api/reminders` | Rendez-vous | Agenda, création, confirmation, report, annulation, fin, rappels |
-| `/api/pets` | Profils des animaux | Fiches, archivage, galerie, pesées |
-| `/api/services/...` | Services | Catégories, prestataires, validation, prestations, disponibilités, réservations |
+| `/api/users/me` | Utilisateurs | Profil, notifications |
+| `/api/pets` | 1 | Fiches, archivage, galerie, pesées (avec l'alerte de poids) |
+| `/api/health/summary`, `/api/pets/{id}/health/...` | 2 | Synthèse, carnet, pièces jointes, traitements, prises |
+| `/api/appointments`, `/api/reminders` | 3 | Agenda, confirmation, report, annulation, fin, rappels |
+| `/api/adoptions`, `/api/applications` | 5 | Fil filtré, annonces, favoris, candidatures (score calculé par le serveur) |
+| `/api/services/...` | 6 | Catégories, prestataires, validation, prestations, horaires, réservations |
 
 Erreurs : JSON `{"error": "message en français"}`, avec `400`, `401`, `403`, `404` ou `409`.
-
-Le module Santé n'a pas encore de routes REST : il passe directement par Firestore.
 
 ---
 
 ## 7. Choix techniques et décisions
 
-| Décision | Raison |
+| Décision | Pourquoi |
 |---|---|
-| Flutter, Android en priorité | Une seule base de code ; l'application est pensée pour le téléphone |
-| Firebase Authentication et Firestore | Connexion et base de données prêtes à l'emploi, sans serveur à héberger |
-| Plan gratuit Spark | Projet étudiant, sans budget |
-| Photos et pièces jointes dans Firestore | Spark n'inclut pas Cloud Storage |
-| API REST Node.js en plus de Firestore | Logique métier centralisée (validation, score de compatibilité, transitions de rendez-vous), et exigence d'une API |
-| Serveur sans clé secrète, avec le jeton de l'utilisateur | Rien de sensible sur le serveur ; les règles Firestore restent la protection finale |
-| Repli automatique sur Firestore | L'application fonctionne même quand le backend n'est pas lancé |
-| Mises à jour par interrogation (`poll`) | Simple et suffisant ; un rafraîchissement immédiat suit chaque modification |
-| Mêmes calculs côté serveur et côté application | Score de compatibilité et règles d'alerte identiques dans les deux cas, vérifiés par des tests communs |
-| Pas de suppression des données importantes | Animaux, annonces et rendez-vous sont archivés ou annulés : l'historique est conservé |
-| Rôle administrateur attribué à la main | Personne ne peut se déclarer administrateur à l'inscription |
-| Une branche par module, fusion dans `main` | Chacun travaille sans bloquer les autres ; `main` reste la version de référence |
-| Textes en français et en anglais | Le bouton de langue est dans l'en-tête ; le français est la langue de référence |
+| **Flutter**, Android en priorité | Une seule base de code pour Android et iOS ; l'application est pensée pour le téléphone |
+| **Firebase Authentication** | Comptes, connexion et mot de passe oublié sûrs, sans les coder soi-même |
+| **Cloud Firestore** | Base NoSQL prête à l'emploi, sans serveur à héberger ; les documents et sous-collections suivent la structure des écrans (un animal et son carnet) |
+| **Plan gratuit Spark** | Projet étudiant sans budget. Conséquences : pas de Cloud Storage, pas de Cloud Functions, quota de lectures limité |
+| **API REST Node.js / Express** en plus de Firestore | Logique métier centralisée (validation, score de compatibilité, transitions de rendez-vous, alerte de poids), et une API exigée par le projet |
+| **Architecture routes / service / dépôt** | Chaque couche a un seul rôle ; les règles métier se testent sans Firebase |
+| **Serveur sans clé secrète** (jeton de l'utilisateur) | Rien de sensible sur le serveur ; les règles Firestore restent la protection finale, même si l'API a un défaut |
+| **Repli automatique sur Firestore** | L'application fonctionne même quand le backend n'est pas lancé |
+| **Interrogation (`poll`)** plutôt que temps réel | Simple et compatible avec l'API REST ; arrêt en arrière-plan et requêtes regroupées pour économiser le quota |
+| **Mêmes calculs côté serveur et côté application**, avec des cas de test communs | Score de compatibilité, règles des rendez-vous et alerte de poids identiques avec ou sans serveur |
+| **Photos et pièces jointes dans Firestore** | Spark n'inclut pas Cloud Storage ; images compressées sous 1 Mo |
+| **Archivage plutôt que suppression** | Animaux, annonces, rendez-vous et réservations gardent leur historique |
+| **Rôle administrateur attribué à la main** | Personne ne peut se déclarer administrateur à l'inscription |
+| **Gemini par Firebase AI Logic** | IA gratuite sur Spark, sans clé d'API à cacher dans l'application |
+| **ML Kit sur le téléphone** pour le scan | Hors ligne, gratuit, sans quota ; l'ordonnance ne quitte pas le téléphone |
+| **Alerte de poids par règles**, sans IA générative | Résultat fiable, explicable et sourcé (VCA, WSAVA, AAHA), sans coût ni clé |
+| **Une branche par module**, fusion dans `main` par pull request | Chacun avance sans bloquer les autres ; `main` reste la version de référence |
+| **Français et anglais** | Bouton de langue dans l'en-tête ; le français est la langue de référence |
 
 ---
 
-## 8. Tests
+## 8. Utilisation de l'IA
+
+L'IA intervient à deux niveaux : **dans l'application**, pour l'utilisateur, et **dans le développement**, pour
+l'équipe.
+
+### 8.1 Dans l'application
+
+| Fonctionnalité | Technologie | Rôle de l'IA | Garde-fous |
+|---|---|---|---|
+| Assistant PetCare | Gemini (`gemini-3.5-flash-lite`) par Firebase AI Logic | Conseils sur les soins, la santé, l'alimentation, le comportement et l'adoption, adaptés à l'animal choisi et à son carnet | Jamais de diagnostic ni de dose de médicament ; urgences signalées en premier ; sujets limités aux animaux ; 30 messages par jour |
+| Actions de l'assistant | Appels de fonction Gemini | Préparer un soin, un traitement, une pesée, un rendez-vous, un rappel ou une réservation | Carte à vérifier, rien n'est enregistré sans « Confirmer » ; mêmes règles que les formulaires ; aucune valeur inventée |
+| Suggestions d'adoption | Gemini, avec la liste réelle des annonces | Proposer jusqu'à 3 animaux adaptés au foyer décrit | Seuls les animaux réellement publiés, cités par leur identifiant ; la décision revient au refuge |
+| « Rédiger avec l'IA » | Gemini | Écrire la description d'une annonce d'adoption | Uniquement à partir des champs remplis ; texte modifiable avant publication |
+| Scan d'ordonnance ou de vignette | Google ML Kit (reconnaissance de texte, sur le téléphone) | Lire le texte de la photo pour pré-remplir le formulaire | Jamais de posologie ; l'utilisateur vérifie tout avant d'enregistrer |
+
+Ce qui n'est **pas** de l'IA, par choix :
+- **l'alerte de poids** : des règles fixes et sourcées (perte de plus de 10 % en 90 jours selon VCA, etc.), le même
+  résultat à chaque fois, qui s'explique au propriétaire ;
+- **le score de compatibilité** de l'adoption : un barème transparent, que l'annonceur peut comprendre et contester.
+
+Pour une décision qui touche la santé de l'animal ou le choix d'un adoptant, une règle explicable vaut mieux qu'une
+réponse générée qui peut varier.
+
+### 8.2 Dans la conception et le développement
+
+| Outil | Utilisation |
+|---|---|
+| **Google Stitch** (génération d'interfaces par IA) | Maquettes des écrans et illustrations, à partir de descriptions écrites (`maquettes/`, `designs/`). Elles ont servi de modèle aux écrans Flutter |
+| **Claude Code** (assistant de programmation d'Anthropic, dans VS Code) | Analyse du code existant de `main` avant d'ajouter une fonctionnalité ; plans proposés puis **validés par l'étudiant avant toute modification** ; écriture du code (API REST du module 1, alerte de poids en JavaScript et en Dart), des tests et des cas de test communs ; vérification des conflits avant une fusion ; recherche de sources vétérinaires pour les seuils de poids ; documentation (`docs/`) et données de démonstration |
+
+Méthode suivie avec les assistants de programmation :
+1. **Rien n'est modifié sans validation** : l'assistant propose, l'étudiant valide ou corrige.
+2. **Travail sur une branche**, jamais directement sur `main` ; fusion par pull request après vérification des
+   conflits.
+3. **Tests à chaque changement** (`npm test`, `flutter test`, `flutter analyze`) et essai de l'application sur
+   l'émulateur.
+4. **Sources vérifiées** : les seuils médicaux viennent d'organismes vétérinaires (WSAVA, VCA, AAHA, iCatCare), et
+   les repères non officiels sont signalés comme tels dans l'application.
+5. **Aucun secret dans le code** : pas de clé d'API, ni de mot de passe dans le dépôt.
+
+---
+
+## 9. Tests
 
 | Commande | Contenu |
 |---|---|
-| `cd backend; npm test` | Validation des champs, score de compatibilité, filtres d'adoption, règles des rendez-vous, routes des animaux et des services avec un faux Firestore |
-| `flutter test` | Validation des formulaires de connexion, dates relatives, règles des rendez-vous et de la santé, score de compatibilité, lecture JSON de l'API, interrogation (`poll`) |
+| `cd backend; npm test` | Validation des champs, services avec un faux dépôt (utilisateurs, adoption, santé, services), score de compatibilité, filtres d'adoption, règles des rendez-vous, routes des animaux et de la santé avec un faux Firestore, alerte de poids |
+| `flutter test` | Formulaires de connexion, dates relatives, interrogation et regroupement des requêtes, règles des rendez-vous et de la santé, synthèse et PDF du carnet, scan, score de compatibilité, lecture JSON de l'API, alerte de poids, assistant (actions, cartes, prestations) |
 | `flutter analyze` | Analyse statique du code Dart |
 
 ---
 
-## 9. Lancer le projet
+## 10. Lancer le projet
 
 1. Backend : `cd backend`, `npm install`, `npm start` (http://localhost:3000, vérification : `/api/health`).
 2. Émulateur Android depuis Android Studio, ou `flutter emulators --launch <nom>`.
@@ -287,19 +292,23 @@ Le module Santé n'a pas encore de routes REST : il passe directement par Firest
 
 Sous Windows, activer le **Mode développeur** avant `flutter pub get`. L'émulateur joint le PC par `10.0.2.2:3000` ;
 pour un téléphone réel : `flutter run --dart-define=API_URL=http://<IP du PC>:3000`. Le trafic `http` n'est autorisé
-qu'en mode debug.
+qu'en mode debug. **Arrêter le serveur et l'application après les tests** (quota gratuit partagé).
 
-Données de démonstration (serveur lancé) : `node scripts/seed-services.js` (compte administrateur requis), puis
-`node scripts/seed-demo-user.js` (voir l'en-tête de chaque script pour les variables à définir).
+Données de démonstration : [DONNEES_DEMO.md](DONNEES_DEMO.md) (`node scripts/seed-demo-complet.js`). Les scripts
+plus anciens `seed-services.js` (annuaire) et `seed-demo-user.js` (un compte de test) restent disponibles.
 
 ---
 
-## 10. Limites connues
+## 11. Limites connues
 
-- **Quota Firestore gratuit.** Il est partagé par toute l'équipe et a déjà été épuisé : les rafraîchissements
-  automatiques consomment des lectures. Fermer l'application quand on ne teste pas.
-- **Pas de notifications push.** Les notifications apparaissent dans la cloche de l'application uniquement.
+- **Quota Firestore gratuit.** Il est partagé par toute l'équipe et a déjà été épuisé une fois : les
+  rafraîchissements automatiques consomment des lectures. Fermer l'application quand on ne teste pas.
+- **Pas de notifications push.** Les notifications apparaissent uniquement dans la cloche de l'application.
 - **Module 4 (Perdus & trouvés)** pas encore développé.
-- **Module Santé** sans API REST.
-- **Assistant IA** (branche `chatbot`) pas encore fusionné : le bouton Conseils du module 1 affiche « Bientôt disponible ».
-- **Navigateur non pris en charge par l'API** (pas de CORS) : dans Chrome, l'application passe par Firestore directement.
+- **Bouton « Conseils »** de la fiche d'un animal pas encore relié à l'assistant IA.
+- **Décisions d'adoption et Happy Tails** écrites directement dans Firestore, pas encore par l'API.
+- **Réservations de services** pas encore ajoutées à l'agenda du module Rendez-vous.
+- **Navigateur non pris en charge par l'API** (pas de CORS) : dans Chrome, l'application passe directement par
+  Firestore, et le scan ML Kit n'existe pas.
+- **Backend non hébergé** : il tourne sur le PC pendant le développement ; en production il faudrait un hébergement
+  `https`.

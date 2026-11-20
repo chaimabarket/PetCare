@@ -1,14 +1,15 @@
 # Module 1 : Profils des animaux
 
 Ce document décrit le module « Mes animaux » de PetCare : ce qu'il fait, comment il est construit, et pourquoi il
-est construit ainsi. Il est à jour à la branche `alerte` (commit `351d0d7`, novembre 2026).
+est construit ainsi. Il est à jour avec `main` (commit `38bb330`, novembre 2026). Vue d'ensemble du projet :
+[PROJET_PETCARE.md](PROJET_PETCARE.md).
 
 Branches du module :
 
 | Branche | Contenu | État |
 |---|---|---|
 | `animals` | Écrans, API REST `/api/pets`, correction des pesées, bouton Conseils, espèce libre | Fusionnée dans `main` |
-| `alerte` | Alerte intelligente de poids | Poussée, fusion vers `main` à valider |
+| `alerte` | Alerte intelligente de poids | Fusionnée dans `main` (PR #2) |
 
 ---
 
@@ -30,7 +31,7 @@ Fonctionnalités :
 - favori et partage limité de la fiche ;
 - archivage et restauration (jamais de suppression) ;
 - espèce « Autre » avec saisie libre (ours, tigre, tortue…) ;
-- bouton « Conseils » (réservé au futur assistant IA) ;
+- bouton « Conseils » (prévu pour ouvrir l'assistant IA sur cet animal) ;
 - application en français et en anglais.
 
 ---
@@ -46,7 +47,7 @@ flowchart LR
     Api["ApiClient + poll()<br/>lib/core/api"]
   end
   subgraph Server["Backend Node.js / Express"]
-    Routes["/api/pets<br/>backend/src/pets/routes.js"]
+    Routes["/api/pets<br/>routes.js → service.js → repository.js"]
     AlertJs["weight_alert.js"]
     FsRest["firestore.js<br/>(API REST Firestore)"]
   end
@@ -93,7 +94,9 @@ lib/features/pets/
     widgets/                      archivage, photo, courbe de poids, bandeau d'alerte
 
 backend/src/pets/
-  routes.js        routes /api/pets
+  routes.js        routes /api/pets (HTTP seulement)
+  service.js       règles métier : archivage, galerie, pesées, alerte de poids
+  repository.js    accès à Firestore (seul à connaître les chemins)
   validation.js    contrôle des champs reçus
   enums.js         valeurs fixes (espèces, sexes, statuts)
   weight_alert.js  analyse des pesées (même logique que weight_alert.dart)
@@ -206,7 +209,7 @@ Détails techniques :
 - Il reste consultable et restaurable, mais **non modifiable** : l'API renvoie 409, et l'application masque les
   boutons de modification (fiche, favori, notes, contacts, photos, pesées).
 
-### 5.6 Alerte intelligente de poids (branche `alerte`)
+### 5.6 Alerte intelligente de poids
 
 **Objectif.** Prévenir tout de suite le propriétaire quand le poids varie anormalement, et l'inviter à consulter un
 vétérinaire. Ce n'est jamais un diagnostic.
@@ -260,8 +263,9 @@ production.
 
 ### 5.7 Autres
 
-- **Conseils.** Le bouton ouvre « Bientôt disponible ». Il sera relié à l'assistant IA de la branche `chatbot`
-  quand celle-ci sera fusionnée dans `main`.
+- **Conseils.** L'assistant IA est maintenant dans `main` (onglet Accueil, [MODULE_ASSISTANT_IA.md](MODULE_ASSISTANT_IA.md)),
+  mais le bouton de la fiche affiche encore « Bientôt disponible » : il reste à lui faire ouvrir `AppRoutes.assistant`
+  avec l'animal sélectionné (`pet_detail_screen.dart`, méthode `_openAdvice`).
 - **Langues.** Bouton de l'en-tête ; textes dans `lib/l10n/app_fr.arb` et `app_en.arb`, choix mémorisé sur
   l'appareil (`LocaleController`).
 
@@ -291,7 +295,7 @@ production.
 
 | Commande | Ce qui est vérifié |
 |---|---|
-| `cd backend; npm test` | Validation des champs, routes avec un faux Firestore (création, galerie, pesées, archivage, accès refusé), alerte de poids et notification sans doublon |
+| `cd backend; npm test` | Validation des champs, service avec un faux dépôt, routes avec un faux Firestore (création, galerie, pesées, archivage, accès refusé), alerte de poids et notification sans doublon |
 | `flutter test` | Lecture JSON de l'API, analyse de l'alerte sur les mêmes cas que le backend |
 | `flutter analyze` | Aucun avertissement |
 
@@ -303,7 +307,8 @@ une seule pesée, animal archivé, pesée trop ancienne.
 
 ## 8. Lancer le projet
 
-1. Backend : `cd backend`, `npm install`, `npm start` (http://localhost:3000).
+1. Backend : `cd backend`, `npm install`, `npm start` (http://localhost:3000). L'arrêter après les tests :
+   l'application relit l'API régulièrement et consomme le quota gratuit de Firestore.
 2. Émulateur Android : `flutter emulators --launch Medium_Phone_API_37.0`.
 3. Application : `flutter run -d emulator-5554`.
 
@@ -313,7 +318,22 @@ L'émulateur joint le PC à l'adresse `10.0.2.2:3000`. Pour un téléphone réel
 
 ---
 
-## 9. Limites connues et suites possibles
+## 9. Démonstration
+
+Compte `sarra@petcare.test` ([DONNEES_DEMO.md](DONNEES_DEMO.md)) :
+- **Rocky** (berger allemand) : 5 pesées en 12 semaines, de 32,0 à 28,5 kg (−11 %). L'alerte « consultez un
+  vétérinaire » (règle `loss-10`, source VCA) s'affiche sur sa fiche, le badge apparaît dans Mes animaux, et la
+  notification « Poids de Rocky : consultez un vétérinaire » est dans la cloche. Il a aussi 2 photos, une puce,
+  2 contacts (vétérinaire et urgences) et il est en favori.
+- **Mimi** (persan) : poids stable, aucune alerte.
+- **Coco** (perroquet, espèce oiseau) et **Speedy** (espèce « Autre » : tortue d'Hermann, date de naissance estimée).
+- **Félix** : animal archivé, dans l'onglet Archivés, restaurable.
+
+Pour montrer l'alerte en direct : ajouter une pesée de 26 kg à Rocky (perte rapide), ou corriger une pesée de Mimi.
+
+---
+
+## 10. Limites connues et suites possibles
 
 - **Blocage des animaux archivés** : appliqué par l'API et masqué dans l'interface, mais pas par `firestore.rules`.
   Serveur éteint, une écriture directe resterait possible.
@@ -321,5 +341,6 @@ L'émulateur joint le PC à l'adresse `10.0.2.2:3000`. Pour un téléphone réel
 - **Notification supprimée** : elle peut revenir à la pesée suivante si l'épisode continue.
 - **Seuils de poids** : repères à faire valider par un vétérinaire.
 - **Quota Firestore** : le plan gratuit est partagé par toute l'équipe ; fermer l'application quand on ne teste pas.
+- **Bouton Conseils** : pas encore relié à l'assistant IA (voir 5.7).
 - **Suites possibles** : relier le bouton Conseils à l'assistant IA, photo vers fiche (Gemini), plan de soins
   courants relié aux rappels, journal de bien-être.

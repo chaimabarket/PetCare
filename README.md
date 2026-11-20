@@ -2,6 +2,12 @@
 
 Application mobile Flutter de **PetCare Community** : gérer ses animaux, trouver des services, publier des annonces d'animaux perdus ou trouvés et faciliter les adoptions. Le cahier des charges est dans `PetCare_Flutter_Version_Equipe.docx`, les maquettes Stitch dans `maquettes/`.
 
+## Documentation
+
+Documentation du projet (architecture, choix techniques, utilisation de l'IA, liens vers chaque module) :
+[docs/PROJET_PETCARE.md](docs/PROJET_PETCARE.md). Comptes et données de démonstration :
+[docs/DONNEES_DEMO.md](docs/DONNEES_DEMO.md).
+
 ## Lancer l'application
 
 Guide pas à pas (installation, émulateur ou téléphone, APK) : [docs/LANCER_SUR_MOBILE.md](docs/LANCER_SUR_MOBILE.md).
