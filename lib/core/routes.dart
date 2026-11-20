@@ -109,7 +109,11 @@ abstract final class AppRoutes {
             ),
         reminders: (_) => const RemindersScreen(),
 
-        assistant: (context) => AssistantScreen(startWithAdoption: _args(context) as bool? ?? false),
+        // Argument : `true` (« Trouver mon compagnon ») ou l'id d'un animal (bouton « Conseils »).
+        assistant: (context) {
+          final args = _args(context);
+          return AssistantScreen(startWithAdoption: args == true, initialPetId: args is String ? args : null);
+        },
         healthRecord: (context) => HealthRecordScreen(petId: _args(context)! as String),
         healthEntryForm: (context) => MedicalEntryFormScreen(petId: _args(context)! as String),
         treatments: (context) => TreatmentsScreen(petId: _args(context)! as String),

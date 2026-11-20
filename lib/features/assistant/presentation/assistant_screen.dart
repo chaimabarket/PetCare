@@ -30,10 +30,12 @@ import 'widgets/reminder_sheet.dart';
 ///   historique et avis 👍 / 👎.
 ///
 /// [startWithAdoption] envoie directement « Trouver mon compagnon » (bannière du fil d'adoption).
+/// [initialPetId] présélectionne un animal (bouton « Conseils » de la fiche d'un animal).
 class AssistantScreen extends StatefulWidget {
-  const AssistantScreen({super.key, this.startWithAdoption = false});
+  const AssistantScreen({super.key, this.startWithAdoption = false, this.initialPetId});
 
   final bool startWithAdoption;
+  final String? initialPetId;
 
   @override
   State<AssistantScreen> createState() => _AssistantScreenState();
@@ -93,6 +95,7 @@ class _AssistantScreenState extends State<AssistantScreen> {
   void initState() {
     super.initState();
     final user = _user;
+    _pendingPetId = widget.initialPetId;
     if (user != null) {
       _petsSubscription = _petRepository.watchPets(user.uid).listen((pets) {
         if (!mounted) return;
