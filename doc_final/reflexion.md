@@ -273,6 +273,40 @@ lib/core/         ce qui est partagé : ApiClient, poll(), thème, routes, langu
 Une organisation par type de fichier aurait mélangé les six modules dans les mêmes dossiers. Chaque fusion aurait
 touché les mêmes répertoires, et retrouver le code d'une fonctionnalité aurait demandé de parcourir tout le projet.
 
+### 7.3 Choix propres à Flutter
+
+**Gestion d'état : les outils natifs de Flutter.** Nous n'avons pas ajouté de bibliothèque de gestion d'état
+(Provider, Bloc, Riverpod) : les outils intégrés à Flutter suffisent pour la façon dont l'application est construite.
+
+| Type d'état | Outil | Exemple |
+|---|---|---|
+| Données partagées (animaux, rendez-vous, annonces, notifications) | Les dépôts exposent des `Stream`, affichés avec `StreamBuilder` | `PetRepository().watchMine(uid)` alimente Mes animaux, l'Accueil et l'assistant |
+| Lecture unique | `Future` et `FutureBuilder` | Photos d'une annonce d'adoption, favoris |
+| État local d'un écran (formulaire, filtre, onglet, sélection) | `StatefulWidget` et `setState` | Filtres du fil d'adoption, étapes de la candidature |
+| État global simple | `ValueNotifier` | Langue choisie (`LocaleController`), alertes de poids ignorées |
+
+Pourquoi ce choix :
+- **la source de vérité est la base de données**, pas la mémoire du téléphone : chaque écran s'abonne au flux de son
+  dépôt, qui relit l'API (`poll()`) ou Firestore, et se met à jour tout seul après une modification
+  (`notifyApiDataChanged()`) ;
+- les dépôts jouent déjà le rôle de couche de données entre les écrans et le serveur : une couche de plus n'apportait
+  rien à la taille du projet ;
+- ce sont les notions de base du cours, que les cinq membres de l'équipe maîtrisent : le code de chaque module reste
+  lisible par tous.
+
+Si l'application grandissait, l'étape suivante serait Riverpod ou Provider, pour injecter une seule instance de chaque
+dépôt et remplacer facilement un dépôt par un faux dans les tests de widgets. Le passage serait simple : les écrans
+dépendent déjà d'un dépôt, et non de l'API ou de Firestore.
+
+**Autres choix**
+
+| Sujet | Choix | Pourquoi |
+|---|---|---|
+| Asynchrone et erreurs | `async` / `await`, `try` / `catch` autour de chaque appel réseau, vérification de `mounted` après chaque `await`, message clair en français dans un `SnackBar` | Une erreur réseau ne fait jamais planter l'écran, et on n'appelle jamais `setState` sur un écran que l'utilisateur a quitté |
+| Navigation | Routes nommées centralisées dans `AppRoutes`, arguments passés par `settings.arguments` ; un écran peut renvoyer un résultat avec `Navigator.pop` (par exemple l'onglet à afficher) | Toutes les routes sont au même endroit, et un module ouvre l'écran d'un autre sans l'importer (`pushNamed(AppRoutes.healthRecord, arguments: pet.id)`) |
+| Code propre au mobile | Import conditionnel : `text_scanner.dart` choisit `text_scanner_mlkit.dart` quand `dart:io` existe, sinon une version vide ; `kIsWeb` et `Platform` masquent le bouton de scan | La même base de code compile pour Android, iOS et le web, sans plantage sur une plateforme où ML Kit n'existe pas |
+| Langues | `flutter_localizations`, textes dans `app_fr.arb` (modèle) et `app_en.arb`, classe `AppLocalizations` générée par `flutter gen-l10n` ; langue choisie gardée par `shared_preferences` | Les textes traduits sont tous au même endroit, une langue de plus se réduit à un fichier `.arb`, et le choix de l'utilisateur est mémorisé |
+
 ---
 
 ## 8. Utilisation de l'IA
