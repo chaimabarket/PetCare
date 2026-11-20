@@ -1,8 +1,6 @@
 # PetCare Community : réflexion et choix du projet
 
-Ce document décrit l'ensemble du projet PetCare tel qu'il est sur la branche `main` (commit `38bb330`, novembre
-2026) : objectif, architecture, modules, données, API, choix techniques et place de l'IA. Chaque module a son propre
-document détaillé (section 4), et les comptes de démonstration sont dans [DONNEES_DEMO.md](DONNEES_DEMO.md).
+Ce document décrit l'ensemble du projet PetCare : objectif, architecture, modules, données, API, choix techniques et place de l'IA. Chaque module a son propre document détaillé (section 4).
 
 ---
 
@@ -111,12 +109,12 @@ lib/
   core/          api/ (ApiClient, poll), locale/, navigation/ (onglets), routes.dart, theme/, utils/, widgets/
   features/
     auth/, profile/, notifications/, home/     module Utilisateurs et Accueil
-    pets/          module 1 : Profils des animaux
-    health/        module 2 : Santé
-    appointments/  module 3 : Rendez-vous et rappels
+    pets/          module Profils des animaux
+    health/        module Santé
+    appointments/  module Rendez-vous et rappels
     community/     onglet Communauté (Adoption, Happy Tails, Perdus & trouvés)
-    adoption/      module 5 : Adoption
-    services/      module 6 : Services
+    adoption/      module Adoption
+    services/      module Services
     assistant/     assistant IA
   l10n/          textes français et anglais
 
@@ -157,8 +155,8 @@ nommées de `AppRoutes`.
 | Démonstration | [DONNEES_DEMO.md](DONNEES_DEMO.md) | Comptes, données et scénario de démonstration |
 
 Les modules sont reliés entre eux :
-- la collection `pets` (module 1) sert à la santé, aux rendez-vous, aux services et à l'assistant ;
-- un vaccin (module 2) peut créer un rappel ou un rendez-vous (module 3) ;
+- la collection `pets` (Profils des animaux) sert à la santé, aux rendez-vous, aux services et à l'assistant ;
+- un vaccin (Santé) peut créer un rappel ou un rendez-vous (Rendez-vous et rappels) ;
 - l'adoption, les services et l'alerte de poids envoient des notifications (module Utilisateurs) ;
 - le bouton « Conseils » de la fiche d'un animal ouvre l'assistant avec cet animal déjà sélectionné ;
 - l'assistant prépare des soins, traitements, pesées, rendez-vous, rappels et réservations avec les dépôts des
@@ -173,12 +171,12 @@ Les modules sont reliés entre eux :
 | `users/{uid}`, `.../notifications` | Utilisateurs | Profil et rôle, notifications |
 | `users/{uid}/adoptionFavorites`, `likedHappyTails`, `healthBookmarks` | Adoption, Santé | Favoris, « j'aime », marque-pages |
 | `users/{uid}/assistantUsage`, `assistantChats/.../messages` | Assistant | Compteur du jour, historique des conversations |
-| `pets/{petId}`, `.../photos`, `.../weights` | 1 | Fiche, photos (octets), pesées (une par jour) |
-| `pets/{petId}/healthEntries`, `.../files`, `treatments` | 2 | Carnet de santé, pièces jointes, traitements |
-| `healthSheets` | 2 | Fiches santé publiques |
-| `appointments`, `reminders` | 3 | Rendez-vous et rappels |
-| `adoptions`, `.../photos`, `adoptionApplications`, `happyTails`, `reports` | 5 | Annonces, candidatures, histoires, signalements |
-| `serviceCategories`, `serviceProviders`, `.../services`, `.../availability`, `serviceBookings` | 6 | Annuaire, prestations, horaires, réservations |
+| `pets/{petId}`, `.../photos`, `.../weights` | Profils des animaux | Fiche, photos (octets), pesées (une par jour) |
+| `pets/{petId}/healthEntries`, `.../files`, `treatments` | Santé | Carnet de santé, pièces jointes, traitements |
+| `healthSheets` | Santé | Fiches santé publiques |
+| `appointments`, `reminders` | Rendez-vous et rappels | Rendez-vous et rappels |
+| `adoptions`, `.../photos`, `adoptionApplications`, `happyTails`, `reports` | Adoption | Annonces, candidatures, histoires, signalements |
+| `serviceCategories`, `serviceProviders`, `.../services`, `.../availability`, `serviceBookings` | Services | Annuaire, prestations, horaires, réservations |
 
 Règles (`firestore.rules`) : tout ce qui n'est pas déclaré est fermé. Les données privées (animaux, carnet,
 rendez-vous, rappels, historique de l'assistant) ne sont lisibles que par leur propriétaire. Les champs autorisés sont
@@ -196,11 +194,11 @@ Toutes les routes, sauf `/api/health` et les lectures publiques (fil d'adoption,
 |---|---|---|
 | `/api/health` | – | Le serveur répond |
 | `/api/users/me` | Utilisateurs | Profil, notifications |
-| `/api/pets` | 1 | Fiches, archivage, galerie, pesées (avec l'alerte de poids) |
-| `/api/health/summary`, `/api/pets/{id}/health/...` | 2 | Synthèse, carnet, pièces jointes, traitements, prises |
-| `/api/appointments`, `/api/reminders` | 3 | Agenda, confirmation, report, annulation, fin, rappels |
-| `/api/adoptions`, `/api/applications` | 5 | Fil filtré, annonces, favoris, candidatures (score calculé par le serveur) |
-| `/api/services/...` | 6 | Catégories, prestataires, validation, prestations, horaires, réservations |
+| `/api/pets` | Profils des animaux | Fiches, archivage, galerie, pesées (avec l'alerte de poids) |
+| `/api/health/summary`, `/api/pets/{id}/health/...` | Santé | Synthèse, carnet, pièces jointes, traitements, prises |
+| `/api/appointments`, `/api/reminders` | Rendez-vous et rappels | Agenda, confirmation, report, annulation, fin, rappels |
+| `/api/adoptions`, `/api/applications` | Adoption | Fil filtré, annonces, favoris, candidatures (score calculé par le serveur) |
+| `/api/services/...` | Services | Catégories, prestataires, validation, prestations, horaires, réservations |
 
 Erreurs : JSON `{"error": "message en français"}`, avec `400`, `401`, `403`, `404` ou `409`.
 
@@ -337,17 +335,30 @@ réponse générée qui peut varier.
 | Outil | Utilisation |
 |---|---|
 | **Google Stitch** (génération d'interfaces par IA) | Maquettes des écrans et illustrations, à partir de descriptions écrites (`maquettes/`, `designs/`). Elles ont servi de modèle aux écrans Flutter |
-| **Claude Code** (assistant de programmation d'Anthropic, dans VS Code) | Analyse du code existant de `main` avant d'ajouter une fonctionnalité ; plans proposés puis **validés par l'étudiant avant toute modification** ; écriture du code (API REST du module 1, alerte de poids en JavaScript et en Dart), des tests et des cas de test communs ; vérification des conflits avant une fusion ; recherche de sources vétérinaires pour les seuils de poids ; documentation (`docs/`) et données de démonstration |
+| **Claude Code** (assistant de programmation d'Anthropic, dans VS Code) | Partenaire de conception et de développement tout au long du projet, selon la démarche décrite ci-dessous |
 
-Méthode suivie avec les assistants de programmation :
-1. **Rien n'est modifié sans validation** : l'assistant propose, l'étudiant valide ou corrige.
-2. **Travail sur une branche**, jamais directement sur `main` ; fusion par pull request après vérification des
-   conflits.
-3. **Tests à chaque changement** (`npm test`, `flutter test`, `flutter analyze`) et essai de l'application sur
-   l'émulateur.
-4. **Sources vérifiées** : les seuils médicaux viennent d'organismes vétérinaires (WSAVA, VCA, AAHA, iCatCare), et
-   les repères non officiels sont signalés comme tels dans l'application.
-5. **Aucun secret dans le code** : pas de clé d'API, ni de mot de passe dans le dépôt.
+Démarche de travail avec Claude Code :
+
+1. **Contexte d'abord** : explication de l'idée du projet, de son contexte et du cahier des charges, pour que
+   l'assistant comprenne le but de chaque module.
+2. **Un prompt par module** : rédaction de prompts précis pour chaque module, afin de couvrir le maximum de
+   fonctionnalités de base du cahier des charges.
+3. **Brainstorming** : échange avec l'assistant pour améliorer les idées, en ajouter (par exemple l'alerte de poids)
+   et formaliser chaque idée dans un prompt clair avant de la lancer.
+4. **Réalisation puis amélioration** : lancement du prompt, correction des erreurs, puis améliorations successives.
+5. **Tests** : préparation et exécution des tests, avec des cas de test communs au serveur et à l'application
+   (`npm test`, `flutter test`, `flutter analyze`) et essai sur l'émulateur.
+6. **Fusion sans risque** : travail sur une branche, jamais directement sur `main`, et vérification des conflits
+   avant chaque fusion par pull request.
+7. **Recherche de sources externes** : informations de référence vérifiées, comme les seuils de poids issus
+   d'organismes vétérinaires (WSAVA, VCA, AAHA, iCatCare). Les repères non officiels sont signalés comme tels dans
+   l'application.
+8. **Documentation** : rédaction de la documentation du projet et des modules, et préparation des données de
+   démonstration.
+
+**Le principe le plus important : Claude ne modifie rien sans la confirmation et la validation de l'utilisateur.**
+L'assistant propose, l'étudiant relit, valide ou corrige, et c'est seulement ensuite que le code change. Aucun
+secret (clé d'API, mot de passe) n'est jamais écrit dans le dépôt.
 
 ---
 
@@ -378,6 +389,6 @@ plus anciens `seed-services.js` (annuaire) et `seed-demo-user.js` (un compte de 
 
 ## 11. Perspectives
 
-- **Module 4 Perdus & trouvés** : signaler un animal perdu ou trouvé, avec une carte.
+- **Module Perdus & trouvés** : signaler un animal perdu ou trouvé, avec une carte.
 - **Notifications push** (Firebase Cloud Messaging) pour les rappels et les alertes.
 - **Hébergement du backend** en `https` pour une mise en production.
