@@ -343,7 +343,7 @@ Démarche de travail avec Claude Code :
    l'assistant comprenne le but de chaque module.
 2. **Un prompt par module** : rédaction de prompts précis pour chaque module, afin de couvrir le maximum de
    fonctionnalités de base du cahier des charges.
-3. **Brainstorming** : échange avec l'assistant pour améliorer les idées, en ajouter (par exemple l'alerte de poids)
+3. **Brainstorming** : échange avec l'assistant pour améliorer les idées, en ajouter
    et formaliser chaque idée dans un prompt clair avant de la lancer.
 4. **Réalisation puis amélioration** : lancement du prompt, correction des erreurs, puis améliorations successives.
 5. **Tests** : préparation et exécution des tests, avec des cas de test communs au serveur et à l'application
