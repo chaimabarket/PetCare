@@ -840,6 +840,8 @@ class _CardActions extends StatelessWidget {
               onPressed: () => callPhone(context, a.providerPhone),
             ),
           ),
+          const SizedBox(width: 8),
+          _CalendarButton(appointment: a),
         ],
       );
     }
@@ -878,7 +880,36 @@ class _CardActions extends StatelessWidget {
             ),
           ),
         ],
+        const SizedBox(width: 8),
+        _CalendarButton(appointment: a),
       ],
+    );
+  }
+}
+
+/// Bouton carré « Ajouter à Google Agenda » à droite des actions d'une carte.
+class _CalendarButton extends StatelessWidget {
+  const _CalendarButton({required this.appointment});
+
+  final Appointment appointment;
+
+  @override
+  Widget build(BuildContext context) {
+    return Tooltip(
+      message: 'Ajouter à Google Agenda',
+      child: SizedBox(
+        width: 44,
+        height: 44,
+        child: Material(
+          color: RdvColors.surfaceContainer,
+          borderRadius: BorderRadius.circular(12),
+          child: InkWell(
+            borderRadius: BorderRadius.circular(12),
+            onTap: () => addToCalendar(context, appointment),
+            child: const Icon(Icons.event_available_outlined, color: RdvColors.primary, size: 20),
+          ),
+        ),
+      ),
     );
   }
 }

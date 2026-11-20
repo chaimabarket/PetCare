@@ -192,6 +192,9 @@ class _AssistantCard extends StatelessWidget {
                 style: FilledButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: AppColors.teal,
+                  // Le thème impose Size.fromHeight (largeur infinie) : impossible dans une Row,
+                  // l'erreur de mise en page vidait tout l'Accueil.
+                  minimumSize: const Size(0, 40),
                   padding: const EdgeInsets.symmetric(horizontal: 14),
                 ),
                 child: const Text('Discuter'),

@@ -13,7 +13,9 @@ void openAppointmentDetail(BuildContext context, Appointment appointment) {
 
 /// Ouvre le formulaire en mode « report » pour ce rendez-vous.
 Future<void> openReschedule(BuildContext context, Appointment appointment) async {
-  final done = await Navigator.of(context).pushNamed<bool>(
+  // <Object?> et non <bool> : les routes de `AppRoutes.all` sont des MaterialPageRoute<dynamic>,
+  // et pushNamed<bool> lèverait une TypeError (le bouton « Reporter » ne faisait rien).
+  final done = await Navigator.of(context).pushNamed<Object?>(
     AppRoutes.appointmentForm,
     arguments: AppointmentFormArgs.reschedule(appointment),
   );
@@ -42,7 +44,8 @@ Future<void> openDirections(BuildContext context, String address) => _open(
       Uri.https('www.google.com', '/maps/search/', {'api': '1', 'query': address}),
     );
 
-/// Ajoute le rendez-vous à Google Agenda (Apple Calendar accepte aussi ce lien depuis le navigateur).
+/// Ouvre Google Agenda avec l'événement prérempli (titre, horaires, lieu) : l'utilisateur n'a plus
+/// qu'à l'enregistrer.
 Future<void> addToCalendar(BuildContext context, Appointment a) {
   String stamp(DateTime d) {
     final u = d.toUtc();

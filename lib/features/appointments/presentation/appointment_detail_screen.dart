@@ -586,7 +586,7 @@ class _ReminderCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           SoftButton(
-            label: 'Ajouter à Google Agenda / Apple Calendar',
+            label: 'Ajouter à Google Agenda',
             icon: Icons.calendar_month_outlined,
             height: 48,
             onPressed: () => addToCalendar(context, a),
