@@ -88,10 +88,3 @@ Règles (`firestore.rules`) :
 Comptes du jeu de démonstration ([DONNEES_DEMO.md](DONNEES_DEMO.md)) : un compte par rôle. Se connecter avec
 `sarra@petcare.test` pour voir l'Accueil rempli et les notifications non lues, puis avec `refuge@petcare.test` ou
 `veto@petcare.test` pour voir les écrans propres à chaque rôle. Le mode visiteur se teste sans compte.
-
-## 8. Limites
-
-- Pas de notifications push : les notifications ne s'affichent que dans l'application.
-- Pas de connexion par Google ni par téléphone.
-- Le rôle d'un compte ne peut pas être changé depuis l'application.
-- Le module 4 (Perdus & trouvés) affiche « Bientôt disponible » sur l'Accueil et dans l'onglet Communauté.

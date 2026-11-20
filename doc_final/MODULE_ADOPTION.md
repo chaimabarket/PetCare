@@ -66,7 +66,7 @@ lib/features/adoption/
                  application_form_screen.dart, application_review_screen.dart, received_applications_screen.dart,
                  my_applications_screen.dart, my_listings_screen.dart, favorites_screen.dart,
                  happy_tails_screen.dart, share_happy_tail_screen.dart, adoption_celebration_screen.dart, widgets/
-lib/features/community/  onglet Communauté (Adoption, Happy Tails, Perdus & trouvés « Bientôt disponible »)
+lib/features/community/  onglet Communauté (Adoption, Happy Tails)
 
 backend/src/adoption/    routes.js → service.js → repository.js, validation.js, enums.js, filters.js, compatibility.js
 ```
@@ -99,8 +99,9 @@ bouge que de 1, en même temps que le « j'aime » de l'utilisateur.
 | POST | `/api/adoptions/{id}/applications` | Candidater (score calculé par le serveur) |
 | GET | `/api/adoptions/{id}/applications/me`, `/api/applications/mine`, `/api/applications/received` | Ma candidature, mes candidatures, candidatures reçues |
 
-Les décisions de l'annonceur (étude, acceptation, refus, adoption), le retrait, les Happy Tails et les signalements ne
-sont pas encore dans l'API : l'application les écrit directement dans Firestore, protégées par les règles.
+Les décisions de l'annonceur (étude, acceptation, refus, adoption), le retrait, les Happy Tails et les signalements
+sont écrits par l'application directement dans Firestore, dans des transactions et des lots atomiques contrôlés
+par les règles de sécurité (statuts autorisés, auteur de la décision).
 
 ## 6. Décisions
 
@@ -132,11 +133,3 @@ Voir [DONNEES_DEMO.md](DONNEES_DEMO.md).
 
 Scénario en direct : avec `refuge@petcare.test`, ouvrir la candidature de Sarra pour Oscar et l'accepter. Oscar
 passe en Réservé et Sarra reçoit la notification.
-
-## 9. Limites
-
-- Décisions de l'annonceur et Happy Tails écrites directement dans Firestore, pas encore par l'API.
-- La fiche de l'animal adopté n'est pas copiée automatiquement dans « Mes animaux » de l'adoptant
-  (`AdoptionRepository.confirmAdoption` est l'endroit prévu).
-- Pas de messagerie entre le candidat et l'annonceur dans l'application.
-- Le module 4 (Perdus & trouvés), dans le même onglet, n'est pas développé.

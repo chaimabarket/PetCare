@@ -2,8 +2,7 @@
 
 Ce document décrit l'ensemble du projet PetCare tel qu'il est sur la branche `main` (commit `38bb330`, novembre
 2026) : objectif, architecture, modules, données, API, choix techniques et place de l'IA. Chaque module a son propre
-document détaillé (section 4). L'installation est expliquée dans [LANCER_SUR_MOBILE.md](LANCER_SUR_MOBILE.md), et les
-comptes de démonstration dans [DONNEES_DEMO.md](DONNEES_DEMO.md).
+document détaillé (section 4), et les comptes de démonstration sont dans [DONNEES_DEMO.md](DONNEES_DEMO.md).
 
 ---
 
@@ -29,7 +28,7 @@ Le cahier des charges est dans `PetCare_Flutter_Version_Equipe.docx`, les maquet
 | 1. Profils des animaux | Fiches, photos, poids, alerte de poids, archivage | `animals`, `alerte` |
 | 2. Santé | Carnet de santé, traitements, tableau du jour, PDF, scan, fiches santé | `health_record`, `health-features` |
 | 3. Rendez-vous et rappels | Agenda, rendez-vous, rappels de soins | `rendez-vous`, `rendez-vous-api` |
-| 4. Perdus & trouvés | Pas encore développé (« Bientôt disponible ») | – |
+| 4. Perdus & trouvés | Prévu (voir Perspectives) | – |
 | 5. Adoption | Annonces, candidatures, score de compatibilité, Happy Tails | `Adoption`, `adoption-api` |
 | 6. Services | Annuaire, prestations, disponibilités, validation, réservations | `services` |
 | Assistant IA | Assistant Gemini, actions à confirmer, rédaction d'annonce | `chatbot` |
@@ -149,19 +148,19 @@ nommées de `AppRoutes`.
 |---|---|---|
 | Utilisateurs et Accueil | [MODULE_UTILISATEURS.md](MODULE_UTILISATEURS.md) | Rôles (propriétaire, prestataire, refuge, admin), profil, notifications, Accueil, visiteur |
 | 1. Profils des animaux | [MODULE_ANIMAUX.md](MODULE_ANIMAUX.md) | Fiches, galerie, pesées et courbe, **alerte de poids** (règles sourcées), archivage, espèce libre |
-| 2. Santé | [MODULE_SANTE.md](MODULE_SANTE.md) (historique : [SANTE_RECAPITULATIF.md](SANTE_RECAPITULATIF.md)) | Onglet Santé, tableau du jour, carnet, vaccins, traitements, PDF, scan d'ordonnance, fiches santé |
+| 2. Santé | [MODULE_SANTE.md](MODULE_SANTE.md) | Onglet Santé, tableau du jour, carnet, vaccins, traitements, PDF, scan d'ordonnance, fiches santé |
 | 3. Rendez-vous et rappels | [MODULE_RENDEZ_VOUS.md](MODULE_RENDEZ_VOUS.md) | Agenda, statuts et règles RG-12 à RG-21, report avec historique, versions, rappels |
 | 4. Perdus & trouvés | – | Pas encore développé |
 | 5. Adoption | [MODULE_ADOPTION.md](MODULE_ADOPTION.md) | Fil filtré, annonces, candidature en 4 étapes, **score de compatibilité**, réservation, adoption, Happy Tails |
 | 6. Services | [MODULE_SERVICES.md](MODULE_SERVICES.md) | Annuaire, espace prestataire, validation par l'administrateur, réservations |
 | Assistant IA | [MODULE_ASSISTANT_IA.md](MODULE_ASSISTANT_IA.md) | Gemini, contexte de l'animal, actions à confirmer, garde-fous santé |
 | Démonstration | [DONNEES_DEMO.md](DONNEES_DEMO.md) | Comptes, données et scénario de démonstration |
-| Installation | [LANCER_SUR_MOBILE.md](LANCER_SUR_MOBILE.md) | Outils, émulateur ou téléphone, APK |
 
 Les modules sont reliés entre eux :
 - la collection `pets` (module 1) sert à la santé, aux rendez-vous, aux services et à l'assistant ;
 - un vaccin (module 2) peut créer un rappel ou un rendez-vous (module 3) ;
 - l'adoption, les services et l'alerte de poids envoient des notifications (module Utilisateurs) ;
+- le bouton « Conseils » de la fiche d'un animal ouvre l'assistant avec cet animal déjà sélectionné ;
 - l'assistant prépare des soins, traitements, pesées, rendez-vous, rappels et réservations avec les dépôts des
   modules concernés.
 
@@ -299,16 +298,8 @@ plus anciens `seed-services.js` (annuaire) et `seed-demo-user.js` (un compte de 
 
 ---
 
-## 11. Limites connues
+## 11. Perspectives
 
-- **Quota Firestore gratuit.** Il est partagé par toute l'équipe et a déjà été épuisé une fois : les
-  rafraîchissements automatiques consomment des lectures. Fermer l'application quand on ne teste pas.
-- **Pas de notifications push.** Les notifications apparaissent uniquement dans la cloche de l'application.
-- **Module 4 (Perdus & trouvés)** pas encore développé.
-- **Bouton « Conseils »** de la fiche d'un animal pas encore relié à l'assistant IA.
-- **Décisions d'adoption et Happy Tails** écrites directement dans Firestore, pas encore par l'API.
-- **Réservations de services** pas encore ajoutées à l'agenda du module Rendez-vous.
-- **Navigateur non pris en charge par l'API** (pas de CORS) : dans Chrome, l'application passe directement par
-  Firestore, et le scan ML Kit n'existe pas.
-- **Backend non hébergé** : il tourne sur le PC pendant le développement ; en production il faudrait un hébergement
-  `https`.
+- **Module 4 Perdus & trouvés** : signaler un animal perdu ou trouvé, avec une carte.
+- **Notifications push** (Firebase Cloud Messaging) pour les rappels et les alertes.
+- **Hébergement du backend** en `https` pour une mise en production.

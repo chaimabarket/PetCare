@@ -97,12 +97,4 @@ Compte `sarra@petcare.test` ([DONNEES_DEMO.md](DONNEES_DEMO.md)) :
 - **rappels** : vermifuge de Rocky, brossage de Mimi aujourd'hui, pesée de contrôle de Rocky, et un rappel déjà fait.
 
 Compte `youssef@petcare.test` : réservation « Bilan de santé Tango » **en attente** chez le vétérinaire de
-démonstration, que `veto@petcare.test` peut confirmer. Elle n'existe qu'une fois ce profil publié par
-l'administrateur.
-
-## 9. Limites
-
-- Pas de notification push avant un rendez-vous : le rappel s'affiche dans l'application.
-- Les réservations du module Services (`serviceBookings`) et les rendez-vous de l'agenda (`appointments`) sont deux
-  collections distinctes : une réservation de service n'apparaît pas encore dans l'agenda.
-- L'ajout à Google Agenda ouvre un lien : il n'y a pas de synchronisation dans les deux sens.
+démonstration, que `veto@petcare.test` peut confirmer.

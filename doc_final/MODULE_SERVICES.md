@@ -101,17 +101,7 @@ Voir [DONNEES_DEMO.md](DONNEES_DEMO.md).
 - **Annuaire** : 10 professionnels publiés et 2 en attente (comptes de l'équipe, `seed-services.js`).
 - `sarra@petcare.test` : réservations **en attente** au Salon Pattes Propres (Mimi) et à la Pension Les Câlins
   (Rocky), et une réservation **annulée**.
-- `veto@petcare.test` (Cabinet Vétérinaire Dr Amine Gharbi) : profil, 4 prestations et horaires du lundi au samedi.
-  Une fois le profil publié par l'administrateur (`admin@petcare.test`), le script de démonstration lui ajoute des
-  réservations confirmées, refusées et en attente.
-- Scénario en direct : avec l'administrateur, publier le profil du Dr Amine, puis réserver une consultation avec
-  Sarra et la confirmer avec `veto@petcare.test`.
-
-## 9. Limites
-
-- Une réservation de service n'est pas encore ajoutée à l'agenda du module Rendez-vous.
-- Pas de paiement en ligne ni d'avis clients.
-- Pas de photo de profil importée (le champ `photoUrl` existe mais Cloud Storage n'est pas disponible sur le plan
-  gratuit).
-- Pas de contrôle des créneaux déjà réservés : deux clients peuvent demander la même heure, et c'est le prestataire
-  qui choisit.
+- `veto@petcare.test` (Cabinet Vétérinaire Dr Amine Gharbi, publié) : 4 prestations, horaires du lundi au samedi,
+  réservations reçues confirmée, refusée et 3 en attente (Sarra et Youssef).
+- Scénario en direct : réserver une consultation avec Sarra, puis la confirmer avec `veto@petcare.test`. Avec le
+  compte administrateur, montrer l'écran de validation (2 profils de l'équipe en attente).

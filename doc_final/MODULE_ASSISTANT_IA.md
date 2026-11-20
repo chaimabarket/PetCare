@@ -7,7 +7,8 @@ Ce document décrit l'assistant IA de PetCare tel qu'il est dans `main` (novembr
 
 ## 1. Fonctionnalités
 
-- **Accès** : carte de l'assistant sur l'Accueil (route `AppRoutes.assistant`).
+- **Accès** : carte de l'assistant sur l'Accueil, bannière du fil d'adoption, et bouton « Conseils » de la fiche d'un
+  animal, qui ouvre l'assistant avec cet animal déjà sélectionné (route `AppRoutes.assistant`).
 - **Visiteur** : questions générales sur les animaux et suggestions d'animaux à adopter, présentées sous forme de
   cartes vers les annonces réelles.
 - **Membre connecté** :
@@ -98,11 +99,3 @@ Avec `sarra@petcare.test` ([DONNEES_DEMO.md](DONNEES_DEMO.md)), choisir **Rocky*
 
 Mise en route, une seule fois par projet Firebase : console → **AI Logic** → *Get started* → **Gemini Developer API**
 (pas Vertex AI).
-
-## 7. Limites
-
-- Le bouton « Conseils » de la fiche d'un animal n'ouvre pas encore l'assistant (il affiche « Bientôt disponible »).
-- Les réponses dépendent du modèle : elles peuvent varier d'une fois à l'autre et doivent rester des conseils
-  généraux.
-- 30 messages par jour et par utilisateur, et le quota gratuit de Gemini est partagé par le projet.
-- Pas de reconnaissance d'image (photo d'un symptôme) ni de saisie vocale.

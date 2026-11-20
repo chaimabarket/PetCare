@@ -5,8 +5,8 @@ Application mobile Flutter de **PetCare Community** : gérer ses animaux, trouve
 ## Documentation
 
 Documentation du projet (architecture, choix techniques, utilisation de l'IA, liens vers chaque module) :
-[docs/PROJET_PETCARE.md](docs/PROJET_PETCARE.md). Comptes et données de démonstration :
-[docs/DONNEES_DEMO.md](docs/DONNEES_DEMO.md).
+[doc_final/PROJET_PETCARE.md](doc_final/PROJET_PETCARE.md). Comptes et données de démonstration :
+[doc_final/DONNEES_DEMO.md](doc_final/DONNEES_DEMO.md).
 
 ## Lancer l'application
 

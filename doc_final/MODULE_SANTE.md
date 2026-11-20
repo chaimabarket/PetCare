@@ -1,8 +1,7 @@
 # Module 2 : Santé et dossier médical
 
 Ce document décrit le module Santé tel qu'il est dans `main` (novembre 2026) : fonctionnalités, architecture,
-données, API, règles et limites. L'historique détaillé du travail (branches, étapes, fichiers modifiés) est dans
-[SANTE_RECAPITULATIF.md](SANTE_RECAPITULATIF.md). Vue d'ensemble du projet : [PROJET_PETCARE.md](PROJET_PETCARE.md).
+données, API et règles. Vue d'ensemble du projet : [PROJET_PETCARE.md](PROJET_PETCARE.md).
 
 ---
 
@@ -121,11 +120,3 @@ Compte `sarra@petcare.test` ([DONNEES_DEMO.md](DONNEES_DEMO.md)) :
 - **Félix** (archivé) : carnet en lecture seule.
 - Export PDF : depuis le carnet de Rocky. Le scan se montre avec une photo d'ordonnance sur un vrai téléphone ou
   sur l'émulateur.
-
-## 8. Limites
-
-- Le scan ne fonctionne que sur Android et iOS (pas de ML Kit sur le web ni sur l'ordinateur).
-- L'application n'a pas d'écran pour rédiger une fiche santé : l'administrateur l'ajoute dans `healthSheets` depuis
-  la console Firebase. Les 5 fiches de départ sont intégrées à l'application.
-- Pas de partage du carnet avec un vétérinaire dans l'application (seulement le PDF).
-- Les rappels vaccinaux s'affichent dans l'application, sans notification push.

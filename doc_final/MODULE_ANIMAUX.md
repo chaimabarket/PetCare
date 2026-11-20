@@ -31,7 +31,7 @@ Fonctionnalités :
 - favori et partage limité de la fiche ;
 - archivage et restauration (jamais de suppression) ;
 - espèce « Autre » avec saisie libre (ours, tigre, tortue…) ;
-- bouton « Conseils » (prévu pour ouvrir l'assistant IA sur cet animal) ;
+- bouton « Conseils » : ouvre l'assistant IA avec cet animal déjà sélectionné ;
 - application en français et en anglais.
 
 ---
@@ -263,9 +263,9 @@ production.
 
 ### 5.7 Autres
 
-- **Conseils.** L'assistant IA est maintenant dans `main` (onglet Accueil, [MODULE_ASSISTANT_IA.md](MODULE_ASSISTANT_IA.md)),
-  mais le bouton de la fiche affiche encore « Bientôt disponible » : il reste à lui faire ouvrir `AppRoutes.assistant`
-  avec l'animal sélectionné (`pet_detail_screen.dart`, méthode `_openAdvice`).
+- **Conseils.** Le bouton ouvre l'assistant IA ([MODULE_ASSISTANT_IA.md](MODULE_ASSISTANT_IA.md)) avec cet animal
+  déjà sélectionné : sa fiche et son carnet de santé sont joints aux questions (`AppRoutes.assistant`, argument : id
+  de l'animal).
 - **Langues.** Bouton de l'en-tête ; textes dans `lib/l10n/app_fr.arb` et `app_en.arb`, choix mémorisé sur
   l'appareil (`LocaleController`).
 
@@ -313,8 +313,7 @@ une seule pesée, animal archivé, pesée trop ancienne.
 3. Application : `flutter run -d emulator-5554`.
 
 L'émulateur joint le PC à l'adresse `10.0.2.2:3000`. Pour un téléphone réel :
-`flutter run --dart-define=API_URL=http://<IP du PC>:3000`. Le guide complet est dans
-[LANCER_SUR_MOBILE.md](LANCER_SUR_MOBILE.md).
+`flutter run --dart-define=API_URL=http://<IP du PC>:3000`.
 
 ---
 
@@ -330,17 +329,3 @@ Compte `sarra@petcare.test` ([DONNEES_DEMO.md](DONNEES_DEMO.md)) :
 - **Félix** : animal archivé, dans l'onglet Archivés, restaurable.
 
 Pour montrer l'alerte en direct : ajouter une pesée de 26 kg à Rocky (perte rapide), ou corriger une pesée de Mimi.
-
----
-
-## 10. Limites connues et suites possibles
-
-- **Blocage des animaux archivés** : appliqué par l'API et masqué dans l'interface, mais pas par `firestore.rules`.
-  Serveur éteint, une écriture directe resterait possible.
-- **Alerte « ignorée »** : mémorisée sur un seul appareil.
-- **Notification supprimée** : elle peut revenir à la pesée suivante si l'épisode continue.
-- **Seuils de poids** : repères à faire valider par un vétérinaire.
-- **Quota Firestore** : le plan gratuit est partagé par toute l'équipe ; fermer l'application quand on ne teste pas.
-- **Bouton Conseils** : pas encore relié à l'assistant IA (voir 5.7).
-- **Suites possibles** : relier le bouton Conseils à l'assistant IA, photo vers fiche (Gemini), plan de soins
-  courants relié aux rappels, journal de bien-être.
