@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../core/routes.dart';
-import '../../../core/widgets/coming_soon_screen.dart';
 import '../../../l10n/app_localizations.dart';
 import '../data/pet.dart';
 import '../data/pet_media.dart';
@@ -153,10 +152,9 @@ class _PetDetailScreenState extends State<PetDetailScreen> {
     await _run(() => _repository.setNotes(pet.id, notes), success: success);
   }
 
-  /// Assistant IA (branche `chatbot`) : une fois fusionné, ouvrir ici `AppRoutes.assistant` avec cet animal.
+  /// Conseils : ouvre l'assistant IA avec cet animal déjà sélectionné (fiche et carnet de santé joints).
   void _openAdvice() {
-    final title = _l.petsAdvice;
-    Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => ComingSoonScreen(title: title)));
+    Navigator.of(context).pushNamed(AppRoutes.assistant, arguments: widget.petId);
   }
 
   Future<void> _addWeight() async {
